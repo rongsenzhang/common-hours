@@ -6,7 +6,7 @@ This map follows the four-page NTU person specification supplied with the vacanc
 
 ## Three ways to inspect the work
 
-1. Run the volunteer search with a stated preference and a fixed requirement. Inspect the reasons for the results. Open the coordinator desk and inspect the provider evidence for the garden opportunity. Follow the [guided practical](field-workbook.md#teaching-practical).
+1. Open the [volunteer Finder](https://rongsenzhang.github.io/common-hours/#discover) or [Ask](https://rongsenzhang.github.io/common-hours/#ask) with a stated preference and a fixed requirement. Read the practical details. In the separate [staff workspace](admin.md), review the fictional host response and preview its effect on the garden opportunity. Follow the [guided practical](field-workbook.md#teaching-practical).
 2. Compare the retrieval approaches using the [release evaluation](../site/data/evaluation.json), [model card](model-card.md) and [test suite](../tests/). Follow one catalogue entry back to its inputs using the [pipeline](../pipeline/).
 3. Read the [steering brief](field-workbook.md#steering-brief), then use the [field study](field-workbook.md#field-evaluation) to challenge a claim about volunteer or coordinator outcomes.
 
@@ -30,7 +30,7 @@ The codes below follow the order within each category in NTU's specification. Th
 
 | Code | Criterion | Evidence and scope |
 | --- | --- | --- |
-| K1 | Applied AI and the development, testing and evaluation lifecycle | Trace the [ranking logic](../site/engine.js) to the [evaluation and limitations](model-card.md). |
+| K1 | Applied AI and the development, testing and evaluation lifecycle | Trace the [ranking logic](../site/engine.js), [local activity classifier](../site/assistant-topics.js) and [evaluation and limitations](model-card.md). |
 | K2 | Engineering maintainable software and AI applications | Inspect the separation between [data preparation](../pipeline/), [retrieval](../site/engine.js) and [tests](../tests/). |
 | K3 | Data engineering, relational modelling and integration | Trace source transformation, relations, joins and validation in the [pipeline](../pipeline/). The demonstration uses synthetic inputs. |
 | K4 | Experiment design, benchmarking and interpretation | Inspect the baseline, comparison, relevance judgements, sample size and metrics in the [model card](model-card.md) and [evaluation file](../site/data/evaluation.json). |
@@ -60,7 +60,7 @@ The codes below follow the order within each category in NTU's specification. Th
 | K3 | Efficiency, sustainability or Green AI | The [model card](model-card.md) explains the computation used for a request. The proposed [cost and performance check](field-workbook.md#field-evaluation) distinguishes measured latency from energy or carbon estimates. |
 | K4 | VCSE, charity, volunteering, public service, higher education or knowledge transfer | The [sector review](market-research.md) and [knowledge-transfer exercise](field-workbook.md#teaching-practical) ground a volunteering scenario. |
 | S1 | Design knowledge models, ontologies, graphs or semantic representations | Inspect the relationships used by the [engine](../site/engine.js) and how their source terms enter the [pipeline](../pipeline/). |
-| S2 | Build retrieval, recommendation, conversational or language systems | Exercise the [opportunity finder](../site/) and inspect the [comparison](../site/data/evaluation.json). |
+| S2 | Build retrieval, recommendation, conversational or language systems | Exercise the [browser assistant](../site/assistant.js), then compare the Finder’s [retrieval results](../site/data/evaluation.json) with the assistant’s [conversation tests](../tests/). |
 | S3 | Deploy, version, test or containerise software | Inspect the [deployment path](roadmap.md), repository history and [tests](../tests/). |
 | S4 | Gather and analyse user requirements | The [interview guide, workshop and coding example](field-workbook.md#discovery) demonstrate method design. Field execution is pending. |
 | E1 | Develop recommendation, retrieval, NLP or conversational systems | The [running implementation](../site/engine.js) and [evaluation](../site/data/evaluation.json) are one example. |

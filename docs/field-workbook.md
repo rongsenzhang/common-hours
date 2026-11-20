@@ -2,16 +2,18 @@
 
 Use this workbook to teach the prototype, plan discovery and decide whether a partner pilot is justified. The exercises use fictional volunteering opportunities. The study design, contact roles and meeting forms are proposals. No participant quotations, minutes, approvals or field findings have been collected.
 
+Volunteer tasks use the [public Finder](https://rongsenzhang.github.io/common-hours/#discover) or [Ask](https://rongsenzhang.github.io/common-hours/#ask). Coordinator and benchmark tasks use the [staff console](admin.md). Its local verification previews use fictional evidence and stay in that staff session. The public catalogue remains the published snapshot.
+
 ## Requirements register
 
 The [public product review](market-research.md) supplies context for these hypotheses. Discovery should establish whether each one matters to participating volunteers and coordinators.
 
 | ID and proposed need | Implemented design | Acceptance check | Question for discovery |
 | --- | --- | --- | --- |
-| R1. A volunteer uses ordinary words for an interest. | Retrieve against opportunity text and related concepts. | Search for an allotment, inspect the garden opportunity and read the reason for its position. Compare with [keyword retrieval](model-card.md). | Which words would you naturally use for a role like this? |
+| R1. A volunteer uses ordinary words for an interest. | Retrieve against opportunity text and related concepts. | Search for an allotment, inspect the garden opportunity and explain which task makes it relevant. Compare with [keyword retrieval](model-card.md). | Which words would you naturally use for a role like this? |
 | R2. A volunteer needs a feasible shift and format. | Treat selected schedule and format as explicit conditions. | Change one condition in Discover. Inspect which roles move out of the confirmed matches. | Which constraints can you vary and which have to be met? |
-| R3. A volunteer needs clear evidence about step-free access. | Distinguish supported, unknown and incompatible requirements. | Require step-free access for the garden opportunity before and after the synthetic provider follow-up. Compare the two states. | What information would you need before deciding whether to travel? |
-| R4. A coordinator needs to verify a missing fact. | A desk links unresolved opportunity information to a provider note and a review action. | Locate the garden record, identify the field and evidence, and apply a supported decision. Re-run the volunteer query. | What evidence is sufficient, and who is allowed to update the record? |
+| R3. A volunteer needs clear evidence about step-free access. | Distinguish supported, unknown and incompatible requirements. | Require step-free access for the garden opportunity before and after the synthetic provider follow-up. Compare the public initial state with the signed-in staff preview. | What information would you need before deciding whether to travel? |
+| R4. A coordinator needs to verify a missing fact. | A desk links unresolved opportunity information to a provider note and a review action. | Locate the garden record, identify the field and evidence, and apply a supported decision. Open the desk’s **Preview volunteer result**. | What evidence is sufficient, and who is allowed to update the record? |
 | R5. A project team needs to review the evidence behind a ranking decision. | Expose a baseline, comparison, fixtures, metrics and interpretation. | Trace a judgement from [test cases](../fixtures/judgements.json) to [results](../site/data/evaluation.json). | Which ranking failures should stop a release? |
 
 ## Discovery
@@ -72,23 +74,24 @@ The [public product review](market-research.md) supplies context for these hypot
 | [Generated catalogue](../site/data/catalog.json) and [release evaluation](../site/data/evaluation.json) | Derived release data. | Regenerate using the [project instructions](../README.md), run checks and compare the versioned diff. Keep inputs, code and outputs together in the release. |
 | Future field observations | Participant-controlled, de-identified, potentially sensitive. | Agree purpose, access, storage, retention period and deletion owner with the partner first. Store consent separately. Keep raw notes and contact details out of the public repository. |
 
-For a live integration, a business owner would need to verify permission, data freshness and the escalation route for each field. Record who approved an update, when, what they reviewed, the previous and current value and how to roll back. A correction made in a visitor's demo is a trial interaction. Authoritative corrections would need staff authentication, durable audit records and provider ownership.
+For a live integration, a business owner would need to verify permission, data freshness and the escalation route for each field. Record who approved an update, when, what they reviewed, the previous and current value and how to roll back. A correction made in the signed-in staff console is a session-local trial interaction. Publishing authoritative corrections would require durable audit records, assigned staff identities and a data owner.
 
 ## Steering brief
 
 **Decision requested of a future steering group.** Authorise a small study of search explanations and access verification using synthetic records. Any production or partner-data pilot would need a separate decision.
 
-**What exists.** Visitors can search opportunities and inspect their evidence, while a coordinator can work through a verification example. A keyword baseline and a hybrid retriever are evaluated with the same authored cases. The [model card](model-card.md) provides the measurements, data size and caveats. The [machine-readable release results](../site/data/evaluation.json) let a technical reviewer inspect outcomes per case.
+**What exists.** Visitors can search, ask follow-up questions and read practical role facts. In the separate staff workspace, a coordinator can inspect source records, confirm a synthetic host reply and preview its effect. A keyword baseline and a hybrid retriever are evaluated with the same authored cases. The [model card](model-card.md) provides the measurements, data size and caveats. The [machine-readable release results](../site/data/evaluation.json) let a technical reviewer inspect outcomes per case.
 
-**Release findings.** On 15 fictional listings and 28 authored cases, the baseline placed a judged-relevant role in the first three on 10 of 17 answerable queries. Hybrid retrieval did so on 16 of 17. The respective nDCG@3 values were 0.5882 and 0.9412. Each approach correctly returned zero confirmed matches on 9 of 11 cases judged to have no answer. The hybrid routed all eight explicitly labelled review or exclusion examples to their expected groups. The baseline routed seven. These eight checks do not establish a general error rate.
+**Release findings.** On 19 fictional listings and 36 authored cases, the baseline placed a judged-relevant role in the first three on 16 of 23 answerable queries. Hybrid retrieval did so on 22 of 23. The respective nDCG@3 values were 0.6957 and 0.9565. For 13 cases with no confirmed match, the baseline correctly returned none in ten cases and the hybrid in all 13. The hybrid routed all 12 labelled review or exclusion pairs as expected. The baseline routed 11. These are fixed Finder tests. Conversational accuracy and real participant outcomes need their own assessment.
 
 | Case | What happened | Development implication |
 | --- | --- | --- |
 | B07, “allotment” | The concept vocabulary connects the query to the garden role. | Retain concept evidence in the explanation so a reviewer can inspect how the role surfaced. |
-| B22, “walk dogs” | The common word “walk” surfaces a litter-walk opportunity even though the catalogue has no dog-walking role. | Test a clarification or abstention rule with both no-answer and genuinely answerable multiword queries before adopting it. |
+| v1.0 B22, “walk dogs” | The archived catalogue contained no dog-walking role. Its old hybrid engine returned the litter walk. | Replay the [frozen case](../fixtures/history/v1.0-B22.json) with the current engine and confirm an empty result. |
+| v1.1 B29–B37 | The current catalogue contains two dog walks. Schedule or access can narrow the choice. A horse walk or dog grooming request has no match. | Compare a positive match, an unsupported activity, a practical conflict and the valid litter walk. Add independently authored requests to the next study. |
 | B28, “teach adults to sound out words” | The hybrid's top three miss the reference adult reading role. | Have volunteers supply paraphrases and freeze an independent test set before changing the vocabulary. |
 
-**Interpretation.** The benchmark measures agreement with the fixture judgements. Improvement on that set could partly reflect overlap between authored examples and the vocabulary model. An access answer requires evidence about the host's premises. Ask independent reviewers to write fresh queries and assess feasibility before seeing either system's rankings. One useful comparison would pair vocabulary expansion with the proposed abstention rule and inspect the trade-off between missed opportunities and misleading suggestions.
+**Interpretation.** The benchmark measures agreement with the fixture judgements. Improvement on that set could partly reflect overlap between authored examples and the vocabulary model. An access answer requires evidence about the host's premises. Ask independent reviewers to write fresh queries and assess feasibility before seeing either system's rankings. A follow-up study could compare Finder and Ask on unseen requests and count both missed opportunities and misleading suggestions, including how easily people can clarify an empty result.
 
 | Proposed decision or risk | Accountable role | Evidence to review at the next gate |
 | --- | --- | --- |
@@ -97,7 +100,7 @@ For a live integration, a business owner would need to verify permission, data f
 | Establish whether coordinators can maintain these records. | Volunteer management lead | Observed verification time, abandoned corrections and who has authority to confirm an update. |
 | Agree accessibility and data-handling arrangements before fieldwork. | Study lead with partner accessibility and data leads | Accessible materials, consent process, storage and deletion decisions, and route to stop participation. |
 
-**Two-minute stakeholder presentation.** Open with a volunteer who wants a weekend gardening role and needs step-free access. Show the uncertain result, ask the audience what they would need to know, then show the synthetic host evidence at the desk. Re-run the search. Explain the difference between ranking a relevant role and confirming a practical requirement. End on the proposed study, named decision owners and how a failed check would change the design.
+**Two-minute stakeholder presentation.** Open with a volunteer who wants a weekend gardening role and needs step-free access. Show the uncertain result, ask the audience what they would need to know, then switch to the authenticated staff desk and inspect the synthetic host evidence. Apply the supported update and open the private volunteer-result preview. Explain the difference between ranking a relevant role and confirming a practical requirement. End on the proposed study, named decision owners and how a failed check would change the design.
 
 ## Research output
 
@@ -140,10 +143,10 @@ The [model card](model-card.md) is the technical release report. This outline su
 
 1. Open Discover. Search for **allotment**, choose a weekend and an in-person role, then require step-free access. Find **Community garden buddy**, including any results that need confirmation. Record what the listing establishes and which fact remains unknown.
 2. Predict which field must change before this opportunity can be treated as meeting all those requirements. Identify which search setting describes interest and which settings impose conditions.
-3. Open the coordinator desk. Read the garden provider's fictional follow-up. If it supports step-free access, apply that supported value. Return to Discover with the same query. Record the result and explain the change in one sentence.
+3. Open the coordinator desk in a staff session and select **Preview volunteer result**. Return to the desk and read the garden provider's fictional follow-up. If it supports step-free access, apply that value and reopen the preview. Record the result and explain the change in one sentence.
 4. Read one [evaluation case](../fixtures/judgements.json). Explain separately how you would test retrieval relevance and how you would test whether a confirmed match violates a stated condition. Name one conclusion about real participants that this exercise cannot establish.
 
-**Worked answer.** “Allotment” supplies a topic. Weekend, in-person attendance and required step-free access constrain feasibility. At the start, the garden role is in the review group and there are zero confirmed matches. Follow-up F01 confirms the level entrance and step-free paths to the raised beds. With the same schedule and mode, recording that fact moves the garden role into the confirmed group. The weekday seed-library role remains excluded. A ranking measure tests ordering against reference judgements. A separate check should reject any confirmed result with a conflicting required condition. This run supplies no evidence about whether real volunteers would apply or attend.
+**Worked answer.** “Allotment” supplies a topic. Weekend, in-person attendance and required step-free access constrain feasibility. At the start, the garden role is in the review group and there are zero confirmed matches. Follow-up F01 confirms the level entrance and step-free paths to the raised beds. With the same schedule and mode, recording that fact moves the garden role into the confirmed group in the staff preview. The weekday seed-library role remains excluded. A ranking measure tests ordering against reference judgements. A separate check should reject any confirmed result with a conflicting required condition. This run supplies no evidence about whether real volunteers would apply or attend.
 
 **Assessment.** Award one point each for identifying the interest and constraints, recording the initial uncertainty, citing the exact evidence for the update, describing the resulting state, and separating relevance from verification and real-world impact. Require four of five and a correct treatment of unknown access before sign-off. If the learner treats uncertainty as confirmed, repeat with the insufficient-note paper variation before reassessment.
 

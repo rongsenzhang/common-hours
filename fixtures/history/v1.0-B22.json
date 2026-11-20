@@ -1,0 +1,284 @@
+{
+  "release": "v1.0.0",
+  "case": {
+    "id": "B22",
+    "query": "walk dogs",
+    "relevant": [],
+    "why": "There is no dog-walking role. A litter walk has an incidental word in common."
+  },
+  "publishedHybridTop3": [
+    "river-walk"
+  ],
+  "opportunities": [
+    {
+      "id": "archive-transcriber",
+      "title": "Local history transcriber",
+      "summary": "Turn scanned handwritten letters into text for a local history collection.",
+      "interests": [
+        "heritage",
+        "writing"
+      ],
+      "tasks": [
+        "Transcribe letters",
+        "Check historical names"
+      ],
+      "organisation": "North Loom Arts",
+      "area": "Ancoats",
+      "time": "flexible",
+      "mode": "remote",
+      "stepFree": "na"
+    },
+    {
+      "id": "caption-editor",
+      "title": "Community audio caption editor",
+      "summary": "Create captions for short recorded interviews to make local arts stories easier to follow.",
+      "interests": [
+        "arts",
+        "writing"
+      ],
+      "tasks": [
+        "Edit captions",
+        "Check transcripts"
+      ],
+      "organisation": "North Loom Arts",
+      "area": "Ancoats",
+      "time": "weekend",
+      "mode": "remote",
+      "stepFree": "na"
+    },
+    {
+      "id": "digital-helper",
+      "title": "Digital drop-in helper",
+      "summary": "Show library visitors how to use a smartphone and build confidence online.",
+      "interests": [
+        "digital",
+        "teaching"
+      ],
+      "tasks": [
+        "Practise email",
+        "Explain device settings"
+      ],
+      "organisation": "Little Lantern Library",
+      "area": "Levenshulme",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes"
+    },
+    {
+      "id": "garden-buddy",
+      "title": "Community garden buddy",
+      "summary": "Help neighbours plant vegetables and look after raised beds at a shared garden.",
+      "interests": [
+        "growing",
+        "outdoors"
+      ],
+      "tasks": [
+        "Plant seedlings",
+        "Water raised beds"
+      ],
+      "organisation": "Moss Lane Growers",
+      "area": "Hulme",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "unknown"
+    },
+    {
+      "id": "meal-cook",
+      "title": "Community kitchen cook",
+      "summary": "Prepare vegetables and cook simple meals alongside the community kitchen team.",
+      "interests": [
+        "food",
+        "cooking"
+      ],
+      "tasks": [
+        "Chop vegetables",
+        "Prepare meals"
+      ],
+      "organisation": "Common Basket Kitchen",
+      "area": "Ancoats",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes"
+    },
+    {
+      "id": "pantry-packer",
+      "title": "Community pantry packer",
+      "summary": "Sort donated groceries and assemble food parcels for local households.",
+      "interests": [
+        "food",
+        "practical"
+      ],
+      "tasks": [
+        "Check tins",
+        "Pack grocery bags"
+      ],
+      "organisation": "Common Basket Kitchen",
+      "area": "Ancoats",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes"
+    },
+    {
+      "id": "phone-companion",
+      "title": "Telephone companion",
+      "summary": "Offer a friendly conversation and regular listening time to an isolated neighbour.",
+      "interests": [
+        "companionship",
+        "listening"
+      ],
+      "tasks": [
+        "Listen on a call",
+        "Record a check-in"
+      ],
+      "organisation": "Neighbourline Circle",
+      "area": "Chorlton",
+      "time": "flexible",
+      "mode": "unknown",
+      "stepFree": "unknown"
+    },
+    {
+      "id": "poster-maker",
+      "title": "Community poster designer",
+      "summary": "Design accessible publicity posters for local arts events using supplied text and images.",
+      "interests": [
+        "design",
+        "arts"
+      ],
+      "tasks": [
+        "Design posters",
+        "Prepare digital artwork"
+      ],
+      "organisation": "North Loom Arts",
+      "area": "Ancoats",
+      "time": "flexible",
+      "mode": "remote",
+      "stepFree": "na"
+    },
+    {
+      "id": "reading-partner",
+      "title": "Reading practice partner",
+      "summary": "Read short stories with adult learners and practise English pronunciation.",
+      "interests": [
+        "literacy",
+        "teaching"
+      ],
+      "tasks": [
+        "Read aloud",
+        "Practise English"
+      ],
+      "organisation": "Open Door Learning Club",
+      "area": "Rusholme",
+      "time": "weekday",
+      "mode": "hybrid",
+      "stepFree": "yes"
+    },
+    {
+      "id": "repair-cafe",
+      "title": "Repair café assistant",
+      "summary": "Join a workbench team repairing small household items and learning simple fixes.",
+      "interests": [
+        "repair",
+        "practical"
+      ],
+      "tasks": [
+        "Sort tools",
+        "Help with mending"
+      ],
+      "organisation": "The Mending Room",
+      "area": "Salford",
+      "time": "unknown",
+      "mode": "onsite",
+      "stepFree": "yes"
+    },
+    {
+      "id": "river-walk",
+      "title": "Riverside litter walk",
+      "summary": "Keep the riverside path tidy by picking up litter with a small walking group.",
+      "interests": [
+        "outdoors",
+        "nature"
+      ],
+      "tasks": [
+        "Collect litter",
+        "Sort recycling"
+      ],
+      "organisation": "Blue Path Collective",
+      "area": "Trafford",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "no"
+    },
+    {
+      "id": "seed-sorter",
+      "title": "Seed library sorter",
+      "summary": "Label donated seed packets for the library and prepare planting information cards.",
+      "interests": [
+        "growing",
+        "organising"
+      ],
+      "tasks": [
+        "Sort seeds",
+        "Label seed packets"
+      ],
+      "organisation": "Moss Lane Growers",
+      "area": "Hulme",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes"
+    },
+    {
+      "id": "website-tester",
+      "title": "Website usability tester",
+      "summary": "Try sample journeys on a charity website and write up any usability issues.",
+      "interests": [
+        "digital",
+        "testing"
+      ],
+      "tasks": [
+        "Check navigation",
+        "Write bug reports"
+      ],
+      "organisation": "Little Lantern Library",
+      "area": "Levenshulme",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na"
+    },
+    {
+      "id": "welcome-desk",
+      "title": "Welcome desk greeter",
+      "summary": "Greet visitors at a neighbourhood centre and explain which local services run that day.",
+      "interests": [
+        "welcome",
+        "communication"
+      ],
+      "tasks": [
+        "Meet visitors",
+        "Give directions"
+      ],
+      "organisation": "Neighbourhood Welcome Desk",
+      "area": "Longsight",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes"
+    },
+    {
+      "id": "wildlife-counter",
+      "title": "Park wildlife recorder",
+      "summary": "Observe birds in a park and record a simple wildlife count alongside other volunteers.",
+      "interests": [
+        "nature",
+        "wildlife"
+      ],
+      "tasks": [
+        "Identify birds",
+        "Record sightings"
+      ],
+      "organisation": "Hedge & Hollow Club",
+      "area": "Didsbury",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "unknown"
+    }
+  ]
+}

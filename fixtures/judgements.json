@@ -20,11 +20,19 @@
   {"id":"B19","query":"food","preferences":{"time":"weekend"},"relevant":["meal-cook"],"excluded":["pantry-packer"],"why":"The kitchen operates at weekends. The pantry-packing shift is on weekdays."},
   {"id":"B20","query":"writing","preferences":{"mode":"remote"},"relevant":["archive-transcriber","caption-editor"],"why":"Both remote roles produce written content."},
   {"id":"B21","query":"astrophysics","relevant":[],"why":"There is no astronomy activity in this catalogue."},
-  {"id":"B22","query":"walk dogs","relevant":[],"why":"There is no dog-walking role. A litter walk has an incidental word in common."},
   {"id":"B23","query":"wheelchair basketball coaching","relevant":[],"why":"There is no sports coaching activity in the catalogue."},
   {"id":"B24","query":"help me","relevant":[],"why":"This nonempty request includes no discriminating topic after stopword removal."},
   {"id":"B25","query":"birding","preferences":{"stepFree":true},"relevant":[],"review":["wildlife-counter"],"why":"The park survey is topically relevant but the route's accessibility is unknown."},
   {"id":"B26","query":"device settings","preferences":{"mode":"remote"},"relevant":[],"excluded":["digital-helper"],"why":"Teaching visitors how to use a device takes place at the venue."},
   {"id":"B27","query":"digital","preferences":{"mode":"remote","time":"weekday"},"relevant":["website-tester","poster-maker"],"why":"The broad interest includes remote weekday website testing and digital design."},
-  {"id":"B28","query":"teach adults to sound out words","relevant":["reading-partner"],"why":"An everyday description of help with pronunciation. Coverage of paraphrases is deliberately incomplete."}
+  {"id":"B28","query":"teach adults to sound out words","relevant":["reading-partner"],"why":"An everyday description of help with pronunciation. Coverage of paraphrases is deliberately incomplete."},
+  {"id":"B29","query":"walk dogs","relevant":["shelter-dog-walker","neighbourhood-dog-walker"],"why":"Both listings explicitly offer dog walking in the expanded catalogue. Archived v1.0 B22 had no such role."},
+  {"id":"B30","query":"take a dog for a walk","preferences":{"time":"weekend","stepFree":true},"relevant":["shelter-dog-walker"],"excluded":["neighbourhood-dog-walker"],"why":"The accompanied shelter loop runs at weekends and is level. The neighbourhood route has weekday sessions and steps."},
+  {"id":"B31","query":"walk a dog","preferences":{"time":"weekday"},"relevant":["neighbourhood-dog-walker"],"excluded":["shelter-dog-walker"],"why":"The neighbourhood route runs on weekdays. The shelter loop runs at weekends."},
+  {"id":"B32","query":"dog walker","preferences":{"mode":"remote"},"relevant":[],"excluded":["neighbourhood-dog-walker","shelter-dog-walker"],"why":"Both dog-walking opportunities need attendance at the venue."},
+  {"id":"B33","query":"sort donated blankets","relevant":["animal-supply-sorter"],"why":"The supply room explicitly sorts donated blankets. Seed and grocery sorting are different activities."},
+  {"id":"B34","query":"walk horses","relevant":[],"why":"The catalogue has walking roles but none involves horses."},
+  {"id":"B35","query":"groom dogs","relevant":[],"why":"Animal activities include walking and sorting supplies. No listing provides grooming."},
+  {"id":"B36","query":"loan helmets","relevant":["cycle-workshop"],"why":"The cycle workshop prepares loan helmets."},
+  {"id":"B37","query":"litter walk","relevant":["river-walk"],"why":"This riverside listing involves walking to collect litter. Neither dog walk does."}
 ]

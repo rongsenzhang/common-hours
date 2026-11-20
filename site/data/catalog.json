@@ -1,31 +1,32 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "provenance": "All organisations, opportunities, timings and follow-ups are fictional.",
   "summary": {
-    "roleCount": 15,
-    "hostCount": 10,
+    "roleCount": 19,
+    "hostCount": 13,
     "counts": {
       "time": {
         "flexible": 3,
         "unknown": 1,
-        "weekday": 5,
-        "weekend": 6
+        "weekday": 7,
+        "weekend": 8
       },
       "mode": {
         "hybrid": 1,
-        "onsite": 9,
+        "onsite": 13,
         "remote": 4,
         "unknown": 1
       },
       "stepFree": {
         "na": 4,
-        "no": 1,
+        "no": 2,
         "unknown": 3,
-        "yes": 7
+        "yes": 10
       },
       "theme": {
+        "animals": 3,
         "arts": 3,
-        "community": 2,
+        "community": 3,
         "digital": 2,
         "food": 2,
         "growing": 2,
@@ -36,6 +37,40 @@
     }
   },
   "opportunities": [
+    {
+      "id": "animal-supply-sorter",
+      "title": "Animal shelter supply sorter",
+      "organisation": "Willow Yard Animal Shelter",
+      "area": "Wythenshawe",
+      "theme": "animals",
+      "summary": "Prepare donated blankets and leads for the shelter's dogs and cats.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Blankets and leads can be sorted at the level indoor packing table.",
+      "interests": [
+        "animal care",
+        "organising"
+      ],
+      "tasks": [
+        "Sort clean blankets",
+        "Label supply boxes"
+      ],
+      "sources": {
+        "id": "roles.csv:animal-supply-sorter",
+        "title": "roles.csv:animal-supply-sorter",
+        "theme": "roles.csv:animal-supply-sorter",
+        "summary": "roles.csv:animal-supply-sorter",
+        "interests": "roles.csv:animal-supply-sorter",
+        "tasks": "roles.csv:animal-supply-sorter",
+        "organisation": "hosts.json:paw-yard",
+        "area": "hosts.json:paw-yard",
+        "time": "sessions.csv:S18",
+        "mode": "sessions.csv:S18",
+        "stepFree": "sessions.csv:S18",
+        "contactNote": "sessions.csv:S18"
+      }
+    },
     {
       "id": "archive-transcriber",
       "title": "Local history transcriber",
@@ -102,6 +137,40 @@
         "mode": "sessions.csv:S15",
         "stepFree": "sessions.csv:S15",
         "contactNote": "sessions.csv:S15"
+      }
+    },
+    {
+      "id": "cycle-workshop",
+      "title": "Cycle workshop kit assistant",
+      "organisation": "Fern Street Cycle Shed",
+      "area": "Hulme",
+      "theme": "community",
+      "summary": "Prepare loan helmets and log returned bicycles at a community cycling workshop.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The kit desk and storage racks are reached by a level route.",
+      "interests": [
+        "cycling",
+        "organising"
+      ],
+      "tasks": [
+        "Label helmets",
+        "Check the bicycle inventory"
+      ],
+      "sources": {
+        "id": "roles.csv:cycle-workshop",
+        "title": "roles.csv:cycle-workshop",
+        "theme": "roles.csv:cycle-workshop",
+        "summary": "roles.csv:cycle-workshop",
+        "interests": "roles.csv:cycle-workshop",
+        "tasks": "roles.csv:cycle-workshop",
+        "organisation": "hosts.json:cycle-shed",
+        "area": "hosts.json:cycle-shed",
+        "time": "sessions.csv:S19",
+        "mode": "sessions.csv:S19",
+        "stepFree": "sessions.csv:S19",
+        "contactNote": "sessions.csv:S19"
       }
     },
     {
@@ -204,6 +273,41 @@
         "mode": "sessions.csv:S09",
         "stepFree": "sessions.csv:S09",
         "contactNote": "sessions.csv:S09"
+      }
+    },
+    {
+      "id": "neighbourhood-dog-walker",
+      "title": "Neighbourhood dog walker",
+      "organisation": "Neighbourhood Pet Circle",
+      "area": "Withington",
+      "theme": "animals",
+      "summary": "Join a coordinator to take a neighbour's dog for a regular walk on a local route.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "no",
+      "contactNote": "The planned route includes steps beside the pedestrian bridge.",
+      "interests": [
+        "animal care",
+        "dogs",
+        "outdoors"
+      ],
+      "tasks": [
+        "Meet the owner with the coordinator",
+        "Walk a dog along the marked route"
+      ],
+      "sources": {
+        "id": "roles.csv:neighbourhood-dog-walker",
+        "title": "roles.csv:neighbourhood-dog-walker",
+        "theme": "roles.csv:neighbourhood-dog-walker",
+        "summary": "roles.csv:neighbourhood-dog-walker",
+        "interests": "roles.csv:neighbourhood-dog-walker",
+        "tasks": "roles.csv:neighbourhood-dog-walker",
+        "organisation": "hosts.json:pet-circle",
+        "area": "hosts.json:pet-circle",
+        "time": "sessions.csv:S17",
+        "mode": "sessions.csv:S17",
+        "stepFree": "sessions.csv:S17",
+        "contactNote": "sessions.csv:S17"
       }
     },
     {
@@ -442,6 +546,41 @@
         "mode": "sessions.csv:S14",
         "stepFree": "sessions.csv:S14",
         "contactNote": "sessions.csv:S14"
+      }
+    },
+    {
+      "id": "shelter-dog-walker",
+      "title": "Shelter dog walking buddy",
+      "organisation": "Willow Yard Animal Shelter",
+      "area": "Wythenshawe",
+      "theme": "animals",
+      "summary": "Walk shelter dogs with a staff member on the centre's level exercise loop.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The entrance and the whole accompanied exercise loop are level.",
+      "interests": [
+        "animal care",
+        "dogs",
+        "outdoors"
+      ],
+      "tasks": [
+        "Walk dogs in pairs",
+        "Return leads after the walk"
+      ],
+      "sources": {
+        "id": "roles.csv:shelter-dog-walker",
+        "title": "roles.csv:shelter-dog-walker",
+        "theme": "roles.csv:shelter-dog-walker",
+        "summary": "roles.csv:shelter-dog-walker",
+        "interests": "roles.csv:shelter-dog-walker",
+        "tasks": "roles.csv:shelter-dog-walker",
+        "organisation": "hosts.json:paw-yard",
+        "area": "hosts.json:paw-yard",
+        "time": "sessions.csv:S16",
+        "mode": "sessions.csv:S16",
+        "stepFree": "sessions.csv:S16",
+        "contactNote": "sessions.csv:S16"
       }
     },
     {

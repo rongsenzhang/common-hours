@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {semanticMetrics, semanticRank} from '../site/semantic.js';
+import {semanticMetrics, semanticRank} from '../admin/semantic.js';
 
 const {opportunities: catalogue} = JSON.parse(await readFile(new URL('../site/data/catalog.json', import.meta.url)));
 const roles = catalogue.filter(r => ['garden-buddy', 'river-walk', 'seed-sorter'].includes(r.id));

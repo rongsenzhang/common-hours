@@ -98,7 +98,7 @@ def build(fixtures, db_path):
             db.execute("INSERT INTO follow_ups VALUES(?,?,?,?,?)", [clean(update[k]) for k in ("id","field","value","note","source")])
         counts = {field: dict(sorted(Counter(row[field] for row in opportunities).items()))
                   for field in ("time","mode","stepFree","theme")}
-        return {"version":"1.0.0","provenance":"All organisations, opportunities, timings and follow-ups are fictional.",
+        return {"version":"1.1.0","provenance":"All organisations, opportunities, timings and follow-ups are fictional.",
                 "summary":{"roleCount":len(opportunities),"hostCount":len(hosts),"counts":counts},
                 "opportunities":opportunities,"followUps":follow_ups}
 

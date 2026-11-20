@@ -1,4 +1,4 @@
-import { matchOpportunities } from "./engine.js";
+import { matchOpportunities } from "../site/engine.js";
 
 const round = (value) => Math.round(value * 10000) / 10000;
 

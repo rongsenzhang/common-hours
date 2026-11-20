@@ -1,3 +1,4 @@
+import { alphabeticalCases, prettyPreferences } from "./queries.js";
 const repository = "https://github.com/rongsenzhang/common-hours/blob/main";
 const methodNames = {
   baseline: "Keyword baseline",
@@ -27,23 +28,6 @@ function roleList(ids, titles) {
   return ids.map((id) => escapeHtml(titles.get(id) || id)).join(" · ");
 }
 
-function prettyPreferences(preferences) {
-  const time = { weekday: "Weekday", weekend: "Weekend", flexible: "Flexible" };
-  const mode = {
-    onsite: "At the venue",
-    remote: "From home",
-    hybrid: "Hybrid",
-  };
-  return (
-    [
-      time[preferences.time],
-      mode[preferences.mode],
-      preferences.stepFree ? "Step-free access required" : "",
-    ]
-      .filter(Boolean)
-      .join(" · ") || "Any time or setting"
-  );
-}
 
 function resultList(ids, titles) {
   if (!ids.length) return '<p class="research-none">No confirmed result</p>';
@@ -112,8 +96,8 @@ export function renderEvidence(evaluation, catalog, ai) {
     catalog.opportunities.map((role) => [role.id, role.title]),
   );
   const garden = evaluation.cases.find((item) => item.id === "B07");
-  const dog = evaluation.cases.find((item) => item.id === "B22");
-  const cases = evaluation.cases
+  const dog = evaluation.cases.find((item) => item.query === "walk dogs" && !Object.keys(item.preferences).length);
+  const cases = alphabeticalCases(evaluation.cases)
     .map((item) => caseEntry(item, titles))
     .join("");
   return `<div class="research-view">
@@ -150,13 +134,13 @@ export function renderEvidence(evaluation, catalog, ai) {
           <div><h3>Hybrid retrieval</h3>${resultList(garden.hybrid.top3, titles)}</div>
         </div>
       </div>
-      <div class="research-example research-failure"><span class="research-subtitle">Failure case · ${dog.id}</span>
-        <h2>“${escapeHtml(dog.query)}”</h2>
-        <p>Both methods return <strong>${escapeHtml(titles.get(dog.hybrid.top3[0]))}</strong> because the activity involves a walk. The catalogue contains no dog-walking role.</p>
-        <p class="research-failure-action">An independent set of no-answer queries would help test when the finder should ask for clarification.</p>
+      <div class="research-example research-failure"><span class="research-subtitle">Dog-walking regression</span>
+        <h2>“walk dogs”</h2>
+        <p>In <a href="https://github.com/rongsenzhang/common-hours/releases/tag/v1.0.0">v1.0</a> this request returned a litter walk. The v1.0 catalogue had no dog-walking opportunity.</p>
+        ${dog ? `<div class="research-ranking-example"><div><h3>Current keyword result</h3>${resultList(dog.baseline.top3, titles)}</div><div><h3>Current hybrid result</h3>${resultList(dog.hybrid.top3, titles)}</div></div>` : ""}
       </div>
     </section>
-    <details class="research-cases"><summary>Inspect all ${evaluation.caseCount} test cases</summary>
+    <details class="research-cases"><summary>Inspect all ${evaluation.caseCount} test cases (A–Z)</summary>
       <p>Open a query to compare the reference judgement, returned roles and the handling of missing or conflicting information.</p>
       <div>${cases}</div></details>
     <section class="research-methods" aria-label="Methods and evidence limits">
@@ -174,6 +158,6 @@ export function renderEvidence(evaluation, catalog, ai) {
     <section class="research-documents" aria-labelledby="research-docs-title"><h2 id="research-docs-title">Project documents</h2>
       <ul><li>${link("docs/model-card.md", "Model and evaluation report")}</li><li>${link("docs/market-research.md", "Company and market research")}</li>
         <li>${link("docs/roadmap.md", "Technical roadmap")}</li><li>${link("docs/role-evidence.md", "KTP role evidence")}</li>
-        <li>${link("site/data/evaluation.json", "Full benchmark data")}</li><li>${link("fixtures/judgements.json", "Reference judgements")}</li></ul>
+        <li><a href="./data/evaluation.json">Full benchmark data</a></li><li>${link("fixtures/judgements.json", "Reference judgements")}</li></ul>
     </section></div>`;
 }

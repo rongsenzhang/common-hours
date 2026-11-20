@@ -55,8 +55,8 @@ for (const method of methods) {
   };
 }
 const output = {
-  version: '1.0.0', caseCount: cases.length, catalogSize: catalog.opportunities.length,
-  methodology: 'Authored synthetic judgements and initial listing facts. Baseline uses literal word coverage; hybrid uses TF-IDF and a fixed concept vocabulary. Both apply identical gates.',
+  version: catalog.version, caseCount: cases.length, catalogSize: catalog.opportunities.length,
+  methodology: 'Authored synthetic judgements on the current catalogue. Literal word coverage is compared with TF-IDF, a controlled vocabulary and activity/object checks. Both methods use the same schedule, access and participation checks. Archived B22 tests the original catalogue.',
   methods: methodMetrics, cases: resultCases,
 };
 await writeFile(new URL('../site/data/evaluation.json', import.meta.url), JSON.stringify(output, null, 2) + '\n');

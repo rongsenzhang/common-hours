@@ -1,5 +1,7 @@
 // Small, purpose-drawn interface symbols. Each inherits the surrounding text colour.
 const paths = {
+  paw: '<circle cx="5" cy="9" r="2"/><circle cx="10" cy="5.5" r="2"/><circle cx="16" cy="6" r="2"/><circle cx="20" cy="10" r="2"/><path d="M6 17c0-2 2-3 3-5 1.3-2.2 4.4-2.2 6 0 1 2 3 3 3 5 0 2-2 3-4 2.4-1.5-.5-2.5-.5-4 0C8 20 6 19 6 17z"/>',
+  chat: '<path d="M20.5 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.4 0-2.7-.3-3.8-.9L3 21l1.6-5.1A8.5 8.5 0 1 1 20.5 11.5Z"/><path d="M8 10h8m-8 4h5"/>',
   discover:
     '<circle cx="12" cy="12" r="9"/><path d="m15.8 8.2-2.5 5.1-5.1 2.5 2.5-5.1z"/>',
   desk: '<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12c6 3 12 3 18 0m-9 0v3"/>',

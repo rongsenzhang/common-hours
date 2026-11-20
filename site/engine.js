@@ -29,6 +29,13 @@ const concepts = {
   testing: "tester testing usability bugs navigation",
   caption:
     "caption captions captioning subtitles subtitling transcription transcripts",
+  walking: "walk walks walking walker walkers stroll strolls strolling",
+  dogs: "dog dogs canine canines pooch pooches",
+  animals: "animal animals pet pets",
+  sorting: "sort sorts sorter sorting",
+  grooming: "groom grooms groomer grooming",
+  training: "train trains trainer training",
+  cycling: "cycle cycles cycling bicycle bicycles bike bikes",
 };
 const wordsByConcept = Object.entries(concepts).map(([label, words]) => [
   label,
@@ -52,6 +59,33 @@ function conceptSet(tokens) {
       .map(([label]) => label),
   );
 }
+
+// An activity and its object must both be grounded in the work offered by a
+// listing. Applying this only to known activity verbs leaves broad browsing
+// (e.g. "digital arts") and the independent literal baseline unchanged.
+const activityVerbs = new Set(["walking", "sorting", "grooming", "training", "cooking"]);
+const requestModifiers = new Set(
+  "am any anything anywhere available community could doing donated enjoy find first free get how interested local love nearby need new often opportunity opportunities please position prefer regular regularly seeking some somewhere start starting take taking there these things time try weekday weekdays weekend weekends what where which while who willing".split(" "),
+);
+function activityRequirements(tokens, queryConcepts) {
+  const activities = [...queryConcepts].filter((name) => activityVerbs.has(name));
+  if (!activities.length) return null;
+  const verbWords = wordsByConcept.filter(([name]) => activities.includes(name));
+  const objects = tokens.filter((word) =>
+    !requestModifiers.has(word) && !verbWords.some(([, vocabulary]) => vocabulary.has(word)),
+  );
+  const objectConcepts = conceptSet(objects);
+  const otherWords = objects.filter((word) => !wordsByConcept.some(([, vocabulary]) => vocabulary.has(word)));
+  return { activities, objectConcepts, otherWords };
+}
+
+function coversActivity(record, requirement) {
+  if (!requirement) return true;
+  const { activities, objectConcepts, otherWords } = requirement;
+  return activities.every((name) => record.taskConcepts.has(name))
+    && [...objectConcepts].every((name) => record.taskConcepts.has(name))
+    && otherWords.every((word) => record.counts.has(word));
+}
 function tally(tokens, weight, result) {
   for (const word of tokens) result.set(word, (result.get(word) ?? 0) + weight);
 }
@@ -72,7 +106,9 @@ function indexRole(role) {
     tally(tokens, weight, counts);
     return { label, tokens, concepts: conceptSet(tokens) };
   });
-  return { role, fields, counts, concepts: conceptSet([...counts.keys()]) };
+  const taskFields = fields.filter(({ label }) => label !== "Organisation" && label !== "Area");
+  const taskConcepts = new Set(taskFields.flatMap((field) => [...field.concepts]));
+  return { role, fields, counts, concepts: conceptSet([...counts.keys()]), taskConcepts };
 }
 function tfidf(counts, idf, missingIdf) {
   const weights = new Map();
@@ -170,6 +206,8 @@ export function matchOpportunities(
   const tokens = words(preferences.query);
   const queryWords = new Set(tokens);
   const queryConcepts = conceptSet(tokens);
+  const literalMethod = method === "baseline" || method === "literal";
+  const requirement = literalMethod ? null : activityRequirements(tokens, queryConcepts);
   const indexed = opportunities.map(indexRole);
   const documentFrequency = new Map();
   for (const record of indexed)
@@ -186,9 +224,9 @@ export function matchOpportunities(
   const queryNorm = norm(queryVector);
   const output = { matches: [], review: [], excluded: [] };
   for (const record of indexed) {
+    if (!coversActivity(record, requirement)) continue;
     const literal = [...queryWords].filter((word) => record.counts.has(word));
     const shared = [...queryConcepts].filter((tag) => record.concepts.has(tag));
-    const literalMethod = method === "baseline" || method === "literal";
     const lexical = cosine(
       queryVector,
       queryNorm,

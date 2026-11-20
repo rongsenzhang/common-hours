@@ -112,11 +112,6 @@
       "scores": []
     },
     {
-      "id": "B22",
-      "query": "walk dogs",
-      "scores": []
-    },
-    {
       "id": "B23",
       "query": "wheelchair basketball coaching",
       "scores": []
@@ -144,6 +139,51 @@
     {
       "id": "B28",
       "query": "teach adults to sound out words",
+      "scores": []
+    },
+    {
+      "id": "B29",
+      "query": "walk dogs",
+      "scores": []
+    },
+    {
+      "id": "B30",
+      "query": "take a dog for a walk",
+      "scores": []
+    },
+    {
+      "id": "B31",
+      "query": "walk a dog",
+      "scores": []
+    },
+    {
+      "id": "B32",
+      "query": "dog walker",
+      "scores": []
+    },
+    {
+      "id": "B33",
+      "query": "sort donated blankets",
+      "scores": []
+    },
+    {
+      "id": "B34",
+      "query": "walk horses",
+      "scores": []
+    },
+    {
+      "id": "B35",
+      "query": "groom dogs",
+      "scores": []
+    },
+    {
+      "id": "B36",
+      "query": "loan helmets",
+      "scores": []
+    },
+    {
+      "id": "B37",
+      "query": "litter walk",
       "scores": []
     }
   ]

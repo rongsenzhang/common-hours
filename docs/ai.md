@@ -1,49 +1,40 @@
-# OpenAI in the release
+# How Common Hours answers a question
 
-Common Hours runs two independent model calls during publication. One compares search examples with role descriptions. The other helps volunteers ask about missing details. The deployed files record the actual provider status for each call, so one can succeed when the other is unavailable.
+## Volunteer questions
 
-## Compare opportunity search using embeddings
+A visitor can ask for an activity and then refine time, participation mode or step-free access. The browser classifies the activity against short, labelled descriptions and checks the requested conditions against the published role facts. It can return confirmed matches, flag a field for host confirmation, ask for clarification or explain an empty result. Role cards link to the facts used in the recommendation. The conversation stays in browser memory for the current visit. The public assistant makes no per-message call to OpenAI. [Ask](https://rongsenzhang.github.io/common-hours/#ask) · [Local classifier](../site/assistant-topics.js) · [Conversation logic](../site/assistant.js)
 
-The build sends 15 synthetic opportunity descriptions and 28 fixed query examples in a single request to `text-embedding-3-small`. The role text includes title, description, activities, interests, organisation and area. Time, delivery mode and venue access stay in the rule-based checks. The request contains the authored query strings only from the judgement file. Relevance labels, explanations, volunteer searches and host follow-ups are excluded.
+The assistant covers supported English questions and selected Chinese phrases. Specific claims about an unlisted requirement need a host's answer. Separate regression cases exercise language parsing, unsupported requests, follow-ups and source-grounded answers. The staff benchmark measures Finder retrieval on its own set of fixed queries. [Tests](../tests/) · [Model card](model-card.md)
 
-The API returns one 256-dimensional vector per input. The builder checks model identity, vector count, position, size and values. It computes cosine similarity between each query and role, rounds to six decimal places and publishes 420 scores. The cutoff of **0.32 inclusive** was fixed before the first model run. It is an exploratory threshold. Its value has received no tuning against these 28 cases. The website uses the same eligibility checks for the semantic and lexical methods. A coordinator can update a missing fact and see its effect without recomputing the topic score. A cosine score measures similarity between two texts. It does not estimate a person's probability of suitability or volunteering.
+## OpenAI during release
 
-Open `data/semantic.json` beneath the deployed site's address. A successful batch records `provider: openai`, `status: ready`, the model name, dimension count and the scored examples. When the key is missing or a batch fails validation, the file keeps its list of examples with empty scores and reports `provider: none`. The website can still run the lexical searches. Browser calculations for nDCG@3, hit@3, correct empty results and routing recall use the original synthetic judgements and list their denominators. Exact queries can be replayed with changed constraints. New free-text queries use the browser matcher. [Embedding builder](../ai/build_semantic.py) · [Ranking and metrics](../site/semantic.js) · [Official embeddings API](https://developers.openai.com/api/reference/resources/embeddings/methods/create)
+The verified release job can call OpenAI twice using the Actions secret `OPENAI_API_KEY`. Both requests use authored, fictional inputs. The public package contains volunteer-facing facts and resolved question wording. The staff snapshot contains the provider metadata, technical evidence and benchmark scores. [Workflow](../.github/workflows/deploy.yml) · [Public packager](../pipeline/package_public.py) · [Staff guide](admin.md)
 
-This small benchmark can reveal missed matches and unsuitable results for a fixed catalogue. A field evaluation would need independently judged cases, participant tasks and realistic provider data. Raw embeddings are discarded after computing the score table.
+### Semantic comparison
 
-## Prepare a question for the host
+The builder sends 19 fictional opportunity descriptions and 36 fixed query strings in one embedding batch. Role descriptions include titles, tasks, interests, summaries, organisations and areas. The relevance labels, eligibility fields, host replies and visitor searches stay outside the request. After checking the model identity, dimensions, indices and numeric values, the builder computes up to 684 query–role cosine scores. It discards the raw vectors. The exploratory cutoff remains 0.32 inclusive, inherited from the v1.0 experiment. Passing that cutoff qualifies a role for the separate schedule, participation and access checks. [Embedding builder](../ai/build_semantic.py) · [Staff comparison](../admin/semantic.js)
 
-Open a role with an unresolved detail in the demo and read its suggested question. For example, the source for the garden opportunity confirms that volunteers work on site but leaves step-free access blank. The question asks about a route from arrival to the activity. Only a host's answer can confirm the detail. The volunteer search and the coordinator's recorded confirmations operate independently of the wording model.
+Open the signed-in staff dashboard to inspect queries in alphabetical order. Its `data/semantic.json` records the provider, status and scores for that release. A complete OpenAI batch has `provider: openai` and `status: ready`. Without a key, or when a batch fails validation, the build includes empty scores and the comparison reports the model as unavailable. The fallback file in the source checkout is reproducible offline. [Dashboard operations](admin.md)
 
-### See which wording was actually published
+The historical [v1.0 release](https://github.com/rongsenzhang/common-hours/releases/tag/v1.0.0) ran 28 queries against 15 roles, producing 420 comparisons on that catalogue. Its technical evidence was part of the original public demonstration. The v1.1 Pages distribution excludes the staff dashboard and semantic manifest. A result on either synthetic catalogue describes only that version and its authored queries.
 
-Open `data/host-questions.json` beneath the deployed site's address. Each entry gives its role, field, source-record reference and the question a person can ask. The top-level fields describe that particular build. A developer checkout starts with a reproducible editor-written edition. The Pages workflow can produce a different edition in its deployment artifact.
+### Suggested wording for a host
 
-| Published fields | Meaning |
-| --- | --- |
-| `provider: openai`, `status: ready` | The release runner called OpenAI, received a completed response from the named snapshot and validated a full set of wording choices. |
-| `provider: curated`, `status: unconfigured` | The release used the editor-written defaults. This is also the default for a local build. |
-| `provider: curated`, `status: fallback` | The release attempted OpenAI, then used the complete editor-written set after an unavailable service or an unacceptable response. The workflow log records a brief diagnostic category. |
+A separate call to the Responses API proposes wording for the five missing fields in the current catalogue. A pinned GPT-5.4 mini snapshot selects an opening and focus from a reviewed set. The request includes only the role title, tasks, affected field and recorded mode. The builder validates the allowed choices, coverage of the expected gaps and source references, then assembles each question. For example, a missing access detail on the garden role results in a question about the route to the activity area. The host still needs to provide the answer. [Question builder](../ai/build_questions.py) · [Validation tests](../tests/test_ai_questions.py)
 
-### The wording model's decision
+In the private `data/host-questions.json`, `openai / ready` identifies a successful model-assisted release. `curated / unconfigured` identifies the offline edition, and `curated / fallback` identifies a release that used the reviewed defaults after a service or validation problem. The public file exposes only the role identifier, field and wording.
 
-For each unknown time, delivery mode or step-free access field, a single release-time request supplies a fictional role title, its activities, the missing field and the recorded delivery mode. The model selects an opening and the emphasis of the question from a short reviewed vocabulary. For instance, a role with unknown delivery mode receives conditional wording if the missing fact concerns access to a venue. This constrained task trades linguistic variety for reviewability.
+## Reproduce and inspect
 
-Python takes the record reference from the catalogue, checks that the response covers exactly the requested gaps, validates every wording choice against that field's allowed options, and publishes the assembled questions. The model never supplies role attributes, rankings, evidence references or host replies. The browser reads the published file. Visitor searches and local review activity stay out of the model request. [Builder](../ai/build_questions.py) · [Validation tests](../tests/test_ai_questions.py)
-
-## Reproduce or operate the build
-
-From the repository root, rebuild the editor-written edition and run its tests.
+From the source repository, build the offline research inputs and run the tests.
 
 ```sh
 python3 pipeline/build.py
+node pipeline/evaluate.mjs
 python3 -E -s -m ai.build_questions
 python3 -E -s -m ai.build_semantic
 python3 -m unittest discover -s tests -p 'test_ai*.py'
-node --test tests/semantic.mjs
+node --test tests/*.mjs
 ```
 
-The publish job accepts a repository Actions secret named `OPENAI_API_KEY`. A push to `main` or a manual run on `main` rebuilds the deployment. The key is scoped to the model step in a fresh runner job, after the independent verification job succeeds. Pull requests execute the checks. The browser receives only static files. Adding or changing a secret takes effect on the next trusted publish run. [Workflow](../.github/workflows/deploy.yml) · [GitHub Pages workflow guide](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
-
-The builder calls the Responses API with a pinned GPT-5.4 mini snapshot, strict structured output and `store: false`. One additional attempt is allowed on transient service or connection errors. A known billing quota error returns directly to the editor-written edition. Build logs report the provider and status. The deployed JSON is the record of which edition a visitor saw. The tests exercise success, invalid responses, quota failure and transient recovery using local fixtures. Actual model execution requires a successful publish run with `provider` set to `openai`. [Model](https://developers.openai.com/api/docs/models/gpt-5.4-mini) · [Structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses) · [Responses API](https://developers.openai.com/api/reference/resources/responses/methods/create)
+On a trusted publication run, verification occurs before model generation. The job scopes the secret to its OpenAI step and passes a separate deployment credential to the private mirror step. A new key takes effect on the next trusted publish run. Use the full private snapshot to establish what that run produced. [Release workflow](../.github/workflows/deploy.yml) · [Staff publication](../release/publish-admin.sh)

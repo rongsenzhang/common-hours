@@ -1,31 +1,31 @@
 {
-  "version": "1.0.0",
-  "caseCount": 28,
-  "catalogSize": 15,
-  "methodology": "Authored synthetic judgements and initial listing facts. Baseline uses literal word coverage; hybrid uses TF-IDF and a fixed concept vocabulary. Both apply identical gates.",
+  "version": "1.1.0",
+  "caseCount": 36,
+  "catalogSize": 19,
+  "methodology": "Authored synthetic judgements on the current catalogue. Literal word coverage is compared with TF-IDF, a controlled vocabulary and activity/object checks. Both methods use the same schedule, access and participation checks. Archived B22 tests the original catalogue.",
   "methods": {
     "baseline": {
-      "ndcgAt3": 0.5882,
-      "hitAt3": 0.5882,
-      "zeroAccuracy": 0.8182,
-      "answerable": 17,
-      "noAnswer": 11,
-      "hits": 10,
-      "correctZero": 9,
-      "labelledRoutes": 8,
-      "correctRoutes": 7,
-      "routeRecall": 0.875
+      "ndcgAt3": 0.6957,
+      "hitAt3": 0.6957,
+      "zeroAccuracy": 0.7692,
+      "answerable": 23,
+      "noAnswer": 13,
+      "hits": 16,
+      "correctZero": 10,
+      "labelledRoutes": 12,
+      "correctRoutes": 11,
+      "routeRecall": 0.9167
     },
     "hybrid": {
-      "ndcgAt3": 0.9412,
-      "hitAt3": 0.9412,
-      "zeroAccuracy": 0.8182,
-      "answerable": 17,
-      "noAnswer": 11,
-      "hits": 16,
-      "correctZero": 9,
-      "labelledRoutes": 8,
-      "correctRoutes": 8,
+      "ndcgAt3": 0.9565,
+      "hitAt3": 0.9565,
+      "zeroAccuracy": 1,
+      "answerable": 23,
+      "noAnswer": 13,
+      "hits": 22,
+      "correctZero": 13,
+      "labelledRoutes": 12,
+      "correctRoutes": 12,
       "routeRecall": 1
     }
   },
@@ -193,12 +193,12 @@
       "baseline": {
         "top3": [
           "seed-sorter",
-          "pantry-packer",
-          "repair-cafe"
+          "animal-supply-sorter",
+          "pantry-packer"
         ],
         "review": [],
         "excluded": [],
-        "returnedCount": 4,
+        "returnedCount": 5,
         "hitAt3": 1,
         "ndcgAt3": 1,
         "zeroCorrect": null,
@@ -207,13 +207,11 @@
       },
       "hybrid": {
         "top3": [
-          "seed-sorter",
-          "repair-cafe",
-          "river-walk"
+          "seed-sorter"
         ],
         "review": [],
         "excluded": [],
-        "returnedCount": 4,
+        "returnedCount": 1,
         "hitAt3": 1,
         "ndcgAt3": 1,
         "zeroCorrect": null,
@@ -235,11 +233,11 @@
         "top3": [
           "archive-transcriber",
           "caption-editor",
-          "pantry-packer"
+          "neighbourhood-dog-walker"
         ],
         "review": [],
         "excluded": [],
-        "returnedCount": 5,
+        "returnedCount": 6,
         "hitAt3": 1,
         "ndcgAt3": 1,
         "zeroCorrect": null,
@@ -254,7 +252,7 @@
         ],
         "review": [],
         "excluded": [],
-        "returnedCount": 5,
+        "returnedCount": 6,
         "hitAt3": 1,
         "ndcgAt3": 1,
         "zeroCorrect": null,
@@ -494,6 +492,7 @@
         "excluded": [
           "meal-cook",
           "caption-editor",
+          "cycle-workshop",
           "garden-buddy"
         ],
         "returnedCount": 2,
@@ -504,20 +503,15 @@
         "labelledRoutes": 1
       },
       "hybrid": {
-        "top3": [
-          "pantry-packer",
-          "poster-maker"
-        ],
+        "top3": [],
         "review": [],
         "excluded": [
-          "meal-cook",
-          "caption-editor",
-          "garden-buddy"
+          "meal-cook"
         ],
-        "returnedCount": 2,
+        "returnedCount": 0,
         "hitAt3": null,
         "ndcgAt3": null,
-        "zeroCorrect": 0,
+        "zeroCorrect": 1,
         "correctRoutes": 1,
         "labelledRoutes": 1
       }
@@ -840,41 +834,6 @@
       }
     },
     {
-      "id": "B22",
-      "query": "walk dogs",
-      "preferences": {},
-      "relevant": [],
-      "review": [],
-      "excluded": [],
-      "why": "There is no dog-walking role. A litter walk has an incidental word in common.",
-      "baseline": {
-        "top3": [
-          "river-walk"
-        ],
-        "review": [],
-        "excluded": [],
-        "returnedCount": 1,
-        "hitAt3": null,
-        "ndcgAt3": null,
-        "zeroCorrect": 0,
-        "correctRoutes": 0,
-        "labelledRoutes": 0
-      },
-      "hybrid": {
-        "top3": [
-          "river-walk"
-        ],
-        "review": [],
-        "excluded": [],
-        "returnedCount": 1,
-        "hitAt3": null,
-        "ndcgAt3": null,
-        "zeroCorrect": 0,
-        "correctRoutes": 0,
-        "labelledRoutes": 0
-      }
-    },
-    {
       "id": "B23",
       "query": "wheelchair basketball coaching",
       "preferences": {},
@@ -1087,6 +1046,367 @@
         "returnedCount": 0,
         "hitAt3": 0,
         "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B29",
+      "query": "walk dogs",
+      "preferences": {},
+      "relevant": [
+        "shelter-dog-walker",
+        "neighbourhood-dog-walker"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "Both listings explicitly offer dog walking in the expanded catalogue. Archived v1.0 B22 had no such role.",
+      "baseline": {
+        "top3": [
+          "neighbourhood-dog-walker",
+          "shelter-dog-walker",
+          "animal-supply-sorter"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 4,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "shelter-dog-walker",
+          "neighbourhood-dog-walker"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B30",
+      "query": "take a dog for a walk",
+      "preferences": {
+        "time": "weekend",
+        "stepFree": true
+      },
+      "relevant": [
+        "shelter-dog-walker"
+      ],
+      "review": [],
+      "excluded": [
+        "neighbourhood-dog-walker"
+      ],
+      "why": "The accompanied shelter loop runs at weekends and is level. The neighbourhood route has weekday sessions and steps.",
+      "baseline": {
+        "top3": [
+          "shelter-dog-walker"
+        ],
+        "review": [],
+        "excluded": [
+          "neighbourhood-dog-walker",
+          "river-walk"
+        ],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [
+          "shelter-dog-walker"
+        ],
+        "review": [],
+        "excluded": [
+          "neighbourhood-dog-walker"
+        ],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B31",
+      "query": "walk a dog",
+      "preferences": {
+        "time": "weekday"
+      },
+      "relevant": [
+        "neighbourhood-dog-walker"
+      ],
+      "review": [],
+      "excluded": [
+        "shelter-dog-walker"
+      ],
+      "why": "The neighbourhood route runs on weekdays. The shelter loop runs at weekends.",
+      "baseline": {
+        "top3": [
+          "neighbourhood-dog-walker"
+        ],
+        "review": [],
+        "excluded": [
+          "shelter-dog-walker",
+          "river-walk"
+        ],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [
+          "neighbourhood-dog-walker"
+        ],
+        "review": [],
+        "excluded": [
+          "shelter-dog-walker"
+        ],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B32",
+      "query": "dog walker",
+      "preferences": {
+        "mode": "remote"
+      },
+      "relevant": [],
+      "review": [],
+      "excluded": [
+        "neighbourhood-dog-walker",
+        "shelter-dog-walker"
+      ],
+      "why": "Both dog-walking opportunities need attendance at the venue.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [
+          "neighbourhood-dog-walker",
+          "shelter-dog-walker"
+        ],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 2,
+        "labelledRoutes": 2
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [
+          "neighbourhood-dog-walker",
+          "shelter-dog-walker"
+        ],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 2,
+        "labelledRoutes": 2
+      }
+    },
+    {
+      "id": "B33",
+      "query": "sort donated blankets",
+      "preferences": {},
+      "relevant": [
+        "animal-supply-sorter"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The supply room explicitly sorts donated blankets. Seed and grocery sorting are different activities.",
+      "baseline": {
+        "top3": [
+          "animal-supply-sorter",
+          "pantry-packer",
+          "seed-sorter"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 5,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "animal-supply-sorter"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B34",
+      "query": "walk horses",
+      "preferences": {},
+      "relevant": [],
+      "review": [],
+      "excluded": [],
+      "why": "The catalogue has walking roles but none involves horses.",
+      "baseline": {
+        "top3": [
+          "neighbourhood-dog-walker",
+          "river-walk",
+          "shelter-dog-walker"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 3,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 0,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B35",
+      "query": "groom dogs",
+      "preferences": {},
+      "relevant": [],
+      "review": [],
+      "excluded": [],
+      "why": "Animal activities include walking and sorting supplies. No listing provides grooming.",
+      "baseline": {
+        "top3": [
+          "animal-supply-sorter",
+          "neighbourhood-dog-walker",
+          "shelter-dog-walker"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 3,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 0,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B36",
+      "query": "loan helmets",
+      "preferences": {},
+      "relevant": [
+        "cycle-workshop"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The cycle workshop prepares loan helmets.",
+      "baseline": {
+        "top3": [
+          "cycle-workshop"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "cycle-workshop"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B37",
+      "query": "litter walk",
+      "preferences": {},
+      "relevant": [
+        "river-walk"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "This riverside listing involves walking to collect litter. Neither dog walk does.",
+      "baseline": {
+        "top3": [
+          "river-walk",
+          "neighbourhood-dog-walker",
+          "shelter-dog-walker"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 3,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "river-walk"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
         "zeroCorrect": null,
         "correctRoutes": 0,
         "labelledRoutes": 0

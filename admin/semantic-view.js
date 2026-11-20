@@ -1,4 +1,5 @@
-import { matchOpportunities } from "./engine.js";
+import { matchOpportunities } from "../site/engine.js";
+import { alphabeticalCases, prettyPreferences } from "./queries.js";
 import { semanticMetrics, semanticRank } from "./semantic.js";
 
 function escapeText(value) {
@@ -65,10 +66,10 @@ export function renderSemanticLab(
   evaluation,
   catalog,
   semantic,
-  caseId = "B28",
+  caseId,
 ) {
-  const item =
-    evaluation.cases.find((row) => row.id === caseId) || evaluation.cases[0];
+  const sorted = alphabeticalCases(evaluation.cases);
+  const item = sorted.find((row) => row.id === caseId) || sorted[0];
   if (!item) return "";
   const roles = catalog.opportunities;
   const prefs = { ...item.preferences, query: item.query };
@@ -100,10 +101,10 @@ export function renderSemanticLab(
       : published
         ? "This query has no published embedding scores."
         : "Embedding scores have yet to be published for this release.";
-  const options = evaluation.cases
+  const options = sorted
     .map(
       (row) =>
-        `<option value="${escapeText(row.id)}"${row.id === item.id ? " selected" : ""}>${escapeText(row.id)} · ${escapeText(row.query)}</option>`,
+        `<option value="${escapeText(row.id)}"${row.id === item.id ? " selected" : ""}>${escapeText(row.query)} · ${escapeText(row.id)}</option>`,
     )
     .join("");
   const approach = published
@@ -113,8 +114,9 @@ export function renderSemanticLab(
     <header class="semantic-intro"><div><h2 id="semantic-title">Embedding <em>comparison</em></h2>
       <p>Try the same published query with concept-aware hybrid retrieval and OpenAI text embeddings. Each method applies the same practical requirements.</p>
     </div>${approach}</header>
-    <div class="semantic-input"><label for="semantic-case">Benchmark query</label>
+    <div class="semantic-input"><label for="semantic-case">Benchmark query (A–Z)</label>
       <select id="semantic-case" data-semantic-case>${options}</select></div>
+    <p class="semantic-reference"><strong>Selected conditions</strong> · ${escapeText(prettyPreferences(item.preferences))}</p>
     <p class="semantic-reference"><strong>Reference judgement</strong> · ${escapeText(item.why)}</p>
     <div class="semantic-columns">
       <section class="semantic-method"><h3>Hybrid retrieval</h3>
@@ -128,8 +130,8 @@ export function renderSemanticLab(
     <details class="semantic-about"><summary>Benchmark totals and method</summary>
       ${metricTable(evaluation.methods.hybrid, aggregate)}
       <p>The cosine cut-off of ${cutoff.toFixed(2)} was declared before the first API run. Each score orders text similarity within its own method. Numerical scores from the two methods use different scales.</p>
-      <p>The release workflow computes embeddings for fictional listings and the fixed benchmark questions. Visitors explore the saved scores locally. Free-text searches in Discover use the hybrid finder.</p>
+      <p>The release workflow computes embeddings for fictional listings and the fixed benchmark questions. This dashboard reads the saved scores. Volunteer searches run separately.</p>
       <a href="./data/semantic.json">Score file served by this release</a>
-      · <a href="https://github.com/rongsenzhang/common-hours/blob/main/site/semantic.js">Scoring implementation <span aria-hidden="true">↗</span></a>
+      · <a href="https://github.com/rongsenzhang/common-hours/blob/main/admin/semantic.js">Scoring implementation <span aria-hidden="true">↗</span></a>
     </details></section>`;
 }

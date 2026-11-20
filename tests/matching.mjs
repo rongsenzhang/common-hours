@@ -9,6 +9,36 @@ const ids = rows => rows.map(row => row.opportunity.id);
 const search = (query, preferences = {}, method = 'hybrid', roles = data.opportunities) =>
   matchOpportunities(roles, {query, ...preferences}, method);
 
+test('replays v1.0 B22 on the original catalogue and distinguishes new dog-walking roles', async () => {
+  const archive = JSON.parse(await readFile(new URL('../fixtures/history/v1.0-B22.json', import.meta.url)));
+  assert.deepEqual(archive.publishedHybridTop3, ['river-walk']);
+  assert.deepEqual(archive.case.relevant, []);
+  assert.equal(archive.opportunities.length, 15);
+  assert.deepEqual(search(archive.case.query, {}, 'hybrid', archive.opportunities), {matches: [], review: [], excluded: []});
+
+  const walkers = ['neighbourhood-dog-walker', 'shelter-dog-walker'];
+  for (const query of ['walk dogs', 'pooch walking', 'I would like to walk a dog', 'take a dog for a stroll']) {
+    assert.deepEqual(ids(search(query).matches).sort(), walkers, query);
+  }
+  assert.deepEqual(ids(search('litter walk').matches), ['river-walk']);
+  assert.deepEqual(ids(search('sort donated blankets').matches), ['animal-supply-sorter']);
+  // Removing both walkers leaves the near-miss supply sorter and litter walk, neither a valid substitute.
+  const withoutWalkers = data.opportunities.filter((role) => !walkers.includes(role.id));
+  assert.deepEqual(search('walking dogs', {}, 'hybrid', withoutWalkers), {matches: [], review: [], excluded: []});
+});
+
+test('compound activity requests need evidence of both action and object', () => {
+  for (const query of ['walking horses', 'walk penguins in a park', 'groom dogs', 'sort batteries', 'train puppies']) {
+    assert.deepEqual(search(query), {matches: [], review: [], excluded: []}, query);
+  }
+  const local = search('walk dogs', {time: 'weekend', stepFree: true});
+  assert.deepEqual(ids(local.matches), ['shelter-dog-walker']);
+  assert.deepEqual(ids(local.excluded), ['neighbourhood-dog-walker']);
+  assert.deepEqual(local.excluded[0].issues.map(issue => issue.field), ['time', 'stepFree']);
+  assert.deepEqual(ids(search('dog walking', {mode: 'remote'}).matches), []);
+  assert.deepEqual(ids(search('rubbish', {stepFree: true}).excluded), ['river-walk']);
+});
+
 test('unknown access is reviewable until an evidence-backed correction is applied', () => {
   const prefs = {time: 'weekend', mode: 'onsite', stepFree: true};
   const queried = search('allotment', prefs);

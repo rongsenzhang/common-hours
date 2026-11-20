@@ -1,8 +1,8 @@
+import { escapeText as e } from "./html.js";
 import { matchOpportunities } from "./engine.js";
 import { icon, mark } from "./icons.js";
-import { renderDesk } from "./desk-view.js";
-import { renderEvidence } from "./research-view.js";
-import { renderSemanticLab } from "./semantic-view.js";
+import { answerVolunteerQuestion } from "./assistant.js";
+import { renderChat } from "./chat-view.js";
 
 const main = document.querySelector("#main");
 const dialog = document.querySelector("#role-dialog");
@@ -16,17 +16,14 @@ const entryPrefs = () => ({
 let prefs = entryPrefs(),
   section = "matches",
   catalog,
-  evaluation,
   ai,
-  semantic,
-  semanticCase = "B28",
   page,
   resultLimit = 6,
   expandedFilters = false,
   returnFocus;
 const saved = new Set(readList("saved"));
-const resolved = new Set(readList("confirmed"));
-const keyOf = (f) => f.id + ":" + f.field;
+let turns = [];
+let conversation = null;
 const labels = {
   time: "Availability",
   mode: "Participation",
@@ -43,6 +40,7 @@ const labels = {
   na: "No venue visit",
 };
 const themes = {
+  animals: ["paw", "Animal care"],
   arts: ["arts", "Arts & heritage"],
   community: ["people", "Community"],
   digital: ["digital", "Digital support"],
@@ -60,16 +58,6 @@ const browseOrder = [
   "phone-companion",
   "repair-cafe",
 ];
-function escapeText(value) {
-  return String(value ?? "").replace(
-    /[&<>"']/g,
-    (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
-        c
-      ],
-  );
-}
-const e = escapeText;
 function readList(name) {
   try {
     const x = JSON.parse(localStorage.getItem("commonhours.1." + name));
@@ -88,23 +76,8 @@ function saveList(name, set) {
 function announce(s) {
   document.querySelector("#announcer").textContent = s;
 }
-function effectiveRoles() {
-  return catalog.opportunities.map((role) => {
-    const updates = catalog.followUps.filter(
-      (f) => f.id === role.id && resolved.has(keyOf(f)),
-    );
-    return updates.reduce(
-      (r, f) => ({
-        ...r,
-        [f.field]: f.value,
-        sources: { ...r.sources, [f.field]: f.source },
-      }),
-      role,
-    );
-  });
-}
 function ranking() {
-  const r = matchOpportunities(effectiveRoles(), prefs);
+  const r = matchOpportunities(catalog.opportunities, prefs);
   if (!prefs.query) {
     const order = (id) => {
       const i = browseOrder.indexOf(id);
@@ -156,7 +129,7 @@ function filterHtml() {
  <button type="submit" class="primary apply">${icon("search", 17)} Find roles</button><button class="text-btn reset" type="button" data-clear>Reset preferences</button></form></aside>`;
 }
 function hero() {
-  return `<section class="hero"><div class="hero-copy"><p class="eyebrow">${icon("pin", 15)} Greater Manchester</p><h1>Find your place<br><em>to volunteer.</em></h1><p class="hero-sub">Explore community roles that fit your interests, your time and your access needs.</p><div class="hero-meta"><span>${icon("layers", 16)} ${catalog.opportunities.length} demo roles</span><i></i><span>${catalog.summary.hostCount} community hosts</span></div></div><div class="hero-photo"><img src="./assets/allotment.webp" width="1000" height="667" alt="Illustration of two volunteers planting seedlings in a community allotment"><span>Community growing · illustrative scene</span></div></section>`;
+  return `<section class="hero"><div class="hero-copy"><p class="eyebrow">${icon("pin", 15)} Greater Manchester</p><h1>Find your place<br><em>to volunteer.</em></h1><p class="hero-sub">Explore community roles that fit your interests, your time and your access needs.</p><a class="hero-assistant" href="#ask">Ask the role finder ${icon("next", 16)}</a><div class="hero-meta"><span>${icon("layers", 16)} ${catalog.opportunities.length} demo roles</span><i></i><span>${catalog.summary.hostCount} community hosts</span></div></div><div class="hero-photo"><img src="./assets/allotment.webp" width="1000" height="667" alt="Illustration of two volunteers planting seedlings in a community allotment"><span>Community growing · illustrative scene</span></div></section>`;
 }
 function renderCard(row) {
   const r = row.opportunity,
@@ -169,7 +142,7 @@ function renderCard(row) {
 }
 function showResults() {
   const r = ranking(),
-    savedRows = effectiveRoles()
+    savedRows = catalog.opportunities
       .filter((x) => saved.has(x.id))
       .map((opportunity) => ({ opportunity }));
   const choices = [
@@ -227,45 +200,24 @@ function refreshResults() {
 }
 function render(scroll = false) {
   const h = location.hash.slice(1);
-  page = ["desk", "evidence"].includes(h) ? h : "discover";
+  page = h === "ask" ? "ask" : "discover";
   document.title =
-    {
-      desk: "Coordinator desk",
-      evidence: "Research evidence",
-      discover: "Discover volunteer roles",
-    }[page] + " · Common Hours";
+    (page === "ask" ? "Ask the role finder" : "Discover volunteer roles") +
+    " · Common Hours";
   for (const n of document.querySelectorAll("nav a")) {
     if (n.dataset.page === page) n.setAttribute("aria-current", "page");
     else n.removeAttribute("aria-current");
   }
   main.innerHTML =
-    page === "desk"
-      ? renderDesk(catalog, resolved, ai)
-      : page === "evidence"
-        ? renderEvidence(evaluation, catalog, ai)
-        : discover();
-  if (page === "evidence") {
-    main
-      .querySelector(".research-benchmark")
-      .insertAdjacentHTML(
-        "beforebegin",
-        '<div id="semantic-lab">' +
-          renderSemanticLab(evaluation, catalog, semantic, semanticCase) +
-          "</div>",
-      );
-  }
+    page === "ask" ? renderChat(turns, catalog.opportunities) : discover();
   if (scroll) {
     main.focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }
 }
 function detail(id) {
-  const r = effectiveRoles().find((x) => x.id === id);
+  const r = catalog.opportunities.find((x) => x.id === id);
   if (!r) return;
-  const ranked = ranking();
-  const found = Object.entries(ranked)
-    .flatMap(([group, rows]) => rows.map((item) => ({ group, ...item })))
-    .find((x) => x.opportunity.id === id);
   const t = themes[r.theme] || themes.community;
   returnFocus = document.activeElement;
   const qs = ai.questions.filter(
@@ -274,17 +226,14 @@ function detail(id) {
       r[q.field] === "unknown" &&
       !(q.field === "stepFree" && r.mode === "remote"),
   );
-  const why = found
-    ? [...found.issues.map((i) => i.label), ...found.reasons]
-    : [];
   const fields = ["time", "mode", "stepFree"];
   dialog.innerHTML = `<div class="modal-head"><span class="themelabel"><span class="tile ${e(r.theme)}">${icon(t[0], 22)}</span>${e(t[1])}</span><button autofocus class="close" aria-label="Close role details" data-close>${icon("close")}</button></div>
  <h2 id="dialog-title">${e(r.title)}</h2><p class="org">${e(r.organisation)} · ${e(r.area)}</p><p>${e(r.summary)}</p>
  <h3>What you would do</h3><ul>${r.tasks.map((x) => "<li>" + e(x) + "</li>").join("")}</ul>
  <h3>Role details</h3><dl class="fact-grid">${fields.map((f) => "<div><dt>" + e(labels[f]) + "</dt><dd>" + e(f === "stepFree" && r.mode === "remote" ? "No venue visit" : labels[r[f]]) + "</dd></div>").join("")}</dl>
- <h3>Why this role appears</h3>${why.length ? "<ul>" + why.map((x) => "<li>" + e(x) + "</li>").join("") + "</ul>" : "<p>" + (!found ? "You saved this role earlier. It falls outside your current search." : "You are browsing the directory with no specific requirements.") + "</p>"}
- ${qs.length ? `<div class="question"><p class="eyebrow">Ask the host</p>${qs.map((q) => "<p>" + e(q.question) + "</p>").join("")}<small>${ai.provider === "openai" ? "OpenAI-assisted wording · created at release" : "Editor-written wording"} · Synthetic listing</small></div>` : ""}
- <details class="sources"><summary>View source records</summary><dl>${[...fields, "summary"].map((f) => "<div><dt>" + e(labels[f] || "Description") + "</dt><dd>" + e(r.sources[f]) + "</dd></div>").join("")}</dl></details><div class="modal-foot"><button class="primary" data-dialog-save="${e(id)}">${icon("save", 17)} ${saved.has(id) ? "Remove from saved" : "Save role"}</button></div>`;
+ ${r.contactNote ? "<h3>Before you take part</h3><p>" + e(r.contactNote) + "</p>" : ""}
+ ${qs.length ? `<div class="question"><h3>What to ask the organiser</h3>${qs.map((q) => "<p>" + e(q.question) + "</p>").join("")}</div>` : ""}
+ <div class="modal-foot"><button class="primary" data-dialog-save="${e(id)}">${icon("save", 17)} ${saved.has(id) ? "Remove from saved" : "Save role"}</button></div>`;
   if (!dialog.open) dialog.showModal();
 }
 function toggleSaved(id) {
@@ -293,21 +242,22 @@ function toggleSaved(id) {
   saveList("saved", saved);
   announce(saved.has(id) ? "Role saved." : "Role removed from saved.");
 }
-function goToGarden() {
-  prefs = {
-    query: "allotment",
-    time: "weekend",
-    mode: "onsite",
-    stepFree: true,
-  };
-  resultLimit = 6;
-  section = resolved.has("garden-buddy:stepFree") ? "matches" : "review";
-  expandedFilters = true;
-  if (location.hash !== "#discover") location.hash = "discover";
-  else render();
-  requestAnimationFrame(() =>
-    document.querySelector("#results")?.scrollIntoView({ block: "start" }),
+function ask(message) {
+  const input = message.trim();
+  if (!input) return;
+  const reply = answerVolunteerQuestion(
+    input,
+    catalog.opportunities,
+    conversation,
   );
+  conversation = reply.state;
+  turns.push({ input, reply });
+  main.innerHTML = renderChat(turns, catalog.opportunities);
+  main.querySelector("#chat-input").focus({ preventScroll: true });
+  main
+    .querySelector(".chat-turn:last-child")
+    ?.scrollIntoView({ block: "nearest" });
+  announce(reply.text);
 }
 document.addEventListener("click", (ev) => {
   const b = ev.target.closest("button");
@@ -358,26 +308,14 @@ document.addEventListener("click", (ev) => {
     refreshResults();
     main.querySelectorAll(".role-card h3 button")[prev]?.focus();
   }
-  if (d.resolve || d.undo) {
-    const key = d.resolve || d.undo;
-    if (!catalog.followUps.some((f) => keyOf(f) === key)) return;
-    if (d.resolve) resolved.add(key);
-    else resolved.delete(key);
-    saveList("confirmed", resolved);
+  if (d.prompt) ask(d.prompt);
+  if ("restartChat" in d) {
+    conversation = null;
+    turns = [];
     render();
-    const newAction = main.querySelector(
-      "[data-" + (d.resolve ? "undo" : "resolve") + '="' + key + '"]',
-    );
-    if (newAction) {
-      const panel = newAction.closest("details");
-      if (panel) panel.open = true;
-      newAction.focus();
-    }
-    announce(
-      d.resolve ? "Host evidence applied." : "Previous field value restored.",
-    );
+    main.querySelector("#chat-input")?.focus();
+    announce("Conversation cleared.");
   }
-  if (d.demo === "garden") goToGarden();
 });
 dialog.addEventListener("click", (ev) => {
   if (ev.target === dialog) {
@@ -396,6 +334,11 @@ dialog.addEventListener("close", () => {
   else main.querySelector("[data-detail]")?.focus();
 });
 document.addEventListener("submit", (ev) => {
+  if (ev.target.id === "chat-form") {
+    ev.preventDefault();
+    ask(String(new FormData(ev.target).get("message") || ""));
+    return;
+  }
   if (ev.target.id !== "pref-form") return;
   ev.preventDefault();
   const f = new FormData(ev.target);
@@ -413,19 +356,6 @@ document.addEventListener("submit", (ev) => {
   if (matchMedia("(max-width:760px)").matches)
     main.querySelector("#results").scrollIntoView();
 });
-document.addEventListener("change", (ev) => {
-  const select = ev.target.closest("[data-semantic-case]");
-  if (!select) return;
-  semanticCase = select.value;
-  document.querySelector("#semantic-lab").innerHTML = renderSemanticLab(
-    evaluation,
-    catalog,
-    semantic,
-    semanticCase,
-  );
-  document.querySelector("[data-semantic-case]")?.focus();
-  announce("Semantic comparison updated.");
-});
 window.addEventListener("hashchange", () => {
   if (catalog && location.hash !== "#main") render(true);
 });
@@ -435,18 +365,12 @@ async function loadJson(file) {
   return response.json();
 }
 try {
-  [catalog, evaluation, ai, semantic] = await Promise.all([
+  [catalog, ai] = await Promise.all([
     loadJson("catalog.json"),
-    loadJson("evaluation.json"),
-    loadJson("host-questions.json").catch(() => ({
-      provider: "curated",
-      status: "fallback",
-      questions: [],
-    })),
-    loadJson("semantic.json").catch(() => null),
+    loadJson("host-questions.json").catch(() => ({ questions: [] })),
   ]);
   render();
 } catch {
   main.innerHTML =
-    '<div class="empty"><h1>The catalogue could not open</h1><p>Reload the page to try again.</p><a href="https://github.com/rongsenzhang/common-hours">Read the project on GitHub</a></div>';
+    '<div class="empty"><h1>The catalogue could not open</h1><p>Reload the page to try again.</p></div>';
 }

@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#163e32" />
     <meta
       name="description"
-      content="Explore fictional volunteering roles in Greater Manchester, see why they match, and investigate the evidence behind a recommendation."
+      content="Explore fictional volunteering roles in Greater Manchester, ask questions, and find activities that fit your interests and availability."
     />
     <title>Discover volunteer roles · Common Hours</title>
     <link rel="icon" href="./assets/mark.svg" type="image/svg+xml" />
@@ -18,8 +18,7 @@
       crossorigin
     />
     <link rel="stylesheet" href="./style.css" />
-    <link rel="stylesheet" href="./research.css" />
-    <link rel="stylesheet" href="./desk.css" />
+    <link rel="stylesheet" href="./chat.css" />
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -29,13 +28,9 @@
           ><span id="mark"></span>Common Hours</a
         >
         <nav aria-label="Main navigation">
-          <a href="#discover" data-page="discover">Discover</a
-          ><a href="#desk" data-page="desk">Coordinator desk</a
-          ><a href="#evidence" data-page="evidence">Evidence</a>
+          <a href="#discover" data-page="discover">Discover</a>
+          <a href="#ask" data-page="ask">Ask the role finder</a>
         </nav>
-        <a class="source" href="https://github.com/rongsenzhang/common-hours"
-          >GitHub <span aria-hidden="true">↗</span></a
-        >
       </div>
     </header>
     <main id="main" tabindex="-1" class="frame">
@@ -47,20 +42,15 @@
           <strong>Common Hours</strong>
           <p>Independent research demo · Fictional roles and organisations</p>
         </div>
-        <a
-          href="https://github.com/rongsenzhang/common-hours/releases/tag/v1.0.0"
-          >Version 1.0</a
-        >
+        <span>Common Hours 1.1</span>
       </div>
     </footer>
     <dialog id="role-dialog" aria-labelledby="dialog-title"></dialog>
     <div id="announcer" class="sr" role="status" aria-live="polite"></div>
     <noscript
       ><p>
-        This interactive demo needs JavaScript.
-        <a href="https://github.com/rongsenzhang/common-hours"
-          >Read the project and its findings on GitHub.</a
-        >
+        Turn on JavaScript to search the volunteering catalogue or ask about a
+        role.
       </p></noscript
     >
     <script type="module" src="./app.js"></script>

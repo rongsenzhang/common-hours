@@ -1,0 +1,12 @@
+.top-inner { justify-content: space-between; gap: 1rem; }
+.brand { display: inline-flex; align-items: center; gap: .55rem; }
+.admin-preview { padding-block: clamp(2rem, 6vw, 5rem); max-width: 44rem; }
+.admin-preview h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.1; }
+.admin-preview dl { margin: 1.8rem 0; }
+.admin-preview dl > div { padding: .75rem 0; border-top: 1px solid #c9d6cf; }
+.admin-preview dd { margin: .3rem 0 0; }
+.admin-preview dt { font-weight: 650; }
+@media (max-width: 560px) {
+  .top-inner { flex-wrap: wrap; padding-block: .65rem; }
+  .top-inner nav { display: flex; visibility: visible; width: 100%; position: static; }
+}

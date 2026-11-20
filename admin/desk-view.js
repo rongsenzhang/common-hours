@@ -1,4 +1,4 @@
-import { icon } from "./icons.js";
+import { icon } from "../site/icons.js";
 
 const fields = {
   stepFree: {
@@ -202,7 +202,7 @@ export function renderDesk(catalog, resolvedIds = new Set(), ai) {
     '<div class="desk-grid"><section class="desk-queue" aria-label="Listing review queue"><div class="desk-section-heading"><h2>Review queue</h2></div>' +
     section("Host replies", available, available[0]?.key, draftFor) +
     section("Awaiting a reply", pending, "", draftFor) +
-    section("Confirmed in this browser", confirmed, "", draftFor) +
+    section("Confirmed in this staff session", confirmed, "", draftFor) +
     "</section>" +
     '<aside class="desk-aside"><div class="desk-walkthrough"><span class="desk-aside-symbol">' +
     icon("sprout", 27) +
@@ -212,13 +212,13 @@ export function renderDesk(catalog, resolvedIds = new Set(), ai) {
     "<p>" +
     (gardenDone
       ? "You confirmed the fictional host’s reply. The garden can now appear among their matches."
-      : "The garden is waiting for an access check. Open the volunteer search, then return here to review the host’s reply.") +
-    '</p><button type="button" class="secondary" data-demo="garden">View volunteer search ' +
+      : "The garden is waiting for an access check. Open the preview, then return here to review the host’s reply.") +
+    '</p><button type="button" class="secondary" data-demo="garden">Preview volunteer result ' +
     icon("next", 16) +
     "</button></div>" +
     '<div class="desk-local"><span>' +
     icon("info", 18) +
-    "</span><p>Confirmations apply in this browser. You can undo a confirmation to restore the original listing.</p></div></aside></div></div>"
+    "</span><p>Confirmations apply in this staff session. You can undo a confirmation to restore the original listing.</p></div></aside></div></div>"
   );
 }
 
