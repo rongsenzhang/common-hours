@@ -1,0 +1,12 @@
+[
+  {"id":"seed-club","name":"Moss Lane Growers","area":"Hulme"},
+  {"id":"pantry","name":"Common Basket Kitchen","area":"Ancoats"},
+  {"id":"library","name":"Little Lantern Library","area":"Levenshulme"},
+  {"id":"neighbours","name":"Neighbourline Circle","area":"Chorlton"},
+  {"id":"repair","name":"The Mending Room","area":"Salford"},
+  {"id":"stories","name":"North Loom Arts","area":"Ancoats"},
+  {"id":"rivers","name":"Blue Path Collective","area":"Trafford"},
+  {"id":"learning","name":"Open Door Learning Club","area":"Rusholme"},
+  {"id":"welcome","name":"Neighbourhood Welcome Desk","area":"Longsight"},
+  {"id":"habitat","name":"Hedge & Hollow Club","area":"Didsbury"}
+]

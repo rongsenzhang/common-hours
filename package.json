@@ -1,0 +1,11 @@
+{
+  "name": "common-hours",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Explainable volunteer opportunity discovery",
+  "scripts": {
+    "test": "node --test tests/*.mjs",
+    "evaluate": "node pipeline/evaluate.mjs"
+  }
+}

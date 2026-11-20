@@ -1,0 +1,5 @@
+[
+  {"id":"garden-buddy","field":"stepFree","value":"yes","note":"The fictional host confirmed a level entrance and step-free paths to the raised beds.","source":"follow-ups.json:F01"},
+  {"id":"repair-cafe","field":"time","value":"weekend","note":"The fictional host confirmed this session runs on Saturdays.","source":"follow-ups.json:F02"},
+  {"id":"phone-companion","field":"mode","value":"remote","note":"The fictional host confirmed calls can be made from home with no venue visit.","source":"follow-ups.json:F03"}
+]

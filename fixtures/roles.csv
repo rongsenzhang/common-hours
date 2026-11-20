@@ -1,0 +1,16 @@
+id,host_id,title,theme,summary,interests,tasks
+garden-buddy,seed-club,Community garden buddy,growing,Help neighbours plant vegetables and look after raised beds at a shared garden.,growing|outdoors,Plant seedlings|Water raised beds
+pantry-packer,pantry,Community pantry packer,food,Sort donated groceries and assemble food parcels for local households.,food|practical,Check tins|Pack grocery bags
+digital-helper,library,Digital drop-in helper,digital,Show library visitors how to use a smartphone and build confidence online.,digital|teaching,Practise email|Explain device settings
+phone-companion,neighbours,Telephone companion,community,Offer a friendly conversation and regular listening time to an isolated neighbour.,companionship|listening,Listen on a call|Record a check-in
+repair-cafe,repair,Repair café assistant,repair,Join a workbench team repairing small household items and learning simple fixes.,repair|practical,Sort tools|Help with mending
+archive-transcriber,stories,Local history transcriber,arts,Turn scanned handwritten letters into text for a local history collection.,heritage|writing,Transcribe letters|Check historical names
+river-walk,rivers,Riverside litter walk,nature,Keep the riverside path tidy by picking up litter with a small walking group.,outdoors|nature,Collect litter|Sort recycling
+reading-partner,learning,Reading practice partner,learning,Read short stories with adult learners and practise English pronunciation.,literacy|teaching,Read aloud|Practise English
+meal-cook,pantry,Community kitchen cook,food,Prepare vegetables and cook simple meals alongside the community kitchen team.,food|cooking,Chop vegetables|Prepare meals
+poster-maker,stories,Community poster designer,arts,Design accessible publicity posters for local arts events using supplied text and images.,design|arts,Design posters|Prepare digital artwork
+welcome-desk,welcome,Welcome desk greeter,community,Greet visitors at a neighbourhood centre and explain which local services run that day.,welcome|communication,Meet visitors|Give directions
+website-tester,library,Website usability tester,digital,Try sample journeys on a charity website and write up any usability issues.,digital|testing,Check navigation|Write bug reports
+wildlife-counter,habitat,Park wildlife recorder,nature,Observe birds in a park and record a simple wildlife count alongside other volunteers.,nature|wildlife,Identify birds|Record sightings
+seed-sorter,seed-club,Seed library sorter,growing,Label donated seed packets for the library and prepare planting information cards.,growing|organising,Sort seeds|Label seed packets
+caption-editor,stories,Community audio caption editor,arts,Create captions for short recorded interviews to make local arts stories easier to follow.,arts|writing,Edit captions|Check transcripts

@@ -1,0 +1,573 @@
+{
+  "version": "1.0.0",
+  "provenance": "All organisations, opportunities, timings and follow-ups are fictional.",
+  "summary": {
+    "roleCount": 15,
+    "hostCount": 10,
+    "counts": {
+      "time": {
+        "flexible": 3,
+        "unknown": 1,
+        "weekday": 5,
+        "weekend": 6
+      },
+      "mode": {
+        "hybrid": 1,
+        "onsite": 9,
+        "remote": 4,
+        "unknown": 1
+      },
+      "stepFree": {
+        "na": 4,
+        "no": 1,
+        "unknown": 3,
+        "yes": 7
+      },
+      "theme": {
+        "arts": 3,
+        "community": 2,
+        "digital": 2,
+        "food": 2,
+        "growing": 2,
+        "learning": 1,
+        "nature": 2,
+        "repair": 1
+      }
+    }
+  },
+  "opportunities": [
+    {
+      "id": "archive-transcriber",
+      "title": "Local history transcriber",
+      "organisation": "North Loom Arts",
+      "area": "Ancoats",
+      "theme": "arts",
+      "summary": "Turn scanned handwritten letters into text for a local history collection.",
+      "time": "flexible",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Ask the archive lead for a sample scan.",
+      "interests": [
+        "heritage",
+        "writing"
+      ],
+      "tasks": [
+        "Transcribe letters",
+        "Check historical names"
+      ],
+      "sources": {
+        "id": "roles.csv:archive-transcriber",
+        "title": "roles.csv:archive-transcriber",
+        "theme": "roles.csv:archive-transcriber",
+        "summary": "roles.csv:archive-transcriber",
+        "interests": "roles.csv:archive-transcriber",
+        "tasks": "roles.csv:archive-transcriber",
+        "organisation": "hosts.json:stories",
+        "area": "hosts.json:stories",
+        "time": "sessions.csv:S06",
+        "mode": "sessions.csv:S06",
+        "stepFree": "sessions.csv:S06",
+        "contactNote": "sessions.csv:S06"
+      }
+    },
+    {
+      "id": "caption-editor",
+      "title": "Community audio caption editor",
+      "organisation": "North Loom Arts",
+      "area": "Ancoats",
+      "theme": "arts",
+      "summary": "Create captions for short recorded interviews to make local arts stories easier to follow.",
+      "time": "weekend",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The team provides a short sample recording to practise with.",
+      "interests": [
+        "arts",
+        "writing"
+      ],
+      "tasks": [
+        "Edit captions",
+        "Check transcripts"
+      ],
+      "sources": {
+        "id": "roles.csv:caption-editor",
+        "title": "roles.csv:caption-editor",
+        "theme": "roles.csv:caption-editor",
+        "summary": "roles.csv:caption-editor",
+        "interests": "roles.csv:caption-editor",
+        "tasks": "roles.csv:caption-editor",
+        "organisation": "hosts.json:stories",
+        "area": "hosts.json:stories",
+        "time": "sessions.csv:S15",
+        "mode": "sessions.csv:S15",
+        "stepFree": "sessions.csv:S15",
+        "contactNote": "sessions.csv:S15"
+      }
+    },
+    {
+      "id": "digital-helper",
+      "title": "Digital drop-in helper",
+      "organisation": "Little Lantern Library",
+      "area": "Levenshulme",
+      "theme": "digital",
+      "summary": "Show library visitors how to use a smartphone and build confidence online.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host provides devices and an induction.",
+      "interests": [
+        "digital",
+        "teaching"
+      ],
+      "tasks": [
+        "Practise email",
+        "Explain device settings"
+      ],
+      "sources": {
+        "id": "roles.csv:digital-helper",
+        "title": "roles.csv:digital-helper",
+        "theme": "roles.csv:digital-helper",
+        "summary": "roles.csv:digital-helper",
+        "interests": "roles.csv:digital-helper",
+        "tasks": "roles.csv:digital-helper",
+        "organisation": "hosts.json:library",
+        "area": "hosts.json:library",
+        "time": "sessions.csv:S03",
+        "mode": "sessions.csv:S03",
+        "stepFree": "sessions.csv:S03",
+        "contactNote": "sessions.csv:S03"
+      }
+    },
+    {
+      "id": "garden-buddy",
+      "title": "Community garden buddy",
+      "organisation": "Moss Lane Growers",
+      "area": "Hulme",
+      "theme": "growing",
+      "summary": "Help neighbours plant vegetables and look after raised beds at a shared garden.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "The host can check the path between the entrance and the beds.",
+      "interests": [
+        "growing",
+        "outdoors"
+      ],
+      "tasks": [
+        "Plant seedlings",
+        "Water raised beds"
+      ],
+      "sources": {
+        "id": "roles.csv:garden-buddy",
+        "title": "roles.csv:garden-buddy",
+        "theme": "roles.csv:garden-buddy",
+        "summary": "roles.csv:garden-buddy",
+        "interests": "roles.csv:garden-buddy",
+        "tasks": "roles.csv:garden-buddy",
+        "organisation": "hosts.json:seed-club",
+        "area": "hosts.json:seed-club",
+        "time": "sessions.csv:S01",
+        "mode": "sessions.csv:S01",
+        "stepFree": "sessions.csv:S01",
+        "contactNote": "sessions.csv:S01"
+      }
+    },
+    {
+      "id": "meal-cook",
+      "title": "Community kitchen cook",
+      "organisation": "Common Basket Kitchen",
+      "area": "Ancoats",
+      "theme": "food",
+      "summary": "Prepare vegetables and cook simple meals alongside the community kitchen team.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Ask about the height of the work surfaces.",
+      "interests": [
+        "food",
+        "cooking"
+      ],
+      "tasks": [
+        "Chop vegetables",
+        "Prepare meals"
+      ],
+      "sources": {
+        "id": "roles.csv:meal-cook",
+        "title": "roles.csv:meal-cook",
+        "theme": "roles.csv:meal-cook",
+        "summary": "roles.csv:meal-cook",
+        "interests": "roles.csv:meal-cook",
+        "tasks": "roles.csv:meal-cook",
+        "organisation": "hosts.json:pantry",
+        "area": "hosts.json:pantry",
+        "time": "sessions.csv:S09",
+        "mode": "sessions.csv:S09",
+        "stepFree": "sessions.csv:S09",
+        "contactNote": "sessions.csv:S09"
+      }
+    },
+    {
+      "id": "pantry-packer",
+      "title": "Community pantry packer",
+      "organisation": "Common Basket Kitchen",
+      "area": "Ancoats",
+      "theme": "food",
+      "summary": "Sort donated groceries and assemble food parcels for local households.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Ask the pantry lead about handling boxes or seated packing.",
+      "interests": [
+        "food",
+        "practical"
+      ],
+      "tasks": [
+        "Check tins",
+        "Pack grocery bags"
+      ],
+      "sources": {
+        "id": "roles.csv:pantry-packer",
+        "title": "roles.csv:pantry-packer",
+        "theme": "roles.csv:pantry-packer",
+        "summary": "roles.csv:pantry-packer",
+        "interests": "roles.csv:pantry-packer",
+        "tasks": "roles.csv:pantry-packer",
+        "organisation": "hosts.json:pantry",
+        "area": "hosts.json:pantry",
+        "time": "sessions.csv:S02",
+        "mode": "sessions.csv:S02",
+        "stepFree": "sessions.csv:S02",
+        "contactNote": "sessions.csv:S02"
+      }
+    },
+    {
+      "id": "phone-companion",
+      "title": "Telephone companion",
+      "organisation": "Neighbourline Circle",
+      "area": "Chorlton",
+      "theme": "community",
+      "summary": "Offer a friendly conversation and regular listening time to an isolated neighbour.",
+      "time": "flexible",
+      "mode": "unknown",
+      "stepFree": "unknown",
+      "contactNote": "Ask whether calls can be made from home.",
+      "interests": [
+        "companionship",
+        "listening"
+      ],
+      "tasks": [
+        "Listen on a call",
+        "Record a check-in"
+      ],
+      "sources": {
+        "id": "roles.csv:phone-companion",
+        "title": "roles.csv:phone-companion",
+        "theme": "roles.csv:phone-companion",
+        "summary": "roles.csv:phone-companion",
+        "interests": "roles.csv:phone-companion",
+        "tasks": "roles.csv:phone-companion",
+        "organisation": "hosts.json:neighbours",
+        "area": "hosts.json:neighbours",
+        "time": "sessions.csv:S04",
+        "mode": "sessions.csv:S04",
+        "stepFree": "sessions.csv:S04",
+        "contactNote": "sessions.csv:S04"
+      }
+    },
+    {
+      "id": "poster-maker",
+      "title": "Community poster designer",
+      "organisation": "North Loom Arts",
+      "area": "Ancoats",
+      "theme": "arts",
+      "summary": "Design accessible publicity posters for local arts events using supplied text and images.",
+      "time": "flexible",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The organiser supplies a brief and source files.",
+      "interests": [
+        "design",
+        "arts"
+      ],
+      "tasks": [
+        "Design posters",
+        "Prepare digital artwork"
+      ],
+      "sources": {
+        "id": "roles.csv:poster-maker",
+        "title": "roles.csv:poster-maker",
+        "theme": "roles.csv:poster-maker",
+        "summary": "roles.csv:poster-maker",
+        "interests": "roles.csv:poster-maker",
+        "tasks": "roles.csv:poster-maker",
+        "organisation": "hosts.json:stories",
+        "area": "hosts.json:stories",
+        "time": "sessions.csv:S10",
+        "mode": "sessions.csv:S10",
+        "stepFree": "sessions.csv:S10",
+        "contactNote": "sessions.csv:S10"
+      }
+    },
+    {
+      "id": "reading-partner",
+      "title": "Reading practice partner",
+      "organisation": "Open Door Learning Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Read short stories with adult learners and practise English pronunciation.",
+      "time": "weekday",
+      "mode": "hybrid",
+      "stepFree": "yes",
+      "contactNote": "Meet at the venue or select a fully remote session.",
+      "interests": [
+        "literacy",
+        "teaching"
+      ],
+      "tasks": [
+        "Read aloud",
+        "Practise English"
+      ],
+      "sources": {
+        "id": "roles.csv:reading-partner",
+        "title": "roles.csv:reading-partner",
+        "theme": "roles.csv:reading-partner",
+        "summary": "roles.csv:reading-partner",
+        "interests": "roles.csv:reading-partner",
+        "tasks": "roles.csv:reading-partner",
+        "organisation": "hosts.json:learning",
+        "area": "hosts.json:learning",
+        "time": "sessions.csv:S08",
+        "mode": "sessions.csv:S08",
+        "stepFree": "sessions.csv:S08",
+        "contactNote": "sessions.csv:S08"
+      }
+    },
+    {
+      "id": "repair-cafe",
+      "title": "Repair café assistant",
+      "organisation": "The Mending Room",
+      "area": "Salford",
+      "theme": "repair",
+      "summary": "Join a workbench team repairing small household items and learning simple fixes.",
+      "time": "unknown",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Ask the host when the next workshop runs.",
+      "interests": [
+        "repair",
+        "practical"
+      ],
+      "tasks": [
+        "Sort tools",
+        "Help with mending"
+      ],
+      "sources": {
+        "id": "roles.csv:repair-cafe",
+        "title": "roles.csv:repair-cafe",
+        "theme": "roles.csv:repair-cafe",
+        "summary": "roles.csv:repair-cafe",
+        "interests": "roles.csv:repair-cafe",
+        "tasks": "roles.csv:repair-cafe",
+        "organisation": "hosts.json:repair",
+        "area": "hosts.json:repair",
+        "time": "sessions.csv:S05",
+        "mode": "sessions.csv:S05",
+        "stepFree": "sessions.csv:S05",
+        "contactNote": "sessions.csv:S05"
+      }
+    },
+    {
+      "id": "river-walk",
+      "title": "Riverside litter walk",
+      "organisation": "Blue Path Collective",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Keep the riverside path tidy by picking up litter with a small walking group.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "no",
+      "contactNote": "The trail includes steps and uneven ground.",
+      "interests": [
+        "outdoors",
+        "nature"
+      ],
+      "tasks": [
+        "Collect litter",
+        "Sort recycling"
+      ],
+      "sources": {
+        "id": "roles.csv:river-walk",
+        "title": "roles.csv:river-walk",
+        "theme": "roles.csv:river-walk",
+        "summary": "roles.csv:river-walk",
+        "interests": "roles.csv:river-walk",
+        "tasks": "roles.csv:river-walk",
+        "organisation": "hosts.json:rivers",
+        "area": "hosts.json:rivers",
+        "time": "sessions.csv:S07",
+        "mode": "sessions.csv:S07",
+        "stepFree": "sessions.csv:S07",
+        "contactNote": "sessions.csv:S07"
+      }
+    },
+    {
+      "id": "seed-sorter",
+      "title": "Seed library sorter",
+      "organisation": "Moss Lane Growers",
+      "area": "Hulme",
+      "theme": "growing",
+      "summary": "Label donated seed packets for the library and prepare planting information cards.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The seed library has a level entrance and a seated packing space.",
+      "interests": [
+        "growing",
+        "organising"
+      ],
+      "tasks": [
+        "Sort seeds",
+        "Label seed packets"
+      ],
+      "sources": {
+        "id": "roles.csv:seed-sorter",
+        "title": "roles.csv:seed-sorter",
+        "theme": "roles.csv:seed-sorter",
+        "summary": "roles.csv:seed-sorter",
+        "interests": "roles.csv:seed-sorter",
+        "tasks": "roles.csv:seed-sorter",
+        "organisation": "hosts.json:seed-club",
+        "area": "hosts.json:seed-club",
+        "time": "sessions.csv:S14",
+        "mode": "sessions.csv:S14",
+        "stepFree": "sessions.csv:S14",
+        "contactNote": "sessions.csv:S14"
+      }
+    },
+    {
+      "id": "website-tester",
+      "title": "Website usability tester",
+      "organisation": "Little Lantern Library",
+      "area": "Levenshulme",
+      "theme": "digital",
+      "summary": "Try sample journeys on a charity website and write up any usability issues.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Ask for the sample task list.",
+      "interests": [
+        "digital",
+        "testing"
+      ],
+      "tasks": [
+        "Check navigation",
+        "Write bug reports"
+      ],
+      "sources": {
+        "id": "roles.csv:website-tester",
+        "title": "roles.csv:website-tester",
+        "theme": "roles.csv:website-tester",
+        "summary": "roles.csv:website-tester",
+        "interests": "roles.csv:website-tester",
+        "tasks": "roles.csv:website-tester",
+        "organisation": "hosts.json:library",
+        "area": "hosts.json:library",
+        "time": "sessions.csv:S12",
+        "mode": "sessions.csv:S12",
+        "stepFree": "sessions.csv:S12",
+        "contactNote": "sessions.csv:S12"
+      }
+    },
+    {
+      "id": "welcome-desk",
+      "title": "Welcome desk greeter",
+      "organisation": "Neighbourhood Welcome Desk",
+      "area": "Longsight",
+      "theme": "community",
+      "summary": "Greet visitors at a neighbourhood centre and explain which local services run that day.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A coordinator will show you around before your first shift.",
+      "interests": [
+        "welcome",
+        "communication"
+      ],
+      "tasks": [
+        "Meet visitors",
+        "Give directions"
+      ],
+      "sources": {
+        "id": "roles.csv:welcome-desk",
+        "title": "roles.csv:welcome-desk",
+        "theme": "roles.csv:welcome-desk",
+        "summary": "roles.csv:welcome-desk",
+        "interests": "roles.csv:welcome-desk",
+        "tasks": "roles.csv:welcome-desk",
+        "organisation": "hosts.json:welcome",
+        "area": "hosts.json:welcome",
+        "time": "sessions.csv:S11",
+        "mode": "sessions.csv:S11",
+        "stepFree": "sessions.csv:S11",
+        "contactNote": "sessions.csv:S11"
+      }
+    },
+    {
+      "id": "wildlife-counter",
+      "title": "Park wildlife recorder",
+      "organisation": "Hedge & Hollow Club",
+      "area": "Didsbury",
+      "theme": "nature",
+      "summary": "Observe birds in a park and record a simple wildlife count alongside other volunteers.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "Ask which parts of the survey route have level access.",
+      "interests": [
+        "nature",
+        "wildlife"
+      ],
+      "tasks": [
+        "Identify birds",
+        "Record sightings"
+      ],
+      "sources": {
+        "id": "roles.csv:wildlife-counter",
+        "title": "roles.csv:wildlife-counter",
+        "theme": "roles.csv:wildlife-counter",
+        "summary": "roles.csv:wildlife-counter",
+        "interests": "roles.csv:wildlife-counter",
+        "tasks": "roles.csv:wildlife-counter",
+        "organisation": "hosts.json:habitat",
+        "area": "hosts.json:habitat",
+        "time": "sessions.csv:S13",
+        "mode": "sessions.csv:S13",
+        "stepFree": "sessions.csv:S13",
+        "contactNote": "sessions.csv:S13"
+      }
+    }
+  ],
+  "followUps": [
+    {
+      "id": "garden-buddy",
+      "field": "stepFree",
+      "value": "yes",
+      "note": "The fictional host confirmed a level entrance and step-free paths to the raised beds.",
+      "source": "follow-ups.json:F01"
+    },
+    {
+      "id": "repair-cafe",
+      "field": "time",
+      "value": "weekend",
+      "note": "The fictional host confirmed this session runs on Saturdays.",
+      "source": "follow-ups.json:F02"
+    },
+    {
+      "id": "phone-companion",
+      "field": "mode",
+      "value": "remote",
+      "note": "The fictional host confirmed calls can be made from home with no venue visit.",
+      "source": "follow-ups.json:F03"
+    }
+  ]
+}

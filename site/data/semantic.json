@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "provider": "none",
+  "status": "unconfigured",
+  "model": null,
+  "dimensions": 256,
+  "cutoff": 0.32,
+  "cases": [
+    {
+      "id": "B01",
+      "query": "food parcels",
+      "scores": []
+    },
+    {
+      "id": "B02",
+      "query": "repair",
+      "scores": []
+    },
+    {
+      "id": "B03",
+      "query": "read aloud",
+      "scores": []
+    },
+    {
+      "id": "B04",
+      "query": "write bug reports",
+      "scores": []
+    },
+    {
+      "id": "B05",
+      "query": "sort seeds",
+      "scores": []
+    },
+    {
+      "id": "B06",
+      "query": "local history",
+      "scores": []
+    },
+    {
+      "id": "B07",
+      "query": "allotment",
+      "scores": []
+    },
+    {
+      "id": "B08",
+      "query": "loneliness",
+      "scores": []
+    },
+    {
+      "id": "B09",
+      "query": "ornithology",
+      "scores": []
+    },
+    {
+      "id": "B10",
+      "query": "subtitling",
+      "scores": []
+    },
+    {
+      "id": "B11",
+      "query": "graphic illustration",
+      "scores": []
+    },
+    {
+      "id": "B12",
+      "query": "rubbish",
+      "scores": []
+    },
+    {
+      "id": "B13",
+      "query": "community kitchen cook",
+      "scores": []
+    },
+    {
+      "id": "B14",
+      "query": "garden",
+      "scores": []
+    },
+    {
+      "id": "B15",
+      "query": "repair",
+      "scores": []
+    },
+    {
+      "id": "B16",
+      "query": "telephone",
+      "scores": []
+    },
+    {
+      "id": "B17",
+      "query": "litter",
+      "scores": []
+    },
+    {
+      "id": "B18",
+      "query": "reading",
+      "scores": []
+    },
+    {
+      "id": "B19",
+      "query": "food",
+      "scores": []
+    },
+    {
+      "id": "B20",
+      "query": "writing",
+      "scores": []
+    },
+    {
+      "id": "B21",
+      "query": "astrophysics",
+      "scores": []
+    },
+    {
+      "id": "B22",
+      "query": "walk dogs",
+      "scores": []
+    },
+    {
+      "id": "B23",
+      "query": "wheelchair basketball coaching",
+      "scores": []
+    },
+    {
+      "id": "B24",
+      "query": "help me",
+      "scores": []
+    },
+    {
+      "id": "B25",
+      "query": "birding",
+      "scores": []
+    },
+    {
+      "id": "B26",
+      "query": "device settings",
+      "scores": []
+    },
+    {
+      "id": "B27",
+      "query": "digital",
+      "scores": []
+    },
+    {
+      "id": "B28",
+      "query": "teach adults to sound out words",
+      "scores": []
+    }
+  ]
+}

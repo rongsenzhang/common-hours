@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#163e32" />
+    <meta
+      name="description"
+      content="Explore fictional volunteering roles in Greater Manchester, see why they match, and investigate the evidence behind a recommendation."
+    />
+    <title>Discover volunteer roles · Common Hours</title>
+    <link rel="icon" href="./assets/mark.svg" type="image/svg+xml" />
+    <link
+      rel="preload"
+      href="./assets/dm-sans.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./research.css" />
+    <link rel="stylesheet" href="./desk.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="frame top-inner">
+        <a class="brand" href="#discover" aria-label="Common Hours home"
+          ><span id="mark"></span>Common Hours</a
+        >
+        <nav aria-label="Main navigation">
+          <a href="#discover" data-page="discover">Discover</a
+          ><a href="#desk" data-page="desk">Coordinator desk</a
+          ><a href="#evidence" data-page="evidence">Evidence</a>
+        </nav>
+        <a class="source" href="https://github.com/rongsenzhang/common-hours"
+          >GitHub <span aria-hidden="true">↗</span></a
+        >
+      </div>
+    </header>
+    <main id="main" tabindex="-1" class="frame">
+      <p class="loading">Opening the volunteer catalogue…</p>
+    </main>
+    <footer>
+      <div class="frame footer-inner">
+        <div>
+          <strong>Common Hours</strong>
+          <p>Independent research demo · Fictional roles and organisations</p>
+        </div>
+        <a
+          href="https://github.com/rongsenzhang/common-hours/releases/tag/v1.0.0"
+          >Version 1.0</a
+        >
+      </div>
+    </footer>
+    <dialog id="role-dialog" aria-labelledby="dialog-title"></dialog>
+    <div id="announcer" class="sr" role="status" aria-live="polite"></div>
+    <noscript
+      ><p>
+        This interactive demo needs JavaScript.
+        <a href="https://github.com/rongsenzhang/common-hours"
+          >Read the project and its findings on GitHub.</a
+        >
+      </p></noscript
+    >
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

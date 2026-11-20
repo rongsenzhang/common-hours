@@ -1,0 +1,1096 @@
+{
+  "version": "1.0.0",
+  "caseCount": 28,
+  "catalogSize": 15,
+  "methodology": "Authored synthetic judgements and initial listing facts. Baseline uses literal word coverage; hybrid uses TF-IDF and a fixed concept vocabulary. Both apply identical gates.",
+  "methods": {
+    "baseline": {
+      "ndcgAt3": 0.5882,
+      "hitAt3": 0.5882,
+      "zeroAccuracy": 0.8182,
+      "answerable": 17,
+      "noAnswer": 11,
+      "hits": 10,
+      "correctZero": 9,
+      "labelledRoutes": 8,
+      "correctRoutes": 7,
+      "routeRecall": 0.875
+    },
+    "hybrid": {
+      "ndcgAt3": 0.9412,
+      "hitAt3": 0.9412,
+      "zeroAccuracy": 0.8182,
+      "answerable": 17,
+      "noAnswer": 11,
+      "hits": 16,
+      "correctZero": 9,
+      "labelledRoutes": 8,
+      "correctRoutes": 8,
+      "routeRecall": 1
+    }
+  },
+  "cases": [
+    {
+      "id": "B01",
+      "query": "food parcels",
+      "preferences": {},
+      "relevant": [
+        "pantry-packer"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The volunteer wants to put together pantry parcels.",
+      "baseline": {
+        "top3": [
+          "pantry-packer",
+          "meal-cook"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "pantry-packer",
+          "meal-cook"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B02",
+      "query": "repair",
+      "preferences": {},
+      "relevant": [
+        "repair-cafe"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "Repairing household objects is the main task.",
+      "baseline": {
+        "top3": [
+          "repair-cafe"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "repair-cafe"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B03",
+      "query": "read aloud",
+      "preferences": {},
+      "relevant": [
+        "reading-partner"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The adult reading activity explicitly involves reading aloud.",
+      "baseline": {
+        "top3": [
+          "reading-partner"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "reading-partner"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B04",
+      "query": "write bug reports",
+      "preferences": {},
+      "relevant": [
+        "website-tester"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The tester documents website issues.",
+      "baseline": {
+        "top3": [
+          "website-tester"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "website-tester"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B05",
+      "query": "sort seeds",
+      "preferences": {},
+      "relevant": [
+        "seed-sorter"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "Sorting seed packets is the specified task.",
+      "baseline": {
+        "top3": [
+          "seed-sorter",
+          "pantry-packer",
+          "repair-cafe"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 4,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "seed-sorter",
+          "repair-cafe",
+          "river-walk"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 4,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B06",
+      "query": "local history",
+      "preferences": {},
+      "relevant": [
+        "archive-transcriber"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The archive project transcribes historical letters.",
+      "baseline": {
+        "top3": [
+          "archive-transcriber",
+          "caption-editor",
+          "pantry-packer"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 5,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "archive-transcriber",
+          "pantry-packer",
+          "poster-maker"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 5,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B07",
+      "query": "allotment",
+      "preferences": {},
+      "relevant": [
+        "garden-buddy"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "Tending a communal plot is a direct fit. Sorting library packets is only adjacent.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "garden-buddy",
+          "seed-sorter"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B08",
+      "query": "loneliness",
+      "preferences": {},
+      "relevant": [
+        "phone-companion"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The telephone role offers companionship to an isolated neighbour.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "phone-companion"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B09",
+      "query": "ornithology",
+      "preferences": {},
+      "relevant": [
+        "wildlife-counter"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The park survey records bird sightings.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "wildlife-counter"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B10",
+      "query": "subtitling",
+      "preferences": {},
+      "relevant": [
+        "caption-editor"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "Captioning recorded interviews fits the stated interest.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "caption-editor"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B11",
+      "query": "graphic illustration",
+      "preferences": {},
+      "relevant": [
+        "poster-maker"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The design task makes posters.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "poster-maker"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B12",
+      "query": "rubbish",
+      "preferences": {},
+      "relevant": [
+        "river-walk"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The path survey collects litter.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "river-walk"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B13",
+      "query": "community kitchen cook",
+      "preferences": {
+        "time": "weekday"
+      },
+      "relevant": [],
+      "review": [],
+      "excluded": [
+        "meal-cook"
+      ],
+      "why": "This volunteer wants to cook. The only cooking shift is at weekends. A pantry role does not entail cooking.",
+      "baseline": {
+        "top3": [
+          "pantry-packer",
+          "poster-maker"
+        ],
+        "review": [],
+        "excluded": [
+          "meal-cook",
+          "caption-editor",
+          "garden-buddy"
+        ],
+        "returnedCount": 2,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 0,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [
+          "pantry-packer",
+          "poster-maker"
+        ],
+        "review": [],
+        "excluded": [
+          "meal-cook",
+          "caption-editor",
+          "garden-buddy"
+        ],
+        "returnedCount": 2,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 0,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B14",
+      "query": "garden",
+      "preferences": {
+        "time": "weekend",
+        "stepFree": true
+      },
+      "relevant": [],
+      "review": [
+        "garden-buddy"
+      ],
+      "excluded": [],
+      "why": "The garden's weekend shift has no initial access evidence. The seed library runs on weekdays.",
+      "baseline": {
+        "top3": [],
+        "review": [
+          "garden-buddy"
+        ],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [
+          "garden-buddy"
+        ],
+        "excluded": [
+          "seed-sorter"
+        ],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B15",
+      "query": "repair",
+      "preferences": {
+        "time": "weekend"
+      },
+      "relevant": [],
+      "review": [
+        "repair-cafe"
+      ],
+      "excluded": [],
+      "why": "The repair workshop timetable is missing from the initial data.",
+      "baseline": {
+        "top3": [],
+        "review": [
+          "repair-cafe"
+        ],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [
+          "repair-cafe"
+        ],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B16",
+      "query": "telephone",
+      "preferences": {
+        "mode": "remote"
+      },
+      "relevant": [],
+      "review": [
+        "phone-companion"
+      ],
+      "excluded": [],
+      "why": "The telephone role has no initial evidence of fully remote participation.",
+      "baseline": {
+        "top3": [],
+        "review": [
+          "phone-companion"
+        ],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [
+          "phone-companion"
+        ],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B17",
+      "query": "litter",
+      "preferences": {
+        "stepFree": true
+      },
+      "relevant": [],
+      "review": [],
+      "excluded": [
+        "river-walk"
+      ],
+      "why": "The walking route has known steps.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [
+          "river-walk"
+        ],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [
+          "river-walk"
+        ],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B18",
+      "query": "reading",
+      "preferences": {
+        "mode": "remote",
+        "stepFree": true
+      },
+      "relevant": [
+        "reading-partner"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The host offers a fully remote alternative to the venue meeting.",
+      "baseline": {
+        "top3": [
+          "reading-partner"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "reading-partner"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B19",
+      "query": "food",
+      "preferences": {
+        "time": "weekend"
+      },
+      "relevant": [
+        "meal-cook"
+      ],
+      "review": [],
+      "excluded": [
+        "pantry-packer"
+      ],
+      "why": "The kitchen operates at weekends. The pantry-packing shift is on weekdays.",
+      "baseline": {
+        "top3": [
+          "meal-cook"
+        ],
+        "review": [],
+        "excluded": [
+          "pantry-packer"
+        ],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [
+          "meal-cook"
+        ],
+        "review": [],
+        "excluded": [
+          "pantry-packer"
+        ],
+        "returnedCount": 1,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B20",
+      "query": "writing",
+      "preferences": {
+        "mode": "remote"
+      },
+      "relevant": [
+        "archive-transcriber",
+        "caption-editor"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "Both remote roles produce written content.",
+      "baseline": {
+        "top3": [
+          "archive-transcriber",
+          "caption-editor"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "archive-transcriber",
+          "caption-editor"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B21",
+      "query": "astrophysics",
+      "preferences": {},
+      "relevant": [],
+      "review": [],
+      "excluded": [],
+      "why": "There is no astronomy activity in this catalogue.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B22",
+      "query": "walk dogs",
+      "preferences": {},
+      "relevant": [],
+      "review": [],
+      "excluded": [],
+      "why": "There is no dog-walking role. A litter walk has an incidental word in common.",
+      "baseline": {
+        "top3": [
+          "river-walk"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 0,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "river-walk"
+        ],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 1,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 0,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B23",
+      "query": "wheelchair basketball coaching",
+      "preferences": {},
+      "relevant": [],
+      "review": [],
+      "excluded": [],
+      "why": "There is no sports coaching activity in the catalogue.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B24",
+      "query": "help me",
+      "preferences": {},
+      "relevant": [],
+      "review": [],
+      "excluded": [],
+      "why": "This nonempty request includes no discriminating topic after stopword removal.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B25",
+      "query": "birding",
+      "preferences": {
+        "stepFree": true
+      },
+      "relevant": [],
+      "review": [
+        "wildlife-counter"
+      ],
+      "excluded": [],
+      "why": "The park survey is topically relevant but the route's accessibility is unknown.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 0,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [
+          "wildlife-counter"
+        ],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B26",
+      "query": "device settings",
+      "preferences": {
+        "mode": "remote"
+      },
+      "relevant": [],
+      "review": [],
+      "excluded": [
+        "digital-helper"
+      ],
+      "why": "Teaching visitors how to use a device takes place at the venue.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [
+          "digital-helper"
+        ],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [
+          "digital-helper"
+        ],
+        "returnedCount": 0,
+        "hitAt3": null,
+        "ndcgAt3": null,
+        "zeroCorrect": 1,
+        "correctRoutes": 1,
+        "labelledRoutes": 1
+      }
+    },
+    {
+      "id": "B27",
+      "query": "digital",
+      "preferences": {
+        "mode": "remote",
+        "time": "weekday"
+      },
+      "relevant": [
+        "website-tester",
+        "poster-maker"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "The broad interest includes remote weekday website testing and digital design.",
+      "baseline": {
+        "top3": [
+          "poster-maker",
+          "website-tester"
+        ],
+        "review": [],
+        "excluded": [
+          "digital-helper"
+        ],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [
+          "poster-maker",
+          "website-tester"
+        ],
+        "review": [],
+        "excluded": [
+          "digital-helper"
+        ],
+        "returnedCount": 2,
+        "hitAt3": 1,
+        "ndcgAt3": 1,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    },
+    {
+      "id": "B28",
+      "query": "teach adults to sound out words",
+      "preferences": {},
+      "relevant": [
+        "reading-partner"
+      ],
+      "review": [],
+      "excluded": [],
+      "why": "An everyday description of help with pronunciation. Coverage of paraphrases is deliberately incomplete.",
+      "baseline": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      },
+      "hybrid": {
+        "top3": [],
+        "review": [],
+        "excluded": [],
+        "returnedCount": 0,
+        "hitAt3": 0,
+        "ndcgAt3": 0,
+        "zeroCorrect": null,
+        "correctRoutes": 0,
+        "labelledRoutes": 0
+      }
+    }
+  ]
+}

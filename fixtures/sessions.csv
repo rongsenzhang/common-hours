@@ -1,0 +1,16 @@
+role_id,session_id,schedule,delivery,step_free,contact_note
+garden-buddy,S01,Saturday or Sunday,At venue,,The host can check the path between the entrance and the beds.
+pantry-packer,S02,Monday to Friday,At venue,Yes,Ask the pantry lead about handling boxes or seated packing.
+digital-helper,S03,Saturday or Sunday,At venue,Yes,The host provides devices and an induction.
+phone-companion,S04,Choose either,, ,Ask whether calls can be made from home.
+repair-cafe,S05,,At venue,Yes,Ask the host when the next workshop runs.
+archive-transcriber,S06,Choose either,From home,N/A,Ask the archive lead for a sample scan.
+river-walk,S07,Saturday or Sunday,At venue,No,The trail includes steps and uneven ground.
+reading-partner,S08,Monday to Friday,Either route,Yes,Meet at the venue or select a fully remote session.
+meal-cook,S09,Saturday or Sunday,At venue,Yes,Ask about the height of the work surfaces.
+poster-maker,S10,Choose either,From home,N/A,The organiser supplies a brief and source files.
+welcome-desk,S11,Monday to Friday,At venue,Yes,A coordinator will show you around before your first shift.
+website-tester,S12,Monday to Friday,From home,N/A,Ask for the sample task list.
+wildlife-counter,S13,Saturday or Sunday,At venue,,Ask which parts of the survey route have level access.
+seed-sorter,S14,Monday to Friday,At venue,Yes,The seed library has a level entrance and a seated packing space.
+caption-editor,S15,Saturday or Sunday,From home,N/A,The team provides a short sample recording to practise with.

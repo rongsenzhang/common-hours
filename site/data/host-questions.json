@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "provider": "curated",
+  "model": null,
+  "status": "unconfigured",
+  "questions": [
+    {
+      "roleId": "garden-buddy",
+      "field": "stepFree",
+      "source": "sessions.csv:S01",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
+      "roleId": "phone-companion",
+      "field": "mode",
+      "source": "sessions.csv:S04",
+      "question": "Could you tell me whether this role can be done from home or requires a visit?"
+    },
+    {
+      "roleId": "phone-companion",
+      "field": "stepFree",
+      "source": "sessions.csv:S04",
+      "question": "Could you tell me whether there is step-free access if a visit is needed?"
+    },
+    {
+      "roleId": "repair-cafe",
+      "field": "time",
+      "source": "sessions.csv:S05",
+      "question": "Could you tell me which days volunteers can take part?"
+    },
+    {
+      "roleId": "wildlife-counter",
+      "field": "stepFree",
+      "source": "sessions.csv:S13",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    }
+  ]
+}
