@@ -4,12 +4,13 @@ import json
 from pathlib import Path
 import shutil
 import tempfile
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 PUBLIC_FILES = (
     "index.html", "app.js", "engine.js", "assistant.js", "assistant-topics.js",
-    "chat-view.js", "html.js", "icons.js", "style.css", "chat.css",
+    "chat-view.js", "live-chat.js", "html.js", "icons.js", "style.css", "chat.css",
 )
 ROLE_FIELDS = (
     "id", "title", "organisation", "area", "theme", "summary", "time", "mode",
@@ -17,7 +18,21 @@ ROLE_FIELDS = (
 )
 
 
-def make_site(output):
+def public_chat_endpoint(value):
+    if not isinstance(value, str) or not value or any(c.isspace() for c in value):
+        raise ValueError("Specify a non-empty public chat endpoint")
+    url = urlsplit(value)
+    local = url.scheme == "http" and url.hostname in {"localhost", "127.0.0.1", "::1"}
+    if (not url.hostname or not url.path or url.path == "/" or url.scheme != "https" and not local
+            or url.username is not None or url.password is not None or url.query or url.fragment
+            or "\\" in value):
+        raise ValueError("The public chat endpoint must be an HTTPS URL without credentials, query or fragment (HTTP is allowed for loopback)")
+    return value
+
+
+def make_site(output, chat_endpoint=None):
+    if chat_endpoint is not None:
+        chat_endpoint = public_chat_endpoint(chat_endpoint)
     output = output.resolve()
     if output.exists():
         raise ValueError(f"Choose a new output directory: {output}")
@@ -37,7 +52,8 @@ def make_site(output):
         }
         host_questions = [{key: q[key] for key in ("roleId", "field", "question")}
                           for q in questions["questions"]]
-        for name, doc in (("catalog", public), ("host-questions", {"questions": host_questions})):
+        for name, doc in (("catalog", public), ("host-questions", {"questions": host_questions}),
+                          ("chat-config", {"endpoint": chat_endpoint})):
             (staging / "data" / f"{name}.json").write_text(json.dumps(doc, ensure_ascii=False) + "\n")
         (staging / ".nojekyll").touch()
         staging.rename(output)
@@ -46,4 +62,7 @@ def make_site(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    make_site(parser.parse_args().output)
+    parser.add_argument("--chat-endpoint", type=public_chat_endpoint,
+                        help="Verified public AI gateway endpoint; omit for on-device search only")
+    args = parser.parse_args()
+    make_site(args.output, args.chat_endpoint)

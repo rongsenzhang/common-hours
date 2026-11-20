@@ -69,6 +69,11 @@ async function verifyViewport(browser, width, height) {
     await page.getByRole("heading", { name: "No matching roles" }).waitFor();
 
     await page.locator('nav a[href="#ask"]').click();
+    // This suite verifies deterministic on-device behaviour, including on a live release.
+    // Live transport and real inference are exercised by separate checks.
+    await page.locator("#chat-disclosure").waitFor();
+    const localMode = page.getByRole("radio", { name: "On-device search" });
+    if (await localMode.count()) await localMode.check();
     await page.locator("[data-prompt]").first().click();
     await page
       .locator('.chat-turn:last-child [data-detail="shelter-dog-walker"]')
@@ -138,7 +143,11 @@ async function verifyViewport(browser, width, height) {
       let response = await api.request.get(base + asset);
       // A CDN edge may briefly serve a cached outage during a Pages rollout.
       // Only an actual 404 passes the privacy check.
-      for (let attempt = 0; response.status() === 503 && attempt < 3; attempt++) {
+      for (
+        let attempt = 0;
+        response.status() === 503 && attempt < 3;
+        attempt++
+      ) {
         response = await api.request.get(base + asset, {
           params: { verify: String(Date.now()) + "-" + attempt },
         });

@@ -1,0 +1,13 @@
+{
+  "name": "common-hours-volunteer-chat",
+  "main": "server/worker.mjs",
+  "compatibility_date": "2025-09-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "vars": { "OWNER_REPO": "rongsenzhang/common-hours" },
+  "durable_objects": {
+    "bindings": [{ "name": "CHAT_QUOTA", "class_name": "ChatQuota" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ChatQuota"] }],
+}

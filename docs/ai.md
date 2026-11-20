@@ -2,13 +2,19 @@
 
 ## Volunteer questions
 
-A visitor can ask for an activity and then refine time, participation mode or step-free access. The browser classifies the activity against short, labelled descriptions and checks the requested conditions against the published role facts. It can return confirmed matches, flag a field for host confirmation, ask for clarification or explain an empty result. Role cards link to the facts used in the recommendation. The conversation stays in browser memory for the current visit. The public assistant makes no per-message call to OpenAI. [Ask](https://rongsenzhang.github.io/common-hours/#ask) · [Local classifier](../site/assistant-topics.js) · [Conversation logic](../site/assistant.js)
+**Live AI** uses the OpenAI Responses API with the pinned model `gpt-5.4-mini-2026-03-17`. Each submitted message travels from GitHub Pages to our Cloudflare Worker. The Worker supplies the current question, up to eight recent exchanges from the same AI conversation and the public facts for 19 fictional opportunities. It asks the provider to interpret the request, choose candidate role IDs, and compose prose for small talk, clarification or general volunteering advice. The release records the actual model on each reply. [Live questions](https://rongsenzhang.github.io/common-hours/#ask) · [Server implementation](../server/live.mjs)
 
-The assistant covers supported English questions and selected Chinese phrases. Specific claims about an unlisted requirement need a host's answer. Separate regression cases exercise language parsing, unsupported requests, follow-ups and source-grounded answers. The staff benchmark measures Finder retrieval on its own set of fixed queries. [Tests](../tests/) · [Model card](model-card.md)
+The Worker checks role IDs, schedules, participation and step-free access against the catalogue before returning up to three role cards. A missing practical fact can send a role to **To confirm**. Visitors can ask about an exact start time, but the catalogue records only broad time bands. The assistant directs them to ask the host. General conversational advice is generated text and can contain mistakes. The existing 36-query benchmark measures Finder retrieval. The separate live-provider checks exercise individual conversations. [Model card](model-card.md) · [Live checks](../qa/openai-live-smoke.mjs)
+
+The browser keeps this chat's history in memory. The Worker does not write messages or replies to storage, and sends `store: false` with every OpenAI request. OpenAI's own API data controls still apply. The shared demo caps usage at 250 accepted requests per UTC day and eight per minute from a network address. An upstream failure can still count towards the limits. **On-device search** keeps its conversations separate, processes messages in the tab and can be selected when the live service is busy. [OpenAI data controls](https://platform.openai.com/docs/guides/your-data) · [On-device classifier](../site/assistant-topics.js)
+
+## Publishing live chat
+
+GitHub repository secrets `OPENAI_API_KEY` and `CLOUDFLARE_API_TOKEN` are read by the trusted main-branch publication workflow. Set the repository variable `CLOUDFLARE_ACCOUNT_ID` to select the hosting account. The workflow deploys the API key as an encrypted Worker secret and checks a real reply from the public endpoint before packaging its URL into Pages. Browser assets contain the endpoint URL. A release failure leaves the last published Pages site available. Rerun the publication workflow after changing the provider key or renewing the deployment token. [Deployment code](../release/deploy-chat.py) · [Workflow](../.github/workflows/deploy.yml)
 
 ## OpenAI during release
 
-The verified release job can call OpenAI twice using the Actions secret `OPENAI_API_KEY`. Both requests use authored, fictional inputs. The public package contains volunteer-facing facts and resolved question wording. The staff snapshot contains the provider metadata, technical evidence and benchmark scores. [Workflow](../.github/workflows/deploy.yml) · [Public packager](../pipeline/package_public.py) · [Staff guide](admin.md)
+In addition to live chat verification, the release job can make two build-time calls to OpenAI using the Actions secret `OPENAI_API_KEY`. Both requests use authored, fictional inputs. The public package contains volunteer-facing facts and resolved question wording. The staff snapshot contains the provider metadata, technical evidence and benchmark scores. [Workflow](../.github/workflows/deploy.yml) · [Public packager](../pipeline/package_public.py) · [Staff guide](admin.md)
 
 ### Semantic comparison
 
@@ -37,4 +43,4 @@ python3 -m unittest discover -s tests -p 'test_ai*.py'
 node --test tests/*.mjs
 ```
 
-On a trusted publication run, verification occurs before model generation. The job scopes the secret to its OpenAI step and passes a separate deployment credential to the private mirror step. A new key takes effect on the next trusted publish run. Use the full private snapshot to establish what that run produced. [Release workflow](../.github/workflows/deploy.yml) · [Staff publication](../release/publish-admin.sh)
+On a trusted publication run, verification occurs before model generation. Only the deployment and provider steps receive the credentials they use. The private mirror step receives its own deployment credential. A new key takes effect on the next trusted publish run. Use the full private snapshot to establish what that run produced. [Release workflow](../.github/workflows/deploy.yml) · [Staff publication](../release/publish-admin.sh)

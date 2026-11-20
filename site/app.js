@@ -3,6 +3,11 @@ import { matchOpportunities } from "./engine.js";
 import { icon, mark } from "./icons.js";
 import { answerVolunteerQuestion } from "./assistant.js";
 import { renderChat } from "./chat-view.js";
+import {
+  chatEndpoint,
+  requestLiveReply,
+  liveFailureMessage,
+} from "./live-chat.js";
 
 const main = document.querySelector("#main");
 const dialog = document.querySelector("#role-dialog");
@@ -22,8 +27,43 @@ let prefs = entryPrefs(),
   expandedFilters = false,
   returnFocus;
 const saved = new Set(readList("saved"));
-let turns = [];
+let endpoint = null;
+let chatMode = "local";
+const chats = {
+  local: { turns: [], draft: "" },
+  live: { turns: [], draft: "" },
+};
 let conversation = null;
+let liveRequest = null;
+let chatError = "";
+function chatContents() {
+  const chat = chats[chatMode];
+  return renderChat(chat.turns, catalog.opportunities, {
+    mode: chatMode,
+    liveAvailable: Boolean(endpoint),
+    pending: liveRequest?.input,
+    error: chatMode === "live" ? chatError : "",
+    draft: chat.draft,
+  });
+}
+function updateChat(focus = false) {
+  if (page !== "ask") return;
+  main.innerHTML = chatContents();
+  if (focus)
+    main
+      .querySelector(liveRequest ? "[data-cancel-chat]" : "#chat-input")
+      ?.focus({ preventScroll: true });
+}
+function cancelRequest(restoreDraft = true) {
+  if (!liveRequest) return;
+  const { input, controller } = liveRequest;
+  liveRequest = null;
+  controller.abort();
+  if (restoreDraft) {
+    chats.live.draft = input;
+    chatError = liveFailureMessage("cancelled", input);
+  }
+}
 const labels = {
   time: "Availability",
   mode: "Participation",
@@ -200,6 +240,7 @@ function refreshResults() {
 }
 function render(scroll = false) {
   const h = location.hash.slice(1);
+  if (page === "ask" && h !== "ask") cancelRequest();
   page = h === "ask" ? "ask" : "discover";
   document.title =
     (page === "ask" ? "Ask the role finder" : "Discover volunteer roles") +
@@ -208,8 +249,7 @@ function render(scroll = false) {
     if (n.dataset.page === page) n.setAttribute("aria-current", "page");
     else n.removeAttribute("aria-current");
   }
-  main.innerHTML =
-    page === "ask" ? renderChat(turns, catalog.opportunities) : discover();
+  main.innerHTML = page === "ask" ? chatContents() : discover();
   if (scroll) {
     main.focus({ preventScroll: true });
     window.scrollTo(0, 0);
@@ -242,23 +282,59 @@ function toggleSaved(id) {
   saveList("saved", saved);
   announce(saved.has(id) ? "Role saved." : "Role removed from saved.");
 }
-function ask(message) {
+async function ask(message) {
   const input = message.trim();
-  if (!input) return;
-  const reply = answerVolunteerQuestion(
-    input,
-    catalog.opportunities,
-    conversation,
-  );
-  conversation = reply.state;
-  turns.push({ input, reply });
-  main.innerHTML = renderChat(turns, catalog.opportunities);
-  main.querySelector("#chat-input").focus({ preventScroll: true });
+  if (!input || liveRequest) return;
+  const chat = chats[chatMode];
+  chat.draft = "";
+  let reply;
+  if (chatMode === "live") {
+    if (!endpoint) return;
+    chatError = "";
+    const request = { input, controller: new AbortController() };
+    liveRequest = request;
+    updateChat(true);
+    try {
+      reply = await requestLiveReply({
+        endpoint,
+        message: input,
+        turns: chat.turns,
+        roles: catalog.opportunities,
+        signal: request.controller.signal,
+      });
+    } catch (error) {
+      if (liveRequest !== request) return;
+      liveRequest = null;
+      chat.draft = input;
+      chatError = liveFailureMessage(error.kind, input);
+      updateChat(true);
+      return;
+    }
+    if (liveRequest !== request) return;
+    liveRequest = null;
+  } else {
+    reply = answerVolunteerQuestion(input, catalog.opportunities, conversation);
+    conversation = reply.state;
+  }
+  chat.turns.push({ input, reply });
+  updateChat(true);
   main
     .querySelector(".chat-turn:last-child")
     ?.scrollIntoView({ block: "nearest" });
   announce(reply.text);
 }
+document.addEventListener("input", (ev) => {
+  if (ev.target.id === "chat-input") chats[chatMode].draft = ev.target.value;
+});
+document.addEventListener("change", (ev) => {
+  if (ev.target.name !== "chat-mode" || !endpoint) return;
+  const mode = ev.target.value;
+  if (!["live", "local"].includes(mode) || mode === chatMode) return;
+  cancelRequest();
+  chatMode = mode;
+  updateChat();
+  main.querySelector(`[name="chat-mode"][value="${mode}"]`)?.focus();
+});
 document.addEventListener("click", (ev) => {
   const b = ev.target.closest("button");
   if (!b) return;
@@ -309,11 +385,16 @@ document.addEventListener("click", (ev) => {
     main.querySelectorAll(".role-card h3 button")[prev]?.focus();
   }
   if (d.prompt) ask(d.prompt);
+  if ("cancelChat" in d) {
+    cancelRequest();
+    updateChat(true);
+  }
   if ("restartChat" in d) {
-    conversation = null;
-    turns = [];
-    render();
-    main.querySelector("#chat-input")?.focus();
+    cancelRequest(false);
+    if (chatMode === "local") conversation = null;
+    else chatError = "";
+    chats[chatMode] = { turns: [], draft: "" };
+    updateChat(true);
     announce("Conversation cleared.");
   }
 });
@@ -330,6 +411,8 @@ dialog.addEventListener("click", (ev) => {
   }
 });
 dialog.addEventListener("close", () => {
+  const active = document.activeElement;
+  if (active && active !== document.body && !dialog.contains(active)) return;
   if (returnFocus?.isConnected) returnFocus.focus();
   else main.querySelector("[data-detail]")?.focus();
 });
@@ -365,10 +448,14 @@ async function loadJson(file) {
   return response.json();
 }
 try {
-  [catalog, ai] = await Promise.all([
+  let config;
+  [catalog, ai, config] = await Promise.all([
     loadJson("catalog.json"),
     loadJson("host-questions.json").catch(() => ({ questions: [] })),
+    loadJson("chat-config.json").catch(() => null),
   ]);
+  endpoint = chatEndpoint(config, location.href);
+  chatMode = endpoint ? "live" : "local";
   render();
 } catch {
   main.innerHTML =

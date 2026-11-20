@@ -1,0 +1,34 @@
+name: Verify live OpenAI volunteer conversations
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - server/live.mjs
+      - qa/openai-live-smoke.mjs
+      - .github/workflows/live-smoke.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openai-live-smoke-main
+  cancel-in-progress: false
+
+jobs:
+  live-turns:
+    if: github.repository == 'rongsenzhang/common-hours' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Verify five synthetic questions against the actual model
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node qa/openai-live-smoke.mjs

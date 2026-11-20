@@ -24,7 +24,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
+          node-version: '>=22.12.0 <23'
       - name: Rebuild catalogue, benchmark and editor-written questions
         run: |
           python3 pipeline/build.py
@@ -34,6 +34,12 @@ jobs:
           git diff --exit-code -- site/data/catalog.json site/data/evaluation.json site/data/host-questions.json site/data/semantic.json
       - name: Check volunteer distribution
         run: python3 pipeline/package_public.py --output .work/public-preview
+      - name: Check the live Worker bundle without credentials
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/chat-tools" --no-audit --no-fund wrangler@4.165.0
+          "$RUNNER_TEMP/chat-tools/node_modules/.bin/wrangler" deploy --config wrangler.jsonc --dry-run --outdir "$RUNNER_TEMP/chat-bundle"
       - name: Run tests
         run: |
           python3 -m unittest discover -s tests -p 'test_*.py'
@@ -47,17 +53,30 @@ jobs:
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
           node qa/browser.cjs http://127.0.0.1:8754/
+          node qa/live-browser.cjs http://127.0.0.1:8754/
           node qa/admin-browser.cjs site/data
 
   package:
     needs: verify
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: github.repository == 'rongsenzhang/common-hours' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '>=22.12.0 <23'
+      - name: Install the pinned Worker deployment tool
+        run: npm install --prefix "$RUNNER_TEMP/chat-tools" --no-audit --no-fund wrangler@4.165.0
+      - name: Deploy Worker and verify a real OpenAI response
+        id: chat
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: WRANGLER_BIN="$RUNNER_TEMP/chat-tools/node_modules/.bin/wrangler" python3 release/deploy-chat.py
       - name: Prepare host questions and benchmark semantic similarities
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -68,8 +87,10 @@ jobs:
         env:
           ADMIN_PUBLISH_KEY: ${{ secrets.ADMIN_PUBLISH_KEY }}
         run: bash release/publish-admin.sh
-      - name: Package only volunteer assets
-        run: python3 pipeline/package_public.py --output .work/public-release
+      - name: Package volunteer assets with the verified chat endpoint
+        env:
+          LIVE_CHAT_ENDPOINT: ${{ steps.chat.outputs.endpoint }}
+        run: python3 pipeline/package_public.py --output .work/public-release --chat-endpoint "$LIVE_CHAT_ENDPOINT"
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: .work/public-release

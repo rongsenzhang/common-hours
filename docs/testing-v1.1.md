@@ -1,6 +1,6 @@
 # Common Hours v1.1 测试指南
 
-公开入口可以直接用手机或电脑打开。目录里是虚构岗位，查询和对话仅在当前浏览器处理。以下案例可直接复制，组与组之间点 **Start a new chat**，同组的追问请留在同一个对话里。
+公开入口可以直接用手机或电脑打开。此页测试本地模式。使用问答时请先选 **On-device search**。若要测试实时模型，请打开[实时问答测试指南](testing-live.md)。以下案例可直接复制，组与组之间点 **Start a new chat**，同组的追问请留在同一个对话里。
 
 [打开问答](https://rongsenzhang.github.io/common-hours/#ask) · [打开目录](https://rongsenzhang.github.io/common-hours/)
 
