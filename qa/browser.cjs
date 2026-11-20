@@ -135,7 +135,15 @@ async function verifyViewport(browser, width, height) {
       "research-view.js",
       "desk-view.js",
     ]) {
-      assert.equal((await api.request.get(base + asset)).status(), 404, asset);
+      let response = await api.request.get(base + asset);
+      // A CDN edge may briefly serve a cached outage during a Pages rollout.
+      // Only an actual 404 passes the privacy check.
+      for (let attempt = 0; response.status() === 503 && attempt < 3; attempt++) {
+        response = await api.request.get(base + asset, {
+          params: { verify: String(Date.now()) + "-" + attempt },
+        });
+      }
+      assert.equal(response.status(), 404, asset);
     }
     const cat = await (
       await api.request.get(base + "data/catalog.json")

@@ -24,4 +24,3 @@ export function prettyPreferences(preferences) {
       .join(" · ") || "Any time or setting"
   );
 }
-
