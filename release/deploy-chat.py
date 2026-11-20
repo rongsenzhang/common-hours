@@ -164,12 +164,14 @@ def deploy(binary, account, api_token, openai_key):
     if not binary.is_absolute() or not binary.is_file():
         raise DeploymentError("WRANGLER_BIN must be the absolute path to the pinned Wrangler executable.")
     env = {name: os.environ[name] for name in ("HOME", "PATH", "TMPDIR", "SYSTEMROOT") if name in os.environ}
-    env.update(CI="true", NO_COLOR="1", WRANGLER_SEND_METRICS="false", WRANGLER_LOG="error", WRANGLER_LOG_SANITIZE="true")
+    # --version prints through Wrangler's normal logger. Suppress logs only for
+    # the later subprocess that receives credentials.
+    env.update(CI="true", NO_COLOR="1", WRANGLER_SEND_METRICS="false", WRANGLER_LOG_SANITIZE="true")
     version = subprocess.run([str(binary), "--version"], cwd=ROOT, env=env,
                              capture_output=True, text=True, timeout=30)
     if version.returncode or version.stdout.strip() != WRANGLER_VERSION:
         raise DeploymentError(f"Use Wrangler {WRANGLER_VERSION} for this release.")
-    env.update(CLOUDFLARE_ACCOUNT_ID=account, CLOUDFLARE_API_TOKEN=api_token)
+    env = {**env, "WRANGLER_LOG": "error", "CLOUDFLARE_ACCOUNT_ID": account, "CLOUDFLARE_API_TOKEN": api_token}
     # The pinned CLI reads JSON input from this path into secret_text bindings in
     # the same upload as the Worker. Keep the GitHub secret out of argv, disk and logs.
     result = subprocess.run(

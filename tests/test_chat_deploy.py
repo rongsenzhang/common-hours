@@ -2,6 +2,7 @@ import importlib.util
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
+import subprocess
 import unittest
 from unittest.mock import Mock, call, patch
 
@@ -14,6 +15,23 @@ BASE = "https://example.test"
 
 
 class ChatDeploymentTests(unittest.TestCase):
+    def test_version_probe_runs_without_deployment_logging_filter_or_secrets(self):
+        binary = str(Path(__file__).resolve())
+        version = subprocess.CompletedProcess([], 0, deploy.WRANGLER_VERSION + "\n")
+        with patch.object(deploy.subprocess, "run", side_effect=[version, subprocess.CompletedProcess([], 0)]) as cli:
+            deploy.deploy(binary, ACCOUNT, "test-cf", "test-ai")
+        check, upload = cli.call_args_list
+        self.assertEqual(check.args[0], [binary, "--version"])
+        for key in ("WRANGLER_LOG", "CLOUDFLARE_API_TOKEN", "OPENAI_API_KEY"):
+            self.assertNotIn(key, check.kwargs["env"])
+        self.assertEqual(upload.kwargs["env"]["WRANGLER_LOG"], "error")
+        self.assertEqual(upload.kwargs["input"], b'{"OPENAI_API_KEY": "test-ai"}')
+        self.assertNotIn("test-ai", upload.args[0])
+        with patch.object(deploy.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, "4.0.0\n")) as cli:
+            with self.assertRaisesRegex(deploy.DeploymentError, "Use Wrangler"):
+                deploy.deploy(binary, ACCOUNT, "test-cf", "test-ai")
+            cli.assert_called_once()
+
     def test_credential_format_rejects_ids_and_other_keys_before_any_request(self):
         token = "cfut_" + "u" * 47
         for bad in (ACCOUNT, "cfk_" + "f" * 48, "cfut_" + "x" * 35, "sk-" + "o" * 37,
