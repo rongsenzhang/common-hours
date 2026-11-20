@@ -27,7 +27,10 @@ class DeploymentError(Exception):
 class CloudflareError(DeploymentError):
     def __init__(self, status, codes):
         self.status, self.codes = status, set(codes)
-        super().__init__(f"Cloudflare returned HTTP {status}, error codes {sorted(self.codes)}.")
+        message = f"Cloudflare returned HTTP {status}, error codes {sorted(self.codes)}."
+        if 9106 in self.codes:
+            message += " Cloudflare did not recognise the authentication supplied. Check the scoped token value in CLOUDFLARE_API_TOKEN."
+        super().__init__(message)
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -73,19 +76,53 @@ def cloudflare(token):
     return call
 
 
+def token_kind(value):
+    # Current user and account API tokens have different verify endpoints.
+    # Legacy scoped tokens do not identify their owner in their format.
+    if re.fullmatch(r"cf(?:u|a)t_[A-Za-z0-9_-]{41,75}", value):
+        return "user" if value.startswith("cfut_") else "account"
+    known_prefix = value.startswith(("cfut_", "cfat_", "cfk_", "cfoat_", "sk-", "ghp_", "ghs_", "gho_", "ghu_", "ghr_"))
+    if re.fullmatch(r"[A-Za-z0-9_-]{40}", value) and not known_prefix:
+        return "legacy"
+    raise DeploymentError("CLOUDFLARE_API_TOKEN must contain only the scoped Cloudflare API token value copied after creation. Check for an ID, a global key, a command, quotes or whitespace.")
+
+
 def account_id(call, provided):
     value = provided
     if not value:
         try:
             accounts = call("/accounts?per_page=2")
         except CloudflareError as error:
-            raise DeploymentError("The token cannot list accounts. Set CLOUDFLARE_ACCOUNT_ID in GitHub.") from error
+            raise DeploymentError(f"Account discovery failed. {error} Supply CLOUDFLARE_ACCOUNT_ID to select the account directly.") from None
         if not isinstance(accounts, list) or len(accounts) != 1:
             raise DeploymentError("Set CLOUDFLARE_ACCOUNT_ID to select one Cloudflare account.")
         value = accounts[0].get("id", "")
     if not re.fullmatch(r"[a-f0-9]{32}", value):
         raise DeploymentError("CLOUDFLARE_ACCOUNT_ID must be a 32-character account ID.")
     return value
+
+
+def verified_account(call, kind, provided):
+    def verify(path):
+        result = call(path)
+        if not isinstance(result, dict) or result.get("status") != "active":
+            raise DeploymentError("Cloudflare did not confirm an active API token.")
+
+    if kind != "account":
+        print("Checking the Cloudflare user token status.", flush=True)
+        try:
+            verify("/user/tokens/verify")
+        except CloudflareError as error:
+            if kind != "legacy" or error.status not in (400, 401, 403, 404):
+                raise
+        else:
+            print("Selecting the Cloudflare account.", flush=True)
+            return account_id(call, provided)
+    print("Selecting the Cloudflare account for account token verification.", flush=True)
+    account = account_id(call, provided)
+    print("Checking the Cloudflare account token status.", flush=True)
+    verify(f"/accounts/{account}/tokens/verify")
+    return account
 
 
 def check_worker_owner(call, account):
@@ -185,11 +222,20 @@ def main():
         raise DeploymentError("Missing deployment configuration: " + ", ".join(missing))
     if os.environ.get("GITHUB_REPOSITORY", REPOSITORY) != REPOSITORY:
         raise DeploymentError("The release repository does not match the Worker ownership marker.")
-    call = cloudflare(os.environ["CLOUDFLARE_API_TOKEN"])
-    account = account_id(call, os.environ.get("CLOUDFLARE_ACCOUNT_ID"))
+    print("Checking the Cloudflare credential format.", flush=True)
+    token = os.environ["CLOUDFLARE_API_TOKEN"]
+    if token == os.environ["OPENAI_API_KEY"]:
+        raise DeploymentError("Supply separate Cloudflare and OpenAI credentials in the corresponding GitHub secrets.")
+    kind = token_kind(token)
+    call = cloudflare(token)
+    account = verified_account(call, kind, os.environ.get("CLOUDFLARE_ACCOUNT_ID"))
+    print("Checking ownership of the target Worker.", flush=True)
     check_worker_owner(call, account)
+    print("Checking the public workers.dev hostname.", flush=True)
     subdomain = workers_subdomain(call, account)
-    deploy(os.environ["WRANGLER_BIN"], account, os.environ["CLOUDFLARE_API_TOKEN"], os.environ["OPENAI_API_KEY"])
+    print("Deploying the Worker with its encrypted runtime secret.", flush=True)
+    deploy(os.environ["WRANGLER_BIN"], account, token, os.environ["OPENAI_API_KEY"])
+    print("Checking the public Worker and live OpenAI reply.", flush=True)
     endpoint = verify_worker(f"https://{WORKER}.{subdomain}.workers.dev")
     if os.environ.get("GITHUB_OUTPUT"):
         with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
@@ -197,9 +243,18 @@ def main():
     print("Live OpenAI reply and Pages origin verified at", endpoint)
 
 
-if __name__ == "__main__":
+def run():
     try:
         main()
-    except (DeploymentError, OSError, ValueError, KeyError, subprocess.TimeoutExpired) as exc:
+    except DeploymentError as exc:
         print("Live chat deployment failed:", exc, file=sys.stderr)
-        sys.exit(1)
+        return 1
+    except Exception:
+        # Library exceptions may quote request headers, URLs or subprocess inputs.
+        print("Live chat deployment failed during the reported stage. Check the configuration and network, then retry.", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(run())
