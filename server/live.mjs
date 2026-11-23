@@ -1,5 +1,6 @@
 // This module is server-only. The catalogue is loaded by the host, never from the chat request.
 import { checkedEvidence, explainEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, validCommunityProfile, visitorExcerpts } from "./community-chat.mjs";
+import { prepareExplanation, explanationInstructions } from "./explanation.mjs";
 import { suppliedExerciseCaseId } from "../site/exercise-chat.js";
 import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
 import { matchOpportunities } from "../site/engine.js";
@@ -227,7 +228,7 @@ function validatePlan(data, known) {
   return data;
 }
 
-function readOutput(body, known, clock) {
+function readOutput(body, known, clock, explanation) {
   if (
     body?.status !== "completed" ||
     !Array.isArray(body.output) ||
@@ -260,6 +261,19 @@ function readOutput(body, known, clock) {
   if (clock) {
     if (!answer || !["zh","en"].includes(answer.language) || !boundedText(answer.host_question, 450)) throw invalidReply();
     return {model: body.model, plan: {intent: "clock_confirmation", language: answer.language, hostQuestion: answer.host_question}};
+  }
+  if (explanation) {
+    if (!answer?.explanations || !["en","zh"].includes(answer.language)) throw invalidReply();
+    const role_evidence = explanation.ids.map(id => {
+      const item = answer.explanations[id];
+      if (!item || !Object.hasOwn(explanation.input.roles[id].fields, item.listing_source)
+          || typeof item.reason !== "string" || item.reason.length > 360
+          || (item.visitor_source !== null && item.visitor_source !== "none" && !explanation.input.volunteer_statements.some(row => String(row.index) === item.visitor_source))) throw invalidReply();
+      return {...item, role_id:id, visitor_source:item.visitor_source === null || item.visitor_source === "none" ? null : Number(item.visitor_source)};
+    });
+    answer = {intent:"explain", language:answer.language, activity:"", time:"any", mode:"any", step_free:false,
+      candidate_ids:explanation.ids, case_profile:explanation.profile, changed_fields:[], required_activity_ref:null,
+      role_evidence, follow_up:"", reply:""};
   }
   return { model: body.model, plan: validatePlan(answer, known) };
 }
@@ -349,7 +363,7 @@ function latestProfile(history) {
 
 function onlyAskingWhy(message) {
   const text = message.trim().toLowerCase().replace(/[?.!！？。]+$/u, "").trim();
-  return /^(?:why(?: these| those| this| that)?(?: roles?| ones?)?(?: for me)?|why (?:did you (?:choose|pick|recommend|suggest)|are|would) (?:these|those|this|that)(?: roles?| ones?)?(?: (?:for me|a good fit|suit me|good for me))?|为什么(?:是|推荐)?(?:这些|这几个|这个|它们)(?:岗位|机会)?(?:给我|适合我)?|(?:这些|这几个|这个)(?:岗位|机会)?为什么适合我|我说的哪些经验和这些岗位的工作有关)$/iu.test(text);
+  return /^(?:why do these roles suit me|你为什么觉得这几个岗位适合我|why(?: these| those| this| that)?(?: roles?| ones?)?(?: for me)?|why (?:did you (?:choose|pick|recommend|suggest)|are|would) (?:these|those|this|that)(?: roles?| ones?)?(?: (?:for me|a good fit|suit me|good for me))?|为什么(?:是|推荐)?(?:这些|这几个|这个|它们)(?:岗位|机会)?(?:给我|适合我)?|(?:这些|这几个|这个)(?:岗位|机会)?为什么适合我|我说的哪些经验和这些岗位的工作有关)$/iu.test(text);
 }
 
 function applyProfileChange(plan, {message, history}) {
@@ -573,6 +587,9 @@ export async function answerLive({
     throw unavailable();
   const turn = validateTurn({ message, history }, roles);
   const clock = clockInTurn(turn.message);
+  const previousIds = previousRoles(turn.history);
+  const explanation = !clock && previousIds.length && onlyAskingWhy(turn.message)
+    ? prepareExplanation(turn, roles, previousIds, latestProfile(turn.history)) : null;
   const controller = new AbortController();
   const abort = () => controller.abort();
   if (signal?.aborted) abort();
@@ -592,8 +609,8 @@ export async function answerLive({
         store: false,
         max_output_tokens: 2200,
         reasoning: { effort: "low" },
-        instructions: clock ? CLOCK_INSTRUCTIONS : INSTRUCTIONS,
-        input: JSON.stringify(clock ? {latest_message:turn.message, clock, active_profile:latestProfile(turn.history)} : {
+        instructions: clock ? CLOCK_INSTRUCTIONS : explanation ? explanationInstructions : INSTRUCTIONS,
+        input: JSON.stringify(explanation ? explanation.input : clock ? {latest_message:turn.message, clock, active_profile:latestProfile(turn.history)} : {
           catalogue: inputCatalogue(roles),
           named_volunteer_examples: EXERCISE_CASE_TEXT,
           active_profile: latestProfile(turn.history),
@@ -605,9 +622,9 @@ export async function answerLive({
         text: {
           format: {
             type: "json_schema",
-            name: clock ? "common_hours_host_time_question" : "common_hours_volunteer_turn",
+            name: clock ? "common_hours_host_time_question" : explanation ? "common_hours_explanation" : "common_hours_volunteer_turn",
             strict: true,
-            schema: clock ? CLOCK_SCHEMA : planSchema(roles),
+            schema: clock ? CLOCK_SCHEMA : explanation ? explanation.schema : planSchema(roles),
           },
         },
       }),
@@ -620,7 +637,7 @@ export async function answerLive({
       );
     if (!response.ok) throw unavailable();
     return formatAnswer(
-      readOutput(await response.json(), new Set(roles.map((r) => r.id)), clock),
+      readOutput(await response.json(), new Set(roles.map((r) => r.id)), clock, explanation),
       turn,
       roles,
     );

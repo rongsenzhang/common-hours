@@ -56,7 +56,18 @@ function run(message, extras = {}, input = {}) {
     roles,
     apiKey: sentinel,
     fetchImpl: async (_url, request) => {
-      if (JSON.parse(request.body).text.format.name === "common_hours_host_time_question") {
+      const body = JSON.parse(request.body);
+      if (body.text.format.name === "common_hours_explanation") {
+        const payload = JSON.parse(body.input);
+        const explanations = Object.fromEntries(Object.keys(payload.roles).map(id => {
+          const selected = extras.role_evidence?.find(row => row.role_id === id);
+          const visitor = payload.volunteer_statements.find(row => row.index === selected?.visitor_source) ?? payload.volunteer_statements[0];
+          return [id, {listing_source: selected?.listing_source || "summary",
+            visitor_source: visitor ? String(visitor.index) : null, reason: selected?.reason || ""}];
+        }));
+        return completed({language:extras.language ?? "en", explanations});
+      }
+      if (body.text.format.name === "common_hours_host_time_question") {
         return completed({language:extras.language ?? "en",host_question:"Could you confirm the exact time?"});
       }
       return completed({ ...basePlan, ...extras });
@@ -410,4 +421,24 @@ test("a clear weekday-evening request narrows broad AI availability in either la
   assert.deepEqual(alternatives.caseProfile.days,proposed.days);
   const named = await run("Case B",{intent:"case_search", activity:"", case_profile:proposed});
   assert.deepEqual(named.caseProfile,profile("B"));
+});
+
+test("a why request asks the model for evidence for each displayed role without re-ranking or re-quoting the question", async () => {
+  const user = "I enjoy helping one person learn to make video calls.";
+  const history=[{user,text:"Two possible roles.",caseProfile:profile("A"),matches:["video-call-coach","email-practice-partner"],toConfirm:[]}];
+  const reply = await run("Why did you choose these for me?",{}, {history,fetchImpl:async (_url, request) => {
+    const body=JSON.parse(request.body);
+    assert.equal(body.text.format.name,"common_hours_explanation");
+    const schema=body.text.format.schema.properties.explanations;
+    assert.deepEqual(schema.required,history[0].matches);
+    const input=JSON.parse(body.input);
+    assert.deepEqual(input.volunteer_statements,[{index:0,text:user}]);
+    assert.deepEqual(Object.keys(input.roles),history[0].matches);
+    return completed({language:"en",explanations:Object.fromEntries(schema.required.map(id=>[id,{
+      listing_source:"digitalEvidence",visitor_source:"0",reason:"This could suit you because you enjoy helping a learner practise."
+    }]))});
+  }});
+  assert.deepEqual(reply.caseProfile,profile("A"));
+  assert.deepEqual(reply.matches,history[0].matches);
+  for(const id of reply.matches) assert.equal(reply.evidence[id].userQuote,user);
 });

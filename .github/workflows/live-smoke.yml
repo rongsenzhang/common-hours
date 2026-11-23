@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - server/live.mjs
+      - server/explanation.mjs
       - server/community-chat.mjs
       - site/community-case.js
       - site/data/catalog.json
