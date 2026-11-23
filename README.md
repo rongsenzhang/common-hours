@@ -2,7 +2,11 @@
 
 Find volunteering opportunities around Greater Manchester and ask follow-up questions about the activities, timing and access. The independent NTU–TeamKinetic application demo uses 19 fictional roles from 13 fictional hosts. All volunteers can use it without an account.
 
-[Find a role](https://rongsenzhang.github.io/common-hours/) · [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask) · [实时问答测试指南](docs/testing-live.md) · [Finder and on-device tests](docs/testing-v1.1.md)
+[Find a role](https://rongsenzhang.github.io/common-hours/) · [Matching exercise](https://rongsenzhang.github.io/common-hours/#exercise) · [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask) · [实时问答测试指南](docs/testing-live.md) · [Finder and on-device tests](docs/testing-v1.1.md)
+
+## Panel matching exercise
+
+Open **Matching exercise** beside Discover. Run Case A, switch to Case B, then change a volunteer requirement or preference. Both cases use the same seven fictional opportunity records and the same matching function. The exercise runs in your browser without a login or an API key. [Run the cases and inspect the code](docs/matching-exercise.md)
 
 ## Try it
 

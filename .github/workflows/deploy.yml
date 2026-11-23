@@ -53,6 +53,7 @@ jobs:
           preview_pid=$!
           trap 'kill "$preview_pid" 2>/dev/null || true' EXIT
           node qa/browser.cjs http://127.0.0.1:8754/
+          node qa/exercise-browser.cjs http://127.0.0.1:8754/
           node qa/live-browser.cjs http://127.0.0.1:8754/
           node qa/admin-browser.cjs site/data
 

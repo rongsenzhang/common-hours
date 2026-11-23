@@ -1,0 +1,222 @@
+import {
+  exerciseEvidence,
+  exerciseProfile,
+  exerciseRoles,
+  matchExercise,
+} from "./exercise-engine.js";
+import { escapeText as e } from "./html.js";
+import { icon } from "./icons.js";
+
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const codeUrl = "https://github.com/rongsenzhang/common-hours/blob/main/site/exercise-engine.js";
+
+function selectField(name, label, options) {
+  return `<label class="ex-field">${label}<select name="${name}">${options
+    .map(([value, text]) => `<option value="${value}">${text}</option>`)
+    .join("")}</select></label>`;
+}
+
+function controls() {
+  return `<details class="ex-controls" id="ex-controls" open>
+    <summary>${icon("filter", 20)}<span>Volunteer conditions</span>${icon("down", 18)}</summary>
+    <form id="exercise-form" class="ex-form" novalidate>
+      <fieldset class="ex-section"><legend>Requirements</legend>
+        ${selectField("mode", "Participation", [["either", "Online or in person"], ["in-person", "In person only"], ["online", "Online only"]])}
+        <fieldset class="ex-days"><legend>Available days</legend><div>${days
+          .map(day => `<label><input type="checkbox" name="days" value="${day}"><span>${day}</span></label>`).join("")}</div></fieldset>
+        ${selectField("period", "Time of day", [["evening", "Evenings only"], ["daytime", "Daytime only"], ["any", "Daytime or evening"]])}
+        <label class="ex-field">Maximum in-person distance (miles)<input type="number" name="maxMiles" min="0" step="any" required inputmode="decimal" aria-describedby="ex-radius-error"></label>
+        <p class="ex-error" id="ex-radius-error" hidden>Enter a distance of zero miles or more.</p>
+        ${selectField("clearance", "Safeguarding clearance for this role", [["unknown", "Validity unknown"], ["verified", "Verified for this role"], ["none", "No valid clearance"]])}
+      </fieldset>
+      <fieldset class="ex-section ex-preferences"><legend>Preferences</legend>
+        <label><input name="individual" type="checkbox">One-to-one support</label>
+        <label><input name="digital" type="checkbox">Using digital support skills</label>
+      </fieldset>
+    </form>
+  </details>`;
+}
+
+function titleList(items) {
+  if (!items.length) return "<p>No roles.</p>";
+  return `<ol>${items.map(({ role }) => `<li>${e(role.title)}</li>`).join("")}</ol>`;
+}
+
+function reasons(item) {
+  return item.reasons.map(e).join(" ");
+}
+
+function recommended(items) {
+  if (!items.length) return '<p class="ex-empty">No role is ready to recommend with these conditions. Review the other records below or change an input.</p>';
+  return `<ol class="ex-recs">${items.map(item => `<li>
+    <article><div class="ex-card-top"><h3>${e(item.role.title)}</h3><span class="ex-fit">${e(item.fit)}</span></div>
+    <p class="ex-when">${e(item.role.whenWhere)}</p><p class="ex-activity">${e(item.role.activity)}.</p>
+    <p class="ex-reason">${e(item.role.activity)}. ${reasons(item)}</p></article>
+  </li>`).join("")}</ol>`;
+}
+
+function reviewed(items, key) {
+  if (!items.length) return "<p>No roles in this group.</p>";
+  return `<ul class="ex-review-list">${items.map(item =>
+    `<li><strong>${e(item.role.title)}</strong><p>${reasons(item)}${key === "other" && item.fit !== "No stated interest match" ? " Other eligible roles filled the three shortlist places." : ""}</p></li>`
+  ).join("")}</ul>`;
+}
+
+function disclosure(key, heading, open = false) {
+  return `<details class="ex-disclosure ex-${key}"${open ? " open" : ""}><summary>
+    <span>${heading}</span><span class="ex-count" id="ex-${key}-count"></span>${icon("down", 17)}
+  </summary><div class="ex-detail-body" id="ex-${key}"></div></details>`;
+}
+
+function records() {
+  return exerciseRoles.map(role => {
+    const evidence = exerciseEvidence(role);
+    const tags = [
+      evidence.individual && `One-to-one from “${e(evidence.individual)}”`,
+      evidence.digital && `Digital support from “${e(evidence.digital)}”`,
+    ].filter(Boolean);
+    return `<li><h4>${e(role.title)}</h4><p>${e(role.activity)}</p>
+      <dl><div><dt>When and where</dt><dd>${e(role.whenWhere)}</dd></div>
+      <div><dt>Requirement</dt><dd>${e(role.requirement)}</dd></div>
+      <div><dt>Derived interests</dt><dd>${tags.length ? tags.join(" · ") : "None identified"}</dd></div></dl>
+    </li>`;
+  }).join("");
+}
+
+function layout() {
+  return `<div class="ex-page">
+    <header class="ex-header"><h1>Matching exercise</h1>
+      <p>Try both volunteer cases against seven fictional opportunities. Change a condition to see which roles the same rules recommend.</p>
+    </header>
+    <div class="ex-cases" role="group" aria-label="Load a case">
+      <button type="button" data-ex-case="A"><strong>Case A</strong><span>Online or in person</span></button>
+      <button type="button" data-ex-case="B"><strong>Case B</strong><span>In person only</span></button>
+    </div>
+    <p class="ex-case-note">Both cases start with weekday evenings, a three-mile travel limit and unverified clearance. One-to-one work and using digital skills are preferences.</p>
+    <div class="ex-workspace">
+      ${controls()}
+      <section class="ex-results" aria-labelledby="ex-shortlist-title">
+        <div class="ex-result-head"><h2 id="ex-shortlist-title">Shortlist</h2><span class="ex-current" id="ex-current"></span></div>
+        <div id="ex-recommendations"></div>
+        <div id="ex-breakdown">
+          ${disclosure("pending", "Needs confirmation", true)}
+          ${disclosure("other", "Other feasible roles")}
+          ${disclosure("excluded", "Ruled out")}
+          <details class="ex-disclosure"><summary><span>Compare with a simple filter</span>${icon("down", 17)}</summary>
+            <div class="ex-detail-body"><p>Both methods apply the same requirements. The filter takes the first three feasible records in the supplied order. The shortlist also uses the volunteer’s interests.</p><div id="ex-baseline" class="ex-comparison"></div></div>
+          </details>
+        </div>
+      </section>
+    </div>
+    <section aria-label="Inspect the exercise" class="ex-evidence">
+      <details class="ex-disclosure"><summary><span>Matching rules</span>${icon("down", 17)}</summary>
+        <div class="ex-detail-body"><ol class="ex-rules">
+          <li><strong>Check feasibility.</strong> Apply the selected days, time, setting, in-person travel limit and any required clearance. A known conflict rules a role out. An unresolved required fact needs confirmation. Online roles require no travel.</li>
+          <li><strong>Interpret preferences.</strong> Treat one-to-one work and digital support as preferences. A small vocabulary links record wording to those concepts. Open the source records to see each phrase behind a tag.</li>
+          <li><strong>Rank viable roles.</strong> Award one point for each selected preference the record supports. Return up to three roles with a positive score. Break ties in the supplied record order. With both preferences off, use that order for all feasible roles.</li>
+        </ol><div class="ex-links"><a href="${codeUrl}">Inspect the matching code ${icon("external", 14)}</a>
+        <a href="https://github.com/rongsenzhang/common-hours/blob/main/docs/matching-exercise.md">Run the exercise locally ${icon("external", 14)}</a></div></div>
+      </details>
+      <details class="ex-disclosure"><summary><span>Seven source records</span>${icon("down", 17)}</summary>
+        <div class="ex-detail-body"><p>“None listed” means the record lists no extra requirement. Derived interests show how the matcher interprets the activity text.</p><ul class="ex-records">${records()}</ul></div>
+      </details>
+    </section>
+    <p class="sr" role="status" id="ex-status"></p>
+  </div>`;
+}
+
+function putProfile(form, profile) {
+  for (const key of ["mode", "period", "maxMiles", "clearance"]) form.elements[key].value = profile[key];
+  for (const key of ["individual", "digital"]) form.elements[key].checked = profile[key];
+  for (const box of form.querySelectorAll("[name=days]")) box.checked = profile.days.includes(box.value);
+}
+
+function readProfile(form) {
+  const fields = form.elements;
+  return {
+    mode: fields.mode.value,
+    days: [...form.querySelectorAll("[name=days]:checked")].map(box => box.value),
+    period: fields.period.value,
+    maxMiles: fields.maxMiles.valueAsNumber,
+    clearance: fields.clearance.value,
+    individual: fields.individual.checked,
+    digital: fields.digital.checked,
+  };
+}
+
+function caseName(profile) {
+  for (const name of ["A", "B"]) {
+    const preset = exerciseProfile(name);
+    if (Object.keys(preset).every(key => key === "days"
+      ? preset.days.join() === profile.days.join()
+      : preset[key] === profile[key])) return name;
+  }
+  return null;
+}
+
+export function mountExercise(main) {
+  main.innerHTML = layout();
+  const find = id => main.querySelector("#ex-" + id);
+  const form = main.querySelector("#exercise-form");
+  const caseButtons = [...main.querySelectorAll("[data-ex-case]")];
+  if (window.matchMedia("(max-width: 740px)").matches) find("controls").open = false;
+
+  function update() {
+    const profile = readProfile(form);
+    const radius = form.elements.maxMiles;
+    radius.disabled = profile.mode === "online";
+    // With no in-person roles, an unfinished distance field has no bearing on eligibility.
+    if (radius.disabled && (!Number.isFinite(profile.maxMiles) || profile.maxMiles < 0)) profile.maxMiles = 0;
+    const invalid = !radius.disabled && !radius.validity.valid;
+    radius.setAttribute("aria-invalid", String(invalid));
+    find("radius-error").hidden = !invalid;
+    const preset = caseName(profile);
+    for (const button of caseButtons) button.setAttribute("aria-pressed", String(button.dataset.exCase === preset));
+    find("current").textContent = preset ? "Case " + preset : "Edited conditions";
+    find("breakdown").hidden = invalid;
+    if (invalid) {
+      find("recommendations").innerHTML = '<p class="ex-empty">Enter a valid travel limit to update the shortlist.</p>';
+      find("status").textContent = "Waiting for a valid travel limit.";
+      return;
+    }
+    const result = matchExercise(profile);
+    find("recommendations").innerHTML = recommended(result.recommendations);
+    for (const key of ["pending", "other", "excluded"]) {
+      find(key + "-count").textContent = String(result[key].length);
+      find(key).innerHTML = reviewed(result[key], key);
+    }
+    find("baseline").innerHTML = `<div><h3>Simple filter</h3>${titleList(result.baseline)}</div>
+      <div><h3>With preferences</h3>${titleList(result.recommendations)}</div>`;
+    const top = result.recommendations[0];
+    find("status").textContent = `${find("current").textContent}. ${result.recommendations.length} recommended. ${top ? "First, " + top.role.title + ". " : ""}${result.pending.length} awaiting confirmation.`;
+  }
+
+  function loadCase(event) {
+    const button = event.target.closest("[data-ex-case]");
+    if (!button) return;
+    putProfile(form, exerciseProfile(button.dataset.exCase));
+    update();
+  }
+
+  function handleNumber(event) {
+    if (event.target.name === "maxMiles") update();
+  }
+
+  function preventSubmit(event) {
+    event.preventDefault();
+  }
+
+  const cases = main.querySelector(".ex-cases");
+  cases.addEventListener("click", loadCase);
+  form.addEventListener("change", update);
+  form.addEventListener("input", handleNumber);
+  form.addEventListener("submit", preventSubmit);
+  putProfile(form, exerciseProfile("A"));
+  update();
+  return () => {
+    cases.removeEventListener("click", loadCase);
+    form.removeEventListener("change", update);
+    form.removeEventListener("input", handleNumber);
+    form.removeEventListener("submit", preventSubmit);
+  };
+}

@@ -3,6 +3,7 @@ import { matchOpportunities } from "./engine.js";
 import { icon, mark } from "./icons.js";
 import { answerVolunteerQuestion } from "./assistant.js";
 import { renderChat } from "./chat-view.js";
+import { mountExercise } from "./exercise-view.js";
 import {
   chatEndpoint,
   requestLiveReply,
@@ -36,6 +37,8 @@ const chats = {
 let conversation = null;
 let liveRequest = null;
 let chatError = "";
+let leaveExercise;
+let catalogueRequest;
 function chatContents() {
   const chat = chats[chatMode];
   return renderChat(chat.turns, catalog.opportunities, {
@@ -241,15 +244,23 @@ function refreshResults() {
 function render(scroll = false) {
   const h = location.hash.slice(1);
   if (page === "ask" && h !== "ask") cancelRequest();
-  page = h === "ask" ? "ask" : "discover";
-  document.title =
-    (page === "ask" ? "Ask the role finder" : "Discover volunteer roles") +
-    " · Common Hours";
+  leaveExercise?.();
+  leaveExercise = undefined;
+  page = ["ask", "exercise"].includes(h) ? h : "discover";
+  const titles = { discover: "Discover volunteer roles", exercise: "Matching exercise", ask: "Ask the role finder" };
+  document.title = titles[page] + " · Common Hours";
   for (const n of document.querySelectorAll("nav a")) {
     if (n.dataset.page === page) n.setAttribute("aria-current", "page");
     else n.removeAttribute("aria-current");
   }
-  main.innerHTML = page === "ask" ? chatContents() : discover();
+  if (page === "exercise") {
+    leaveExercise = mountExercise(main);
+  } else if (catalog) {
+    main.innerHTML = page === "ask" ? chatContents() : discover();
+  } else {
+    main.innerHTML = '<p class="loading">Opening the volunteer catalogue…</p>';
+    catalogueRequest ??= openCatalogue();
+  }
   if (scroll) {
     main.focus({ preventScroll: true });
     window.scrollTo(0, 0);
@@ -440,24 +451,29 @@ document.addEventListener("submit", (ev) => {
     main.querySelector("#results").scrollIntoView();
 });
 window.addEventListener("hashchange", () => {
-  if (catalog && location.hash !== "#main") render(true);
+  if (location.hash !== "#main") render(true);
 });
 async function loadJson(file) {
   const response = await fetch("./data/" + file);
   if (!response.ok) throw Error("Resource unavailable");
   return response.json();
 }
-try {
-  let config;
-  [catalog, ai, config] = await Promise.all([
-    loadJson("catalog.json"),
-    loadJson("host-questions.json").catch(() => ({ questions: [] })),
-    loadJson("chat-config.json").catch(() => null),
-  ]);
-  endpoint = chatEndpoint(config, location.href);
-  chatMode = endpoint ? "live" : "local";
-  render();
-} catch {
-  main.innerHTML =
-    '<div class="empty"><h1>The catalogue could not open</h1><p>Reload the page to try again.</p></div>';
+async function openCatalogue() {
+  try {
+    let config;
+    [catalog, ai, config] = await Promise.all([
+      loadJson("catalog.json"),
+      loadJson("host-questions.json").catch(() => ({ questions: [] })),
+      loadJson("chat-config.json").catch(() => null),
+    ]);
+    endpoint = chatEndpoint(config, location.href);
+    chatMode = endpoint ? "live" : "local";
+    if (page !== "exercise") main.innerHTML = page === "ask" ? chatContents() : discover();
+  } catch {
+    if (page !== "exercise") main.innerHTML =
+      '<div class="empty"><h1>The catalogue could not open</h1><p>Reload the page to try again.</p></div>';
+  } finally {
+    catalogueRequest = undefined;
+  }
 }
+render();

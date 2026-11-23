@@ -980,7 +980,12 @@ dialog dl {
     font-size: 0.75rem;
   }
   .top nav {
-    gap: 1.45rem;
+    gap: clamp(0.6rem, 3vw, 1.45rem);
+  }
+  .top nav a {
+    min-height: 44px;
+    line-height: 1.2;
+    text-align: center;
   }
   dialog {
     padding: 18px;

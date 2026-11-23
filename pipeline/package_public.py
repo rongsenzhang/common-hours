@@ -1,4 +1,4 @@
-"""Build the volunteer-only GitHub Pages directory from explicit public inputs."""
+"""Build Common Hours and the public matching exercise from explicit inputs."""
 import argparse
 import json
 from pathlib import Path
@@ -11,6 +11,7 @@ SITE = ROOT / "site"
 PUBLIC_FILES = (
     "index.html", "app.js", "engine.js", "assistant.js", "assistant-topics.js",
     "chat-view.js", "live-chat.js", "html.js", "icons.js", "style.css", "chat.css",
+    "exercise-engine.js", "exercise-view.js", "exercise.css",
 )
 ROLE_FIELDS = (
     "id", "title", "organisation", "area", "theme", "summary", "time", "mode",
