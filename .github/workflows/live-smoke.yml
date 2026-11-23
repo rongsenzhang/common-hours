@@ -8,8 +8,11 @@ on:
       - server/live.mjs
       - server/explanation.mjs
       - server/community-chat.mjs
+      - site/assistant.js
+      - site/assistant-topics.js
       - site/community-case.js
       - site/data/catalog.json
+      - site/engine.js
       - site/exercise-engine.js
       - site/exercise-chat.js
       - qa/openai-live-smoke.mjs

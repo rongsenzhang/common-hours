@@ -156,6 +156,25 @@ test("small talk gets a generated answer and identity uses the actual provider m
   assert.match(general.text, /who will greet/);
 });
 
+test("a known activity with unconfirmed access stays visible without promising the route", async () => {
+  const message = "I want to help at the community garden at weekends. I need a step-free route to the beds.";
+  const missing = {intent:"unknown", activity:"", candidate_ids:[], reply:"Please check with the host."};
+  for (const plan of [missing, {...missing,intent:"search",activity:"garden"},
+    {...missing,intent:"search",activity:"garden",candidate_ids:["garden-buddy"],step_free:false}]) {
+    const result = await run(message, plan);
+    assert.deepEqual(result.matches, []);
+    assert.deepEqual(result.toConfirm, ["garden-buddy"]);
+    assert.match(result.details["garden-buddy"], /path between the entrance and the beds/);
+  }
+  for (const text of [message.replace("weekends", "weekdays"), message + " I also need an accessible toilet."]) {
+    const result = await run(text, missing);
+    assert.deepEqual(result.matches, []);
+    assert.deepEqual(result.toConfirm, []);
+  }
+  const history = [{user:"I need an accessible toilet.",text:"Please ask the host.",matches:[],toConfirm:[]}];
+  assert.deepEqual((await run(message, missing, {history})).toConfirm, []);
+});
+
 test("specific time or missing information never appears as a confirmed match", async () => {
   const nine = await run("Can I walk dogs on Saturday at 9am?");
   assert(!nine.matches.length && !nine.toConfirm.length);

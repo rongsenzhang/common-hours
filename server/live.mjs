@@ -4,6 +4,7 @@ import { prepareExplanation, explanationInstructions } from "./explanation.mjs";
 import { suppliedExerciseCaseId } from "../site/exercise-chat.js";
 import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
 import { matchOpportunities } from "../site/engine.js";
+import { answerVolunteerQuestion } from "../site/assistant.js";
 
 export const DEFAULT_MODEL = "gpt-5.4-mini-2026-03-17";
 const API_URL = "https://api.openai.com/v1/responses";
@@ -157,6 +158,8 @@ Choose one intent:
 - case_search: interpret a volunteer profile, a specific weekly day, day/evening period, travel radius, interest in one-to-one/digital support, safeguarding requirements, a named Case A/B, or follow-up that changes any active profile constraint. Use case_search even for a pasted interview case. The search is ALWAYS across the community catalogue. The named case statements are example volunteer inputs, not a separate list of roles. "Case B" alone refers to A with online participation removed. "The same volunteer can no longer volunteer online" retains the last profile, or A if there is no earlier one. Preserve unchanged constraints even after small talk. If a different literal case profile is pasted in full, interpret its actual wording. Mark unsupported mandatory conditions unknown and explain what to ask. Examples: exact clock times, "mornings only" (daytime is too broad), a specific street address or actual distance from the visitor's own home, or a hard prohibition on any group activity when the record only describes some individual support. For contradictions clarify.
 - more: the next page of an existing search. Keep the previous criteria.
 - detail: explicit question about an identifiable role, several named roles, the first/second previously shown option, or its tasks, location, accessibility or schedule. Select only the referenced ID(s). If an asked-for detail isn't in the catalogue use unknown.
+
+A request to volunteer with a step-free route is a search even when a relevant venue has not confirmed its route. Set step_free true, select that role and let the catalogue mark it for host confirmation. Reserve unknown for requirements the catalogue cannot represent, such as the width of a doorway or the availability of an accessible toilet.
 
 candidate_ids: choose all genuinely relevant catalogue IDs in order, considering actual tasks and interests. For a recommendation, include topically suitable roles before time/mode/access filtering (the server enforces these facts). Return [] if the activity is absent. For "walk dogs" both dog walking roles qualify, the supply sorter and litter walk do not. Sorting cycle workshop kit and repairing a bicycle are different activities. For a broad search without a named activity use an empty activity. The server will then consider all records. A short interest such as "food" is enough for a useful first search; nominate food handling and preparation roles and optionally ask which kind of work appeals. For explicit alternatives or exclusions respect the visitor's request. Never pad a shortlist.
 
@@ -421,6 +424,24 @@ function groundVolunteerProfile(plan, turn) {
   groundAvailability(plan, turn.message);
 }
 
+// An unconfirmed route still leaves a known activity the visitor can ask the
+// host about. Use the shared catalogue checks only to recover pending cards.
+function unconfirmedAccessReply(message, roles, result, zh) {
+  if (!/step[- ]free|without (?:steps|stairs)|level access|无台阶/iu.test(message)) return null;
+  const checked = answerVolunteerQuestion(message, roles);
+  if (!checked.state.inferred || !checked.state.preferences.stepFree || checked.matches.length) return null;
+  const pending = checked.toConfirm.map(id => roles.find(role => role.id === id))
+    .filter(role => role?.stepFree === "unknown" && role.mode !== "remote");
+  if (!pending.length) return null;
+  return {
+    ...result,
+    toConfirm: pending.map(role => role.id),
+    details: Object.fromEntries(pending.map(role => [role.id, roleDescription(role, zh)])),
+    text: zh ? "这些岗位与所选活动相符。出发前请向主办方确认无台阶通道。"
+      : "These listings fit the activity. Please ask the host to confirm the step-free route before you go.",
+  };
+}
+
 function formatAnswer({ plan, model }, { message, history }, roles) {
   const zh = plan ? plan.language === "zh" : /[\u3400-\u9fff]/u.test(message);
   const say = (en, cn) => (zh ? cn : en);
@@ -468,7 +489,10 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
     const profile = latestProfile(history);
     return {...result, ...(profile && {caseProfile: profile}), text:intro + " " + (safeQuestion ? question : fallback)};
   }
+  const pendingAccess = !history.length && !plan.case_profile && ["unknown","clarify","search"].includes(plan.intent)
+    ? unconfirmedAccessReply(message, roles, result, zh) : null;
   if (["social", "explore", "advice", "clarify", "off_topic", "unknown"].includes(plan.intent)) {
+    if (pendingAccess) return pendingAccess;
     if (!plan.reply.trim()) throw invalidReply();
     return respond(plan.reply.trim());
   }
@@ -503,7 +527,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
     query: wantsDetails ? "" : plan.activity.trim(),
     time: plan.time,
     mode: plan.mode,
-    stepFree: plan.step_free,
+    stepFree: plan.step_free || Boolean(pendingAccess),
   };
   const ranked = matchOpportunities(candidates, prefs);
   const rows = [
@@ -528,8 +552,8 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
       ) + roleDescription(role, zh),
     );
   }
-  if (!rows.length)
-    return respond(
+  if (!rows.length) {
+    return pendingAccess || respond(
       plan.intent === "more"
         ? say(
             "Those were the last available options for this search. Would you like to try another activity or change a preference?",
@@ -540,6 +564,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
             "演示目录中没有找到符合该请求的岗位。你想换一种活动，还是调整一个条件？",
           ),
     );
+  }
   if (plan.intent === "explain") return respond(say(
     "Here is how the work in each listing relates to what you told me.",
     "下面是各岗位的实际任务与你所述需求之间的联系。",
