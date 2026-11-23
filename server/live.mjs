@@ -149,7 +149,7 @@ Choose one intent:
 - more: the next page of an existing search. Keep the previous criteria.
 - detail: explicit question about an identifiable role, several named roles, the first/second previously shown option, or its tasks, location, accessibility or schedule. Select only the referenced ID(s). If an asked-for detail isn't in the catalogue use unknown.
 
-candidate_ids: choose all genuinely relevant catalogue IDs in order, considering actual tasks and interests. For a recommendation, include topically suitable roles before time/mode/access filtering (the server enforces these facts). Return [] if the activity is absent. For "walk dogs" both dog walking roles qualify, the supply sorter and litter walk do not. Sorting cycle workshop kit and repairing a bicycle are different activities. For a broad search without a named activity use an empty activity. The server will then consider all records. For explicit alternatives or exclusions respect the visitor's request. Never pad a shortlist.
+candidate_ids: choose all genuinely relevant catalogue IDs in order, considering actual tasks and interests. For a recommendation, include topically suitable roles before time/mode/access filtering (the server enforces these facts). Return [] if the activity is absent. For "walk dogs" both dog walking roles qualify, the supply sorter and litter walk do not. Sorting cycle workshop kit and repairing a bicycle are different activities. For a broad search without a named activity use an empty activity. The server will then consider all records. A short interest such as "food" is enough for a useful first search; nominate food handling and preparation roles and optionally ask which kind of work appeals. For explicit alternatives or exclusions respect the visitor's request. Never pad a shortlist.
 
 case_profile: required non-null only for case_search and for detail/more/explain continuing such a profile, otherwise null. Interpret evidence semantically in English or Chinese. days is the set of available days; use all seven if unspecified. period is any, daytime or evening. Use either mode for "online is fine"; only explicit online-only or in-person-only requests restrict mode. maxMiles is null if unrestricted. All example venue distances use one fixed fictional origin. Uncertain or unmentioned clearance is unknown. Only use verifiedRoleId when the visitor explicitly reports verification for that named role. A generic DBS or uncertainty about transfer is unknown; a stated lack of clearance is none. individual and digital are independent preferences. stepFree is a venue requirement if requested. Case A has weekdays/evening/either/3 miles/unknown clearance and both preferences, B changes only mode to in-person. For these kinds of community profile ONLY put an additional distinct activity like dog walking into the activity field and identify its roles; one-to-one, helping someone and digital skills are already represented and do not count as an additional activity. For standard A/B set activity empty. Personally nominate and rank up to eight strongest evidenced options from the full catalogue in candidate_ids, including a potential option where a host must confirm a detail if appropriate. Prefer personal skill and task alignment within the same eligibility/fit tier. The server independently checks *every* role and can promote stronger eligible alternatives. For more/detail/explain retain the profile across turns.
 For search, case_search, more, detail and explain, include role_evidence for up to six genuinely relevant IDs you nominate. For each, select a short exact substring (8–150 characters) from that role's summary, task, individualEvidence or digitalEvidence, plus a verbatim phrase from the visitor's own recent messages that explains *why* that work is a good fit. Set user_quote to "" if no suitable quote exists. Keep quotes in their original language: never translate or paraphrase evidence. Use [] for other intents. For partial profiles optionally add ONE natural, personal follow_up question (maximum 180 characters) that helps narrow a useful unknown. Do not demand unrelated information, repeat known conditions or add factual claims. Use "" when no question is needed. For explore put the question in reply and leave follow_up empty.
@@ -268,11 +268,26 @@ const descriptions = {
   },
 };
 
-function roleDescription(role, zh) {
+function roleDescription(role, zh, includeSession = false) {
   const facts = Object.entries(descriptions)
     .map(([field, values]) => values[role[field]]?.[zh ? 1 : 0])
     .filter(Boolean);
-  return [role.summary, facts.join(" · "), role.contactNote]
+  const extra = [];
+  if (includeSession && role.caseFacts) {
+    const { slots, clearance, distanceMiles } = role.caseFacts;
+    extra.push(slots.length
+      ? slots.map(slot => slot.day + " " + slot.period).join(", ")
+      : (zh ? "具体星期与时段待确认。" : "Ask the host to confirm the session days and periods."));
+    if (role.mode !== "remote") extra.push(Number.isFinite(distanceMiles)
+      ? (zh ? `场地距离虚构起点 ${distanceMiles} 英里。` : `Venue distance from the fictional starting point: ${distanceMiles} miles.`)
+      : (zh ? "请确认场地距离。" : "Ask the host to confirm the venue distance."));
+    extra.push({
+      required: zh ? "需要针对该岗位核实保护审查。" : "Safeguarding clearance needs to be verified for this role.",
+      "none-listed": zh ? "主办方未列出保护审查要求。" : "The host lists no safeguarding clearance requirement.",
+      unknown: zh ? "保护审查要求待主办方确认。" : "Ask the host whether safeguarding clearance is required.",
+    }[clearance]);
+  }
+  return [role.summary, facts.join(" · "), ...extra, role.contactNote]
     .filter(Boolean)
     .join("\n");
 }
@@ -371,7 +386,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
     result[group].push(opportunity.id);
     result.details[opportunity.id] = [
       checkedEvidence(plan, opportunity, [message, ...history.map(turn => turn.user)]),
-      roleDescription(opportunity, zh),
+      roleDescription(opportunity, zh, wantsDetails),
     ].filter(Boolean).join("\n");
   }
   if (wantsDetails && !rows.length && ranked.excluded.length) {
