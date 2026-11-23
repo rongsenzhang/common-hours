@@ -167,7 +167,7 @@ test("accepted requests invoke the configured provider and expose only normalize
       candidate_ids: [],
       case_profile: null,
       changed_fields: null,
-      required_activity_quote: "",
+      required_activity_ref: null,
       role_evidence: [],
       follow_up: "",
       activity: "",

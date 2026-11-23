@@ -38,6 +38,8 @@ async function checkTurn(label, message, history, expected) {
     // IDs are logged. Never print visitor text, provider content or request data.
     const facts = answer ? JSON.stringify({
       profile: answer.caseProfile ?? null, recommended: answer.matches, pending: answer.toConfirm,
+      evidence: Object.entries(answer.evidence ?? {}).map(([id, item]) =>
+        [id, Boolean(item.sourceQuote), Boolean(item.userQuote), Boolean(item.reason)]),
     }) : "";
     throw new Error(`${label}: ${reason} ${facts}`);
   }
@@ -63,6 +65,12 @@ async function checkLiveResponses() {
     ({ matches, toConfirm }) => requireResult(
       !matches.includes("garden-buddy") && toConfirm.includes("garden-buddy")));
   const cases = [];
+  const sameProfile = (first, next) => {
+    requireResult(first && next && first.days.length === next.days.length && first.days.every(day => next.days.includes(day)));
+    for (const key of ["period","mode","maxMiles","clearance","individual","digital","stepFree","verifiedRoleId"]) {
+      requireResult(first[key] === next[key]);
+    }
+  };
   const expectProfile = (expected) => answer => {
     const profile = answer.caseProfile;
     requireResult(profile && profile.days.length === expected.days.length
@@ -99,6 +107,7 @@ async function checkLiveResponses() {
       requireResult(reply.matches.every(id => ["remote","hybrid"].includes(roles.find(role => role.id === id).mode)));
     });
   await checkTurn("why the work suits the volunteer", "Why did you choose these for me?", coaching, reply => {
+    sameProfile(found.caseProfile, reply.caseProfile);
     requireResult(reply.matches.length > 0 && reply.matches.every(id => found.matches.includes(id)));
     requireResult(Object.values(reply.evidence).some(item => item.sourceQuote && item.userQuote));
   });
@@ -111,7 +120,8 @@ async function checkLiveResponses() {
     "朋友经常叫我教他们用手机。我喜欢一次帮一个人，而且我只能在工作日晚上线上参加。", chinese,
     reply => expectProfile({...exerciseProfile("A"), mode:"online", maxMiles:null})(reply));
   await checkTurn("Chinese personalised recommendation explanation", "我说的哪些经验和这些岗位的工作有关？", chinese, reply => {
-    requireResult(reply.matches.some(id => chineseFound.matches.includes(id)));
+    sameProfile(chineseFound.caseProfile, reply.caseProfile);
+    requireResult(reply.matches.length > 0 && reply.matches.every(id => chineseFound.matches.includes(id)));
     requireResult(Object.values(reply.evidence).some(item => item.sourceQuote && item.userQuote));
   });
   console.log("Verified fifteen real OpenAI turns with", DEFAULT_MODEL);

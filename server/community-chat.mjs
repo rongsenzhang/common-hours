@@ -59,13 +59,24 @@ function describeProfile(profile, zh) {
   return say("I checked " + constraints.join(", ") + ".", "我采用的条件是：" + constraints.join("、") + "。") + interests;
 }
 
-export function checkedEvidence(plan, role, userMessages) {
+// Give the provider stable references into the volunteer's actual words.
+// The same ordered excerpts are used in the request and to render its reply.
+export function visitorExcerpts({history, message}) {
+  return [...history.map(turn => turn.user), message].flatMap(text =>
+    (text.match(/[^.!?。！？\n]+[.!?。！？]*/gu) || []).flatMap(sentence =>
+      (sentence.match(/[\s\S]{1,175}(?:\s|$)|[\s\S]{1,175}/gu) || [])
+        .map(chunk => chunk.trim()).filter(Boolean)));
+}
+
+export function checkedEvidence(plan, role, excerpts) {
   const item = plan.role_evidence.find(row => row.role_id === role.id);
   if (!item || !plan.candidate_ids.includes(role.id)) return null;
-  const quote = item.quote.trim(), userQuote = item.user_quote.trim();
-  const sources = [role.summary, ...role.tasks, role.caseFacts?.individualEvidence, role.caseFacts?.digitalEvidence];
-  if (quote.length < 8 || !sources.some(source => source?.includes(quote))) return null;
-  const fromUser = userQuote.length >= 2 && userMessages.some(source => source.includes(userQuote));
+  const listingFields = {summary: role.summary, individualEvidence: role.caseFacts?.individualEvidence,
+    digitalEvidence: role.caseFacts?.digitalEvidence, ...Object.fromEntries(role.tasks.map((task, i) => [`task_${i}`, task]))};
+  const quote = listingFields[item.listing_source];
+  if (typeof quote !== "string" || !quote.trim()) return null;
+  const userQuote = Number.isInteger(item.visitor_source) ? excerpts[item.visitor_source] : null;
+  const fromUser = typeof userQuote === "string" && userQuote.length > 1;
   // Model prose is allowed only as an explicitly subjective fit judgement.
   // Venue, clearance, numbers, availability and application facts come from
   // structured records and are rendered separately below.
@@ -99,9 +110,12 @@ export function communityAnswer(plan, roles, result, {message, history}) {
   const profile = plan.case_profile;
   const wantsDetails = ["explain", "detail"].includes(plan.intent);
   const preferenceOrder = new Map(plan.candidate_ids.map((id, index) => [id, index]));
-  const userMessages = [message, ...history.map(turn => turn.user)];
-  const requiredActivity = plan.required_activity_quote.trim();
-  const explicitTask = requiredActivity.length > 1 && userMessages.some(text => text.includes(requiredActivity));
+  const excerpts = visitorExcerpts({message, history});
+  const explicitTask = Number.isInteger(plan.required_activity_ref) && Boolean(excerpts[plan.required_activity_ref]);
+  if (plan.required_activity_ref !== null && !explicitTask && !wantsDetails) {
+    return {...result, caseProfile: profile, text: say("Which specific activity would you like me to look for?",
+      "你想让我查找哪一类具体的志愿活动？")};
+  }
   let candidates = roles;
   if (wantsDetails) {
     const previous = previousRoles(history);
@@ -112,7 +126,7 @@ export function communityAnswer(plan, roles, result, {message, history}) {
     // A specific extra task must be supported by the visitor's words and an
     // actual listing excerpt. A strength (in any language) is a signal for
     // ranking, never an English keyword condition on the entire catalogue.
-    candidates = roles.filter(role => preferenceOrder.has(role.id) && checkedEvidence(plan, role, userMessages));
+    candidates = roles.filter(role => preferenceOrder.has(role.id) && checkedEvidence(plan, role, excerpts));
   }
   if (plan.intent === "more") {
     const shown = new Set();
@@ -134,7 +148,7 @@ export function communityAnswer(plan, roles, result, {message, history}) {
   for (const [group, rows] of [["matches", ranked.recommendations], ["toConfirm", ranked.pending]]) {
     for (const {role, fit, reasons} of rows.sort(withinTier).slice(0, 3)) {
       result[group].push(role.id);
-      const evidence = checkedEvidence(plan, role, userMessages);
+      const evidence = checkedEvidence(plan, role, excerpts);
       if (evidence) result.evidence[role.id] = evidence;
       result.details[role.id] = [explainEvidence(evidence, zh), role.summary, fit, ...reasons].filter(Boolean).join("\n");
     }
