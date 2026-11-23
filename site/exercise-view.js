@@ -1,5 +1,6 @@
 import {
   exerciseEvidence,
+  exerciseLanguageExamples,
   exerciseProfile,
   exerciseRoles,
   matchExercise,
@@ -50,8 +51,8 @@ function recommended(items) {
   if (!items.length) return '<p class="ex-empty">No role is ready to recommend with these conditions. Review the other records below or change an input.</p>';
   return `<ol class="ex-recs">${items.map(item => `<li>
     <article><div class="ex-card-top"><h3>${e(item.role.title)}</h3><span class="ex-fit">${e(item.fit)}</span></div>
-    <p class="ex-when">${e(item.role.whenWhere)}</p><p class="ex-activity">${e(item.role.activity)}.</p>
-    <p class="ex-reason">${e(item.role.activity)}. ${reasons(item)}</p></article>
+    <p class="ex-when">${item.role.id === "form-filling-volunteer" ? "Original listing · " : ""}${e(item.role.whenWhere)}</p><p class="ex-activity">${e(item.role.activity)}.</p>
+    <p class="ex-reason">${reasons(item)}</p></article>
   </li>`).join("")}</ol>`;
 }
 
@@ -83,6 +84,62 @@ function records() {
   }).join("");
 }
 
+function venueScenario() {
+  return `<fieldset id="ex-venue-scenario" class="ex-scenario">
+    <legend>What if the venue distance is confirmed?</legend>
+    <p id="ex-venue-help"><strong>Form-filling volunteer</strong> takes place in person. Its original listing gives no distance. Test a hypothetical distance from this volunteer.</p>
+    <div class="ex-distance-options">${[["unknown", "Unknown (source)"], ["2", "2 miles"], ["5", "5 miles"]]
+      .map(([value, text]) => `<label><input type="radio" name="formFillingMiles" value="${value}" aria-describedby="ex-venue-help"${value === "unknown" ? " checked" : ""}>${text}</label>`).join("")}</div>
+    <p id="ex-venue-outcome" class="ex-scenario-outcome"></p>
+  </fieldset>`;
+}
+
+function venueOutcome(result) {
+  const target = row => row.role.id === "form-filling-volunteer";
+  const rank = result.recommendations.findIndex(target);
+  if (rank >= 0) return `Form-filling volunteer is number ${rank + 1} on the shortlist.`;
+  const pending = result.pending.find(target);
+  if (pending) return "Needs confirmation. " + pending.reasons.join(" ");
+  const excluded = result.excluded.find(target);
+  if (excluded) return "Ruled out. " + excluded.reasons.join(" ");
+  return "Form-filling volunteer is among the other feasible roles.";
+}
+
+function tagList(individual, digital) {
+  const tags = [];
+  if (individual) tags.push("One-to-one support");
+  if (digital) tags.push("Digital support");
+  return tags.join(", ") || "No matching tags";
+}
+
+function wordingChecks() {
+  const checks = exerciseLanguageExamples.map(example => {
+    const actual = exerciseEvidence({activity: example.text});
+    const passed = Boolean(actual.individual) === example.individual && Boolean(actual.digital) === example.digital;
+    return `<li data-check="${passed ? "pass" : "check"}"><div class="ex-check-heading">
+      <q>${e(example.text)}</q><strong>${passed ? "Pass" : "Check"}</strong></div>
+      <dl><div><dt>Expected</dt><dd>${tagList(example.individual, example.digital)}</dd></div>
+      <div><dt>Observed</dt><dd>${tagList(actual.individual, actual.digital)}</dd></div></dl></li>`;
+  }).join("");
+  return `<details class="ex-disclosure" id="ex-wording"><summary><span>Wording checks</span>${icon("down", 17)}</summary>
+    <div class="ex-detail-body"><p>These additional phrases test how the matcher reads activity descriptions. The seven case records are listed separately.</p>
+    <ul class="ex-checks">${checks}</ul><div class="ex-links"><a href="https://github.com/rongsenzhang/common-hours/blob/main/tests/exercise.mjs">Inspect the tests ${icon("external", 14)}</a></div></div>
+  </details>`;
+}
+
+function odiFields() {
+  return `<details class="ex-disclosure" id="ex-odi"><summary><span>ODI field guide</span>${icon("down", 17)}</summary>
+    <div class="ex-detail-body"><p>These fields in the volunteering opportunity standard help explain the form-filling decision.</p>
+    <dl class="ex-mapping">
+      <div><dt>Activity description · <code>Role.description</code></dt><dd>“Online forms” describes the work. The matcher uses those words as evidence of digital support.</dd></div>
+      <div><dt>Remote option · <code>Role.allowsRemoteParticipation</code></dt><dd>This role is explicitly in person. The published field records whether remote participation is allowed. A role allowing it could also offer an in-person option.</dd></div>
+      <div><dt>When and where · <code>Session.time</code> and <code>Session.location</code></dt><dd>The record gives Thursday evening and no venue address. Distance in miles depends on the volunteer’s starting point. The 2- and 5-mile scenarios add a temporary distance assumption.</dd></div>
+      <div><dt>Eligibility · <code>Role.requirement</code></dt><dd>Youth reading mentor requires verified safeguarding clearance. Whether this volunteer’s clearance is valid for that role is a separate, private check.</dd></div>
+    </dl>
+    <div class="ex-links"><a href="https://standard.volunteeringdata.io/ontology">Explore the published data model ${icon("external", 14)}</a></div></div>
+  </details>`;
+}
+
 function layout() {
   return `<div class="ex-page">
     <header class="ex-header"><h1>Matching exercise</h1>
@@ -96,6 +153,7 @@ function layout() {
     <div class="ex-workspace">
       ${controls()}
       <section class="ex-results" aria-labelledby="ex-shortlist-title">
+        ${venueScenario()}
         <div class="ex-result-head"><h2 id="ex-shortlist-title">Shortlist</h2><span class="ex-current" id="ex-current"></span></div>
         <div id="ex-recommendations"></div>
         <div id="ex-breakdown">
@@ -118,8 +176,13 @@ function layout() {
         <a href="https://github.com/rongsenzhang/common-hours/blob/main/docs/matching-exercise.md">Run the exercise locally ${icon("external", 14)}</a></div></div>
       </details>
       <details class="ex-disclosure"><summary><span>Seven source records</span>${icon("down", 17)}</summary>
-        <div class="ex-detail-body"><p>“None listed” means the record lists no extra requirement. Derived interests show how the matcher interprets the activity text.</p><ul class="ex-records">${records()}</ul></div>
+        <div class="ex-detail-body"><p>“None listed” means the record lists no extra requirement. Derived interests show how the matcher interprets the activity text.</p><ul class="ex-records">${records()}</ul>
+        <h3 class="ex-source-heading">Original case inputs</h3>
+        <dl class="ex-mapping"><div><dt>Case A · Online or in person</dt><dd>“I’d like to help people one to one, ideally using the digital support skills I already have. I can only volunteer on weekday evenings. Online is fine, but I can’t travel more than three miles. I don’t know if my safeguarding clearance is valid for a new role.”</dd></div>
+        <div><dt>Case B · In person only</dt><dd>The same volunteer can no longer volunteer online. Everything else stays the same.</dd></div></dl></div>
       </details>
+      ${wordingChecks()}
+      ${odiFields()}
     </section>
     <p class="sr" role="status" id="ex-status"></p>
   </div>`;
@@ -158,6 +221,7 @@ export function mountExercise(main) {
   main.innerHTML = layout();
   const find = id => main.querySelector("#ex-" + id);
   const form = main.querySelector("#exercise-form");
+  const venue = find("venue-scenario");
   const caseButtons = [...main.querySelectorAll("[data-ex-case]")];
   if (window.matchMedia("(max-width: 740px)").matches) find("controls").open = false;
 
@@ -171,15 +235,21 @@ export function mountExercise(main) {
     radius.setAttribute("aria-invalid", String(invalid));
     find("radius-error").hidden = !invalid;
     const preset = caseName(profile);
-    for (const button of caseButtons) button.setAttribute("aria-pressed", String(button.dataset.exCase === preset));
-    find("current").textContent = preset ? "Case " + preset : "Edited conditions";
+    const selected = venue.querySelector("input:checked").value;
+    const formFillingMiles = selected === "unknown" ? null : Number(selected);
+    for (const button of caseButtons) button.setAttribute("aria-pressed", String(button.dataset.exCase === preset && formFillingMiles === null));
+    const profileName = preset ? "Case " + preset : "Edited conditions";
+    find("current").textContent = formFillingMiles === null ? profileName : profileName + " · venue scenario";
     find("breakdown").hidden = invalid;
     if (invalid) {
       find("recommendations").innerHTML = '<p class="ex-empty">Enter a valid travel limit to update the shortlist.</p>';
+      find("venue-outcome").textContent = "";
       find("status").textContent = "Waiting for a valid travel limit.";
       return;
     }
-    const result = matchExercise(profile);
+    const result = matchExercise(profile, {formFillingMiles});
+    const outcome = venueOutcome(result);
+    find("venue-outcome").textContent = outcome;
     find("recommendations").innerHTML = recommended(result.recommendations);
     for (const key of ["pending", "other", "excluded"]) {
       find(key + "-count").textContent = String(result[key].length);
@@ -188,13 +258,14 @@ export function mountExercise(main) {
     find("baseline").innerHTML = `<div><h3>Simple filter</h3>${titleList(result.baseline)}</div>
       <div><h3>With preferences</h3>${titleList(result.recommendations)}</div>`;
     const top = result.recommendations[0];
-    find("status").textContent = `${find("current").textContent}. ${result.recommendations.length} recommended. ${top ? "First, " + top.role.title + ". " : ""}${result.pending.length} awaiting confirmation.`;
+    find("status").textContent = `${find("current").textContent}. ${result.recommendations.length} recommended. ${top ? "First, " + top.role.title + ". " : ""}${result.pending.length} awaiting confirmation. ${outcome}`;
   }
 
   function loadCase(event) {
     const button = event.target.closest("[data-ex-case]");
     if (!button) return;
     putProfile(form, exerciseProfile(button.dataset.exCase));
+    venue.querySelector('input[value="unknown"]').checked = true;
     update();
   }
 
@@ -208,6 +279,7 @@ export function mountExercise(main) {
 
   const cases = main.querySelector(".ex-cases");
   cases.addEventListener("click", loadCase);
+  venue.addEventListener("change", update);
   form.addEventListener("change", update);
   form.addEventListener("input", handleNumber);
   form.addEventListener("submit", preventSubmit);
@@ -215,6 +287,7 @@ export function mountExercise(main) {
   update();
   return () => {
     cases.removeEventListener("click", loadCase);
+    venue.removeEventListener("change", update);
     form.removeEventListener("change", update);
     form.removeEventListener("input", handleNumber);
     form.removeEventListener("submit", preventSubmit);

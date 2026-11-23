@@ -6,7 +6,7 @@ Find volunteering opportunities around Greater Manchester and ask follow-up ques
 
 ## Panel matching exercise
 
-Open **Matching exercise** beside Discover. Run Case A, switch to Case B, then change a volunteer requirement or preference. Both cases use the same seven fictional opportunity records and the same matching function. The exercise runs in your browser without a login or an API key. [Run the cases and inspect the code](docs/matching-exercise.md)
+Open **Matching exercise** beside Discover. Run either supplied case, then try a hypothetical venue distance for the form-filling role. Compare the shortlist, inspect the original seven records, or check how different wording is interpreted. The exercise runs in your browser without a login or an API key. [Run the cases and inspect the code](docs/matching-exercise.md)
 
 ## Try it
 

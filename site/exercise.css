@@ -143,6 +143,20 @@
 }
 .ex-preferences input { width: 1.05rem; height: 1.05rem; margin: 0; }
 .ex-error { margin: -.3rem 0 .5rem; color: #873919; font-size: .86rem; }
+.ex-scenario {
+  min-width: 0;
+  margin: 0 0 1.2rem;
+  padding: .7rem 1rem .85rem;
+  border: 1px solid #cdd8c7;
+  border-radius: 9px;
+  background: white;
+}
+.ex-scenario legend { padding: 0 .3rem; font-weight: 700; }
+.ex-scenario p { font-size: .9rem; color: var(--muted); }
+.ex-distance-options { display: flex; flex-wrap: wrap; gap: .15rem .9rem; margin: .2rem 0; }
+.ex-distance-options label { display: inline-flex; min-height: 44px; gap: .35rem; align-items: center; cursor: pointer; }
+.ex-distance-options input { margin: 0; accent-color: var(--green); }
+.ex-scenario .ex-scenario-outcome { color: var(--green); font-weight: 650; }
 .ex-result-head, .ex-card-top {
   display: flex;
   align-items: baseline;
@@ -234,6 +248,20 @@
 .ex-evidence { border-bottom: 1px solid var(--border); }
 .ex-links { display: flex; gap: .4rem 1.35rem; flex-wrap: wrap; }
 .ex-links a { font-weight: 650; padding: .3rem 0; }
+.ex-source-heading { font-size: 1.05rem; margin: 1.1rem 0 .25rem; }
+.ex-mapping, .ex-checks { margin: .5rem 0; padding: 0; }
+.ex-mapping > div, .ex-checks li { padding: .55rem 0; }
+.ex-mapping dt, .ex-checks dt { font-weight: 650; }
+.ex-mapping dd, .ex-checks dd { margin: .15rem 0 0; color: var(--muted); }
+.ex-mapping code { font-size: .86em; overflow-wrap: anywhere; }
+.ex-checks { list-style: none; }
+.ex-checks li + li { border-top: 1px solid var(--border); }
+.ex-check-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
+.ex-check-heading strong { font-size: .85rem; color: var(--green); }
+.ex-checks [data-check=check] strong { color: #873919; }
+.ex-checks dl { display: flex; flex-wrap: wrap; gap: .15rem 1.25rem; margin: .22rem 0 0; font-size: .85rem; }
+.ex-checks dl > div { display: flex; gap: .4rem; align-items: baseline; }
+.ex-checks dd { margin: 0; }
 @media (max-width: 740px) {
   .ex-workspace { grid-template-columns: 1fr; gap: 1.2rem; margin-top: 1rem; padding-top: 1rem; }
   .ex-page { margin-top: 1.6rem; }

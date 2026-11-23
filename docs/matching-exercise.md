@@ -2,11 +2,29 @@
 
 [Open the exercise](https://rongsenzhang.github.io/common-hours/#exercise) or choose **Matching exercise** beside **Discover**. The seven fictional opportunities come from the candidate exercise. All matching runs in the browser. You can inspect and edit the implementation without an account or an API key.
 
-1. Select **Case A**. The volunteer wants individual and digital support activities on weekday evenings. They accept online roles and can travel up to three miles for an in-person role. Clearance for a new role is unverified.
-2. Select **Case B**. Only the participation setting changes to in person. Both presets run the same function. Compare the shortlist and the cases that still need a check.
-3. In Case B, change the limit to **5 miles**. Conversation partner now meets the travel requirement. Form-filling volunteer still has an unknown venue distance.
-4. Return to Case B and mark clearance as **verified for this role**. Youth reading mentor can now be ranked. Return to either preset to reset the inputs.
-5. Compare the ranked shortlist with the feasibility-only baseline. Both check exactly the same requirements. The baseline takes the first three feasible records in source order. The shortlist also considers the selected interests.
+## Run the two supplied cases
+
+1. Select **Case A**. With weekday evenings, online or in-person participation, a three-mile travel limit and unverified clearance, the shortlist is **Digital access buddy**, then **Digital skills facilitator**.
+2. Select **Case B**. The only change is in-person participation. **Digital skills facilitator** is the sole recommendation. In both cases, the form-filling role needs a venue distance and the youth reading role needs a clearance check.
+3. Open **Compare with a simple filter**. In Case B the simple filter returns **Food parcel packer** and **Digital skills facilitator**. Both activities are feasible. Only the latter describes work that fits one of the volunteer's interests. Both methods use the same current inputs and evidence.
+
+## Test one missing fact
+
+In **Case B**, leave the volunteer’s travel limit at **3 miles**. Use the separate venue-distance control for **Form-filling volunteer**. The numbers below simulate what the coordinator might learn. Each refers to the distance from this volunteer to the venue.
+
+| Venue distance | What happens to Form-filling volunteer | Why |
+| --- | --- | --- |
+| Unknown (supplied record) | Needs confirmation | The role takes place in person. The record gives no distance. |
+| 2 miles (hypothetical) | First recommendation, ahead of Digital skills facilitator | Thursday evening is available, two miles is within reach, and helping individuals with online forms fits both interests. |
+| 5 miles (hypothetical) | Ruled out | The venue is beyond the three-mile limit. |
+
+Select either case again to restore the supplied conditions and the unknown venue distance. For a boundary test, choose **5 miles** for the simulated venue and then change the volunteer’s own limit to **5 miles**. The form-filling role now meets the distance limit exactly.
+
+## Check how the records are interpreted
+
+The wording examples run through the same activity matcher as the seven supplied records. Try reading the example about helping someone use their phone in a one-to-one session, then compare the expected and observed interests. The counterexamples check whether the matcher attributes an interest when a phrase refers to a different activity or is negated. These hand-picked cases demonstrate the behaviour of a small English vocabulary. They cannot estimate how often it will recognise volunteers’ own wording.
+
+The ODI field notes relate the supplied activity text to `Role.description`, remote participation to `Role.allowsRemoteParticipation`, and the session to `Session.time` and `Session.location`. “Online forms” describes the task, while the supplied setting specifies in-person attendance. The original venue remains unknown in all three simulations. The host can describe a venue once, whereas the travel distance depends on the volunteer. Likewise, a role’s published clearance requirement and an individual’s verification status describe different facts. [Volunteering and Social Action data model](https://standard.volunteeringdata.io/ontology)
 
 ## Inspect or run your own copy
 

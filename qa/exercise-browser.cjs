@@ -4,6 +4,55 @@ const { chromium } = require("playwright");
 const base = process.argv[2] || "http://127.0.0.1:8754/";
 const options = process.env.CHROME_EXECUTABLE ? { executablePath: process.env.CHROME_EXECUTABLE } : {};
 
+async function verifyVenueScenario(page, shortlist, expectedA) {
+  const formRole = "Form-filling volunteer";
+  const facilitator = "Digital skills facilitator";
+  const venue = page.locator("#ex-venue-scenario");
+  const setting = value => venue.locator(`input[value="${value}"]`);
+  const simpleFilter = page.locator("#ex-baseline ol").first().locator("li");
+  const sourceRecords = page.locator(".ex-records > li");
+  const original = await sourceRecords.allTextContents();
+  const formsRecord = sourceRecords.filter({ has: page.getByRole("heading", { name: formRole, includeHidden: true }) });
+  assert.match(await formsRecord.textContent(), /Thu evening · in person, distance not recorded/);
+  assert.equal(await setting("unknown").isChecked(), true);
+
+  await setting("2").check();
+  assert.deepEqual(await shortlist.allTextContents(), [formRole, facilitator]);
+  assert.match(await page.locator("#ex-venue-outcome").innerText(), /number 1/);
+  assert.deepEqual(await simpleFilter.allTextContents(), ["Food parcel packer", formRole, facilitator]);
+  assert.doesNotMatch(await page.locator("#ex-pending").textContent(), /Form-filling volunteer/);
+  assert.deepEqual(await sourceRecords.allTextContents(), original);
+
+  await setting("5").check();
+  assert.deepEqual(await shortlist.allTextContents(), [facilitator]);
+  assert.match(await page.locator("#ex-venue-outcome").innerText(), /ruled out/i);
+  assert.deepEqual(await simpleFilter.allTextContents(), ["Food parcel packer", facilitator]);
+  assert.match(await page.locator("#ex-excluded").textContent(), /Form-filling volunteer/);
+  assert.doesNotMatch(await page.locator("#ex-pending").textContent(), /Form-filling volunteer/);
+  assert.deepEqual(await sourceRecords.allTextContents(), original);
+
+  const radius = page.locator("[name=maxMiles]");
+  if (!(await radius.isVisible())) await page.locator("#ex-controls summary").click();
+  await radius.fill("5");
+  assert.equal(await setting("5").isChecked(), true);
+  assert.equal((await shortlist.allTextContents())[0], formRole);
+  await radius.fill("3");
+  assert.match(await page.locator("#ex-excluded").textContent(), /Form-filling volunteer/);
+
+  await setting("unknown").check();
+  assert.match(await page.locator("#ex-venue-outcome").innerText(), /needs confirmation/i);
+  assert.match(await page.locator("#ex-pending").textContent(), /Form-filling volunteer/);
+  await setting("2").check();
+  await page.getByRole("button", { name: /Case A/ }).click();
+  assert.equal(await setting("unknown").isChecked(), true);
+  assert.deepEqual(await shortlist.allTextContents(), expectedA);
+  await setting("2").check();
+  assert.deepEqual(await shortlist.allTextContents(), [expectedA[0], formRole, facilitator]);
+  await page.getByRole("button", { name: /Case B/ }).click();
+  assert.equal(await setting("unknown").isChecked(), true);
+  assert.deepEqual(await shortlist.allTextContents(), [facilitator]);
+}
+
 async function verify(browser, width) {
   const page = await browser.newPage({ viewport: { width, height: 900 } });
   const errors = [];
@@ -25,6 +74,7 @@ async function verify(browser, width) {
     await page.getByText("Compare with a simple filter", { exact: true }).click();
     assert.deepEqual(await page.locator("#ex-baseline ol").first().locator("li").allTextContents(),
       ["Food parcel packer", "Digital skills facilitator"]);
+    await verifyVenueScenario(page, shortlist, expectedA);
     const radius = page.locator("[name=maxMiles]");
     if (!(await radius.isVisible())) await page.locator("#ex-controls summary").click();
     await radius.fill("5");
@@ -40,6 +90,13 @@ async function verify(browser, width) {
     assert.deepEqual(await shortlist.allTextContents(), expectedA);
     await page.getByText("Seven source records", { exact: true }).click();
     assert.equal(await page.locator(".ex-records h4").count(), 7);
+    await page.locator("#ex-wording summary").click();
+    assert.ok(await page.locator("#ex-wording li[data-check=pass]").count() >= 2);
+    assert.equal(await page.locator("#ex-wording li[data-check=check]").count(), 0);
+    await page.locator("#ex-odi summary").click();
+    const mapping = await page.locator("#ex-odi").innerText();
+    for (const field of ["allowsRemoteParticipation", "requirement", "location"]) assert.ok(mapping.includes(field), field);
+    assert.ok(await page.locator('#ex-odi a[href^="https://standard.volunteeringdata.io/ontology"]').count());
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     assert.equal(calls.some(req => req.method() === "POST" || /\/data\/.*\.json/.test(req.url())), false,
       "Direct entry and case changes should run without the catalogue or chat service.");
@@ -49,7 +106,7 @@ async function verify(browser, width) {
     await page.getByRole("heading", { name: "Matching exercise", exact: true }).waitFor();
     assert.deepEqual(await shortlist.allTextContents(), expectedA);
     assert.deepEqual(errors, []);
-    console.log(width + "px passed: cases, baseline, edits, unknowns, navigation and network isolation.");
+    console.log(width + "px passed: original cases, all three venue settings, immutable records, wording checks, ODI mapping, navigation and network isolation.");
   } finally { await page.close(); }
 }
 

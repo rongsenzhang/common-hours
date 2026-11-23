@@ -67,13 +67,43 @@ export function exerciseProfile(caseId = "A") {
   };
 }
 
-// Only the listed activity supplies preference evidence. In particular, the
-// words "online forms" describe an activity, not permission to work remotely.
+// Additional wording probes for the reviewer and tests; none is an opportunity.
+// The expected labels are recorded separately from the matcher's actual output.
+export const exerciseLanguageExamples = [
+  {text: "Help someone use their phone in a one-to-one session.", individual: true, digital: true},
+  {text: "Sit with one person at a time to practise English.", individual: true, digital: false},
+  {text: "Teach a group how to use a smartphone.", individual: false, digital: true},
+  {text: "Welcome visitors and answer the phone at reception.", individual: false, digital: false},
+  {text: "Group workshops only. No one-to-one support or help with online forms.", individual: false, digital: false},
+  {text: "Give one-to-one support with reading, but do not help with online forms.", individual: true, digital: false},
+];
+
+// Return the exact supporting phrase so the interpretation can be inspected.
+// Negation is local to a clause. Unrecognised phrasing supplies no evidence.
+function affirmedPhrase(clause, pattern, precedingContext) {
+  const match = pattern.exec(clause);
+  if (!match) return null;
+  const before = clause.slice(0, match.index);
+  const after = clause.slice(match.index + match[0].length);
+  if (precedingContext && !precedingContext.test(before)) return null;
+  if (/\b(?:no|not|never|without|cannot|\w+n['’]t|rather than|instead of)\b/i.test(before)) return null;
+  if (/^(?:\s+(?:help|work|sessions?|support|assistance))?\s+(?:is|are|will be)\s+(?:not|unavailable|excluded)\b/i.test(after)) return null;
+  return match[0];
+}
+
+// Activity language is evidence of interests only. "Online forms" cannot set
+// participation mode. Giving help with a device differs from merely using one.
 export function exerciseEvidence(role) {
-  return {
-    individual: role.activity.match(/\b(?:individually|one to one)\b/i)?.[0] ?? null,
-    digital: role.activity.match(/\b(?:get online|online forms|smartphone basics)\b/i)?.[0] ?? null,
-  };
+  const evidence = {individual: null, digital: null};
+  const helping = /\b(?:help|support|teach|show|assist|guide|coach|tutor|mentor)\b/i;
+  for (const clause of role.activity.split(/[.,;:!?]|\b(?:but|however|whereas)\b/i)) {
+    evidence.individual ??= affirmedPhrase(clause, /\b(?:one[\s\-\u2010\u2011](?:to|on)[\s\-\u2010\u2011]one|one person at a time)\b/i);
+    evidence.individual ??= affirmedPhrase(clause, /\bindividually\b/i, helping);
+    evidence.digital ??= affirmedPhrase(clause,
+      /\b(?:get online|(?:online|digital) forms?|forms? online|smartphone basics|use (?:a|their) (?:smartphone|phone|tablet))\b/i, helping);
+    evidence.digital ??= affirmedPhrase(clause, /\bsmartphone basics\b/i, /\blead\b/i);
+  }
+  return evidence;
 }
 
 function validateProfile(profile) {
@@ -89,12 +119,13 @@ function validateProfile(profile) {
 
 // A known conflict makes the role unavailable even if another field needs a check.
 // We only suggest a follow-up when resolving it could make the role feasible.
-function checkRequirements(role, profile) {
+export function checkExerciseRequirements(role, profile, formFillingMiles = null) {
   const [schedule, location] = role.whenWhere.split(" · ");
   const [day, period] = schedule.split(" ");
   const online = location === "online";
   const conflicts = [];
   const checks = [];
+  let distanceNote = null;
   if (!profile.days.includes(day) || (profile.period !== "any" && profile.period !== period)) {
     conflicts.push(`The listed time (${schedule}) is outside your availability.`);
   }
@@ -103,21 +134,30 @@ function checkRequirements(role, profile) {
   } else if (!online && profile.mode === "online") {
     conflicts.push("This role takes place in person. You selected online volunteering only.");
   } else if (!online) {
-    const miles = location.match(/^(\d+(?:\.\d+)?) miles?$/);
-    if (!miles) {
+    const listedMiles = location.match(/^(\d+(?:\.\d+)?) miles?$/);
+    const scenario = role.id === "form-filling-volunteer" && formFillingMiles !== null;
+    const recordedDistance = listedMiles ? Number(listedMiles[1]) : null;
+    const miles = scenario ? formFillingMiles : recordedDistance;
+    if (miles === null) {
       checks.push(`Ask the host for the venue distance to check your ${profile.maxMiles}-mile limit. The record gives no distance.`);
-    } else if (Number(miles[1]) > profile.maxMiles) {
-      conflicts.push(`The venue is ${location} away, beyond your ${profile.maxMiles}-mile travel limit.`);
+    } else if (miles > profile.maxMiles) {
+      const fact = scenario ? `The hypothetical venue distance is ${miles} miles` : `The venue is ${location} away`;
+      conflicts.push(`${fact}, beyond your ${profile.maxMiles}-mile travel limit.`);
+    } else if (scenario) {
+      distanceNote = `The hypothetical venue distance is ${miles} miles, within your ${profile.maxMiles}-mile travel limit.`;
     }
   }
-  if (role.requirement === "Verified safeguarding clearance") {
+  const requirement = role.requirement?.trim() ?? "";
+  if (/^(?:verified safeguarding clearance|safeguarding clearance must be verified)\.?$/i.test(requirement)) {
     if (profile.clearance === "none") {
       conflicts.push("This role requires verified safeguarding clearance and you selected no clearance.");
     } else if (profile.clearance === "unknown") {
       checks.push("Ask the coordinator to verify that your safeguarding clearance is valid for this role.");
     }
+  } else if (!/^none listed\.?$/i.test(requirement)) {
+    checks.push("Ask the coordinator to clarify the role’s requirement before recommending it.");
   }
-  return {conflicts, checks};
+  return {conflicts, checks, distanceNote};
 }
 
 // Each supported preference earns one point, regardless of repeated wording.
@@ -151,28 +191,35 @@ function scorePreferences(role, profile) {
   return {role, fit, points, reasons};
 }
 
-export function matchExercise(profile) {
+export function matchExercise(profile, {formFillingMiles = null} = {}) {
   validateProfile(profile);
+  if (![null, 2, 5].includes(formFillingMiles)) {
+    throw new RangeError("Choose the supplied unknown distance or a 2- or 5-mile scenario.");
+  }
   const eligible = [];
   const pending = [];
   const excluded = [];
   for (const role of exerciseRoles) {
-    const {conflicts, checks} = checkRequirements(role, profile);
+    const {conflicts, checks, distanceNote} = checkExerciseRequirements(role, profile, formFillingMiles);
     if (conflicts.length) {
       excluded.push({role, fit: null, points: null, reasons: conflicts});
     } else if (checks.length) {
       pending.push({role, fit: null, points: null, reasons: checks});
     } else {
-      eligible.push(role);
+      eligible.push({role, distanceNote});
     }
   }
 
   // Feasibility-only comparison uses the same volunteer input and the same gates.
-  const baseline = eligible.slice(0, 3).map(role => ({
+  const baseline = eligible.slice(0, 3).map(({role}) => ({
     role, fit: "Feasible", points: null, reasons: ["Meets the stated requirements. Listed in source order."],
   }));
   // Stable sort preserves source order for tied scores, including no preferences.
-  const ranked = eligible.map(role => scorePreferences(role, profile)).sort((a, b) => b.points - a.points);
+  const ranked = eligible.map(({role, distanceNote}) => {
+    const row = scorePreferences(role, profile);
+    if (distanceNote) row.reasons.push(distanceNote);
+    return row;
+  }).sort((a, b) => b.points - a.points);
   const recommendations = ranked.filter(row => row.fit !== "No stated interest match").slice(0, 3);
   const other = ranked.filter(row => !recommendations.includes(row));
   return {recommendations, pending, excluded, other, baseline};
