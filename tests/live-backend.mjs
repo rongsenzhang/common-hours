@@ -55,7 +55,12 @@ function run(message, extras = {}, input = {}) {
     history: [],
     roles,
     apiKey: sentinel,
-    fetchImpl: async () => completed({ ...basePlan, ...extras }),
+    fetchImpl: async (_url, request) => {
+      if (JSON.parse(request.body).text.format.name === "common_hours_host_time_question") {
+        return completed({language:extras.language ?? "en",host_question:"Could you confirm the exact time?"});
+      }
+      return completed({ ...basePlan, ...extras });
+    },
     ...input,
   });
 }
@@ -358,4 +363,33 @@ test("bare why in either language is read-only even when the provider guessed a 
     assert.deepEqual(reply.caseProfile,initial);
     assert.deepEqual(reply.matches,["bus-app-coach"]);
   }
+});
+
+test("a precise time gets a real upstream question and remains unresolved on refinements until released", async () => {
+  const message = "I can only start at exactly 6:35pm. Which role guarantees that?";
+  let requests = 0;
+  const first = await run(message, {}, {fetchImpl:async (_url, req) => {
+    requests++;
+    const body=JSON.parse(req.body);
+    assert.equal(body.text.format.name,"common_hours_host_time_question");
+    assert.equal(JSON.parse(body.input).clock,"6:35pm");
+    return completed({language:"en",host_question:"Could I start at 6:35pm?"});
+  }});
+  assert.equal(requests,1); assert.deepEqual(first.matches,[]); assert.match(first.text,/6:35pm/);
+  const history=[{user:message,text:first.text,matches:[],toConfirm:[]}];
+  const next=await run("Any home-based options?",{intent:"unknown",case_profile:profile("A"),reply:""}, {history});
+  assert.deepEqual(next.matches,[]); assert.match(next.text,/6:35pm/);
+  const reset=await run("Any start time works. Can I walk dogs at weekends?",{}, {history});
+  assert.deepEqual(reset.matches,["shelter-dog-walker"]);
+  await assert.rejects(run(message,{}, {fetchImpl:async()=>new Response("",{status:503})}),{code:"provider_unavailable"});
+  await assert.rejects(run(message,{}, {fetchImpl:async()=>completed({language:"en"})}),{code:"invalid_reply"});
+});
+
+test("a preset name isn't presented as personal evidence about the volunteer", async () => {
+  const history = [{user:"Case A",text:"Case conditions recorded.",caseProfile:profile("A"),matches:["email-practice-partner"],toConfirm:[]}];
+  const why = await run("Why these?",{intent:"explain",case_profile:profile("A"),activity:"",candidate_ids:["email-practice-partner"],
+    role_evidence:[{role_id:"email-practice-partner", listing_source:"digitalEvidence", visitor_source:0, reason:"You might enjoy explaining email."}]},{history});
+  const evidence=why.evidence["email-practice-partner"];
+  assert(evidence.sourceQuote && evidence.userQuote === null && evidence.reason === null);
+  assert(!why.details["email-practice-partner"].includes("You mentioned"));
 });

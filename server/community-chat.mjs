@@ -76,7 +76,9 @@ export function checkedEvidence(plan, role, excerpts) {
   const quote = listingFields[item.listing_source];
   if (typeof quote !== "string" || !quote.trim()) return null;
   const userQuote = Number.isInteger(item.visitor_source) ? excerpts[item.visitor_source] : null;
-  const fromUser = typeof userQuote === "string" && userQuote.length > 1;
+  const commandOnly = /^(?:(?:run|show|use|try|switch to)\s+)?case [ab]$|^案例\s*[ab]$|^(?:why(?: these| those| this| that)?|why did you (?:pick|choose|recommend|suggest) (?:these|those)(?: for me)?|为什么(?:是|推荐)?(?:这些|这个|这几个)(?:岗位)?(?:给我)?)$/iu;
+  const fromUser = typeof userQuote === "string" && userQuote.length > 1
+    && !commandOnly.test(userQuote.trim().replace(/[?!？。！.]+$/u, ""));
   // Model prose is allowed only as an explicitly subjective fit judgement.
   // Venue, clearance, numbers, availability and application facts come from
   // structured records and are rendered separately below.

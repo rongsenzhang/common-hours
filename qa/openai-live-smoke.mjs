@@ -112,7 +112,9 @@ async function checkLiveResponses() {
     requireResult(Object.values(reply.evidence).some(item => item.sourceQuote && item.userQuote));
   });
   await checkTurn("an unsupported exact time needs confirmation",
-    "One more thing, I can only start at exactly 6:35pm. Which role guarantees that start time?", coaching, noRoles);
+    "One more thing, I can only start at exactly 6:35pm. Which role guarantees that start time?", coaching, reply => {
+      noRoles(reply); requireResult(/6[:.]35\s*pm/iu.test(reply.text) && /host/iu.test(reply.text));
+    });
   const chinese = [];
   await checkTurn("Chinese guided discovery", "我想尝试做志愿者，但不知道自己能做什么。", chinese,
     reply => { noRoles(reply); requireResult(/[?？]/u.test(reply.text)); });
