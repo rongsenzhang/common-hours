@@ -2,6 +2,7 @@ import { escapeText as e } from "./html.js";
 import { matchOpportunities } from "./engine.js";
 import { icon, mark } from "./icons.js";
 import { answerVolunteerQuestion } from "./assistant.js";
+import { askExercise, isExerciseChatRequest } from "./exercise-chat.js";
 import { renderChat } from "./chat-view.js";
 import { mountExercise } from "./exercise-view.js";
 import {
@@ -33,24 +34,29 @@ let chatMode = "local";
 const chats = {
   local: { turns: [], draft: "" },
   live: { turns: [], draft: "" },
+  exercise: { turns: [], draft: "" },
 };
-let conversation = null;
 let liveRequest = null;
 let chatError = "";
 let leaveExercise;
 let catalogueRequest;
+function activeChat() {
+  return chats[page === "ask-exercise" ? "exercise" : chatMode];
+}
 function chatContents() {
-  const chat = chats[chatMode];
-  return renderChat(chat.turns, catalog.opportunities, {
+  const exercise = page === "ask-exercise";
+  const chat = activeChat();
+  return renderChat(chat.turns, catalog?.opportunities ?? [], {
+    source: exercise ? "exercise" : "community",
     mode: chatMode,
     liveAvailable: Boolean(endpoint),
-    pending: liveRequest?.input,
-    error: chatMode === "live" ? chatError : "",
+    pending: exercise ? null : liveRequest?.input,
+    error: !exercise && chatMode === "live" ? chatError : "",
     draft: chat.draft,
   });
 }
 function updateChat(focus = false) {
-  if (page !== "ask") return;
+  if (page !== "ask" && page !== "ask-exercise") return;
   main.innerHTML = chatContents();
   if (focus)
     main
@@ -246,15 +252,17 @@ function render(scroll = false) {
   if (page === "ask" && h !== "ask") cancelRequest();
   leaveExercise?.();
   leaveExercise = undefined;
-  page = ["ask", "exercise"].includes(h) ? h : "discover";
-  const titles = { discover: "Discover volunteer roles", exercise: "Matching exercise", ask: "Ask the role finder" };
+  page = ["ask", "ask-exercise", "exercise"].includes(h) ? h : "discover";
+  const titles = { discover: "Discover volunteer roles", exercise: "Matching exercise", ask: "Ask the role finder", "ask-exercise": "Interview cases · Ask the role finder" };
   document.title = titles[page] + " · Common Hours";
   for (const n of document.querySelectorAll("nav a")) {
-    if (n.dataset.page === page) n.setAttribute("aria-current", "page");
+    if (n.dataset.page === (page === "ask-exercise" ? "ask" : page)) n.setAttribute("aria-current", "page");
     else n.removeAttribute("aria-current");
   }
   if (page === "exercise") {
     leaveExercise = mountExercise(main);
+  } else if (page === "ask-exercise") {
+    main.innerHTML = chatContents();
   } else if (catalog) {
     main.innerHTML = page === "ask" ? chatContents() : discover();
   } else {
@@ -265,6 +273,12 @@ function render(scroll = false) {
     main.focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }
+}
+function selectChatSource(source) {
+  const destination = source === "exercise" ? "ask-exercise" : "ask";
+  if (page === destination) return;
+  history.pushState(null, "", "#" + destination);
+  render();
 }
 function detail(id) {
   const r = catalog.opportunities.find((x) => x.id === id);
@@ -296,10 +310,18 @@ function toggleSaved(id) {
 async function ask(message) {
   const input = message.trim();
   if (!input || liveRequest) return;
-  const chat = chats[chatMode];
+  // Route a pasted recruitment case before constructing any external request.
+  if (page === "ask" && isExerciseChatRequest(input)) {
+    activeChat().draft = "";
+    selectChatSource("exercise");
+  }
+  const chat = activeChat();
   chat.draft = "";
   let reply;
-  if (chatMode === "live") {
+  if (page === "ask-exercise") {
+    reply = askExercise(input, chat.state);
+    chat.state = reply.state;
+  } else if (chatMode === "live") {
     if (!endpoint) return;
     chatError = "";
     const request = { input, controller: new AbortController() };
@@ -324,20 +346,33 @@ async function ask(message) {
     if (liveRequest !== request) return;
     liveRequest = null;
   } else {
-    reply = answerVolunteerQuestion(input, catalog.opportunities, conversation);
-    conversation = reply.state;
+    reply = answerVolunteerQuestion(input, catalog.opportunities, chat.state);
+    chat.state = reply.state;
   }
   chat.turns.push({ input, reply });
   updateChat(true);
   main
     .querySelector(".chat-turn:last-child")
     ?.scrollIntoView({ block: "nearest" });
-  announce(reply.text);
+  announce(page === "ask-exercise" ? reply.reply : reply.text);
 }
 document.addEventListener("input", (ev) => {
-  if (ev.target.id === "chat-input") chats[chatMode].draft = ev.target.value;
+  if (ev.target.id === "chat-input") activeChat().draft = ev.target.value;
+});
+document.addEventListener("keydown", (ev) => {
+  if (ev.target.matches("textarea#chat-input") && ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && ev.keyCode !== 229) {
+    ev.preventDefault();
+    ev.target.form.requestSubmit();
+  }
 });
 document.addEventListener("change", (ev) => {
+  if (ev.target.name === "chat-source") {
+    const source = ev.target.value;
+    if (source !== "exercise" && source !== "community") return;
+    selectChatSource(source);
+    main.querySelector(`[name="chat-source"][value="${source}"]`)?.focus();
+    return;
+  }
   if (ev.target.name !== "chat-mode" || !endpoint) return;
   const mode = ev.target.value;
   if (!["live", "local"].includes(mode) || mode === chatMode) return;
@@ -402,9 +437,8 @@ document.addEventListener("click", (ev) => {
   }
   if ("restartChat" in d) {
     cancelRequest(false);
-    if (chatMode === "local") conversation = null;
-    else chatError = "";
-    chats[chatMode] = { turns: [], draft: "" };
+    if (page === "ask" && chatMode === "live") chatError = "";
+    Object.assign(activeChat(), { turns: [], draft: "", state: null });
     updateChat(true);
     announce("Conversation cleared.");
   }
@@ -468,10 +502,10 @@ async function openCatalogue() {
     ]);
     endpoint = chatEndpoint(config, location.href);
     chatMode = endpoint ? "live" : "local";
-    if (page !== "exercise") main.innerHTML = page === "ask" ? chatContents() : discover();
+    if (page === "ask" || page === "discover") main.innerHTML = page === "ask" ? chatContents() : discover();
   } catch {
-    if (page !== "exercise") main.innerHTML =
-      '<div class="empty"><h1>The catalogue could not open</h1><p>Reload the page to try again.</p></div>';
+    if (page === "ask" || page === "discover") main.innerHTML =
+      '<div class="empty"><h1>The catalogue could not open</h1><p>Reload the page to try again, or <a href="#ask-exercise">open the interview cases</a>.</p></div>';
   } finally {
     catalogueRequest = undefined;
   }

@@ -8,6 +8,8 @@
 2. Select **Case B**. The only change is in-person participation. **Digital skills facilitator** is the sole recommendation. In both cases, the form-filling role needs a venue distance and the youth reading role needs a clearance check.
 3. Open **Compare with a simple filter**. In Case B the simple filter returns **Food parcel packer** and **Digital skills facilitator**. Both activities are feasible. Only the latter describes work that fits one of the volunteer's interests. Both methods use the same current inputs and evidence.
 
+You can also [paste either case into the role finder](https://rongsenzhang.github.io/common-hours/#ask-exercise). Paste the Case A paragraph from the pack, then send “I can only volunteer in person now”. The same matching function produces the two Case A recommendations and then the single Case B recommendation. The role finder also shows which listings need confirmation and why. “My travel limit is 5 miles” changes the volunteer’s reach. “The form-filling venue is 2 miles away” changes the hypothetical distance of that one role. The conversation uses the seven exercise records in this tab and clears on reload.
+
 ## Test one missing fact
 
 In **Case B**, leave the volunteer’s travel limit at **3 miles**. Use the separate venue-distance control for **Form-filling volunteer**. The numbers below simulate what the coordinator might learn. Each refers to the distance from this volunteer to the venue.

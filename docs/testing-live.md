@@ -2,6 +2,8 @@
 
 用手机或电脑打开 [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask)，选择 **Live AI**。每条成功的回复旁会显示 OpenAI 和模型名称。示例使用虚构的志愿者岗位。测试时只需输入示例内容。
 
+要测试附件里的 Case A 和 B，请打开[七岗位面试案例入口](https://rongsenzhang.github.io/common-hours/#ask-exercise)，粘贴 Case A，再输入 Case B 的追问。这组结果由评委页的匹配规则在浏览器内生成。下面的实时 AI 示例使用另一组社区岗位。
+
 | 顺序 | 发给助手的消息 | 检查什么 |
 | --- | --- | --- |
 | 1 | Can I walk dogs at weekends? | 应找到 **Shelter dog walking buddy**。点岗位卡可以看时间和活动说明。 |

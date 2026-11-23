@@ -1,4 +1,5 @@
 import {
+  EXERCISE_CASE_TEXT,
   exerciseEvidence,
   exerciseLanguageExamples,
   exerciseProfile,
@@ -149,7 +150,7 @@ function layout() {
       <button type="button" data-ex-case="A"><strong>Case A</strong><span>Online or in person</span></button>
       <button type="button" data-ex-case="B"><strong>Case B</strong><span>In person only</span></button>
     </div>
-    <p class="ex-case-note">Both cases start with weekday evenings, a three-mile travel limit and unverified clearance. One-to-one work and using digital skills are preferences.</p>
+    <p class="ex-case-note">Both cases start with weekday evenings, a three-mile travel limit and unverified clearance. One-to-one work and using digital skills are preferences. <a href="#ask-exercise">Try these cases in the role finder</a>.</p>
     <div class="ex-workspace">
       ${controls()}
       <section class="ex-results" aria-labelledby="ex-shortlist-title">
@@ -178,8 +179,8 @@ function layout() {
       <details class="ex-disclosure"><summary><span>Seven source records</span>${icon("down", 17)}</summary>
         <div class="ex-detail-body"><p>“None listed” means the record lists no extra requirement. Derived interests show how the matcher interprets the activity text.</p><ul class="ex-records">${records()}</ul>
         <h3 class="ex-source-heading">Original case inputs</h3>
-        <dl class="ex-mapping"><div><dt>Case A · Online or in person</dt><dd>“I’d like to help people one to one, ideally using the digital support skills I already have. I can only volunteer on weekday evenings. Online is fine, but I can’t travel more than three miles. I don’t know if my safeguarding clearance is valid for a new role.”</dd></div>
-        <div><dt>Case B · In person only</dt><dd>The same volunteer can no longer volunteer online. Everything else stays the same.</dd></div></dl></div>
+        <dl class="ex-mapping"><div><dt>Case A · Online or in person</dt><dd>“${e(EXERCISE_CASE_TEXT.A)}”</dd></div>
+        <div><dt>Case B · In person only</dt><dd>${e(EXERCISE_CASE_TEXT.B)}</dd></div></dl></div>
       </details>
       ${wordingChecks()}
       ${odiFields()}

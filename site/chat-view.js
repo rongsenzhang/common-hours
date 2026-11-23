@@ -23,10 +23,54 @@ function recommendations(ids, details, byId, heading) {
     : "";
 }
 
+function interviewReply({ reply, summary, result, state }) {
+  let cards = "";
+  if (result) {
+    const matches = result.recommendations.map(({ role, reasons }) => {
+      const simulated = role.id === "form-filling-volunteer" && state.formFillingMiles !== null;
+      return `<li><strong data-exercise-title>${e(role.title)}</strong>
+      <span class="chat-host">${simulated ? "Original listing · " : ""}${e(role.whenWhere)}</span>
+      <p>${e(role.activity)}.</p><p>${e(reasons.join(" "))}</p></li>`;
+    }).join("");
+    cards = `<h3>Shortlist</h3>${matches
+      ? '<ol class="chat-options chat-shortlist" data-exercise-recommendations>' + matches + '</ol>'
+      : '<p data-exercise-recommendations>No confirmed recommendation for these conditions.</p>'}`;
+    if (result.pending.length) {
+      cards += `<h3>Needs confirmation</h3><ul class="chat-options chat-pending" data-exercise-pending>${result.pending
+        .map(({ role, reasons }) => `<li><strong data-exercise-title>${e(role.title)}</strong>
+        <p>${e(reasons.join(" "))}</p></li>`).join("")}</ul>`;
+    }
+  }
+  return `<span class="chat-source">Interview exercise · On-device matching</span>
+    <p class="chat-answer">${e(reply)}</p>
+    ${summary ? `<p class="chat-criteria"><strong>Current conditions</strong> ${e(summary)}</p>` : ""}${cards}`;
+}
+
+function promptButton(input, label = input) {
+  return `<button type="button" data-prompt="${e(input)}">${e(label)} ${icon("next", 15)}</button>`;
+}
+
+function casePrompts() {
+  return promptButton("Case A", "Run Case A") + promptButton("Case B", "Run Case B");
+}
+
+function interviewFollowups(state) {
+  const prompts = [];
+  if (!state) prompts.push(casePrompts());
+  else {
+    if (state.profile.mode !== "in-person") prompts.push(promptButton("I can only volunteer in person now.", "Switch to in person"));
+    if (state.formFillingMiles !== 2) prompts.push(promptButton("The form-filling venue is 2 miles away.", "Try a 2-mile venue"));
+    if (state.formFillingMiles !== 5) prompts.push(promptButton("The form-filling venue is 5 miles away.", "Try a 5-mile venue"));
+    if (state.formFillingMiles !== null) prompts.push(promptButton("The form-filling venue distance is unknown.", "Restore unknown distance"));
+  }
+  return `<div class="chat-starters chat-followups" aria-label="Example follow-ups">${prompts.join("")}</div>`;
+}
+
 export function renderChat(
   turns,
   roles,
   {
+    source = "community",
     mode = "local",
     liveAvailable = false,
     pending = null,
@@ -34,44 +78,53 @@ export function renderChat(
     draft = "",
   } = {},
 ) {
-  const live = mode === "live";
-  const disclosure = live
+  const interview = source === "exercise";
+  const live = !interview && mode === "live";
+  const disclosure = interview
+    ? "The seven interview roles are matched on this device using the rules from Matching exercise. Your case stays in this tab."
+    : live
     ? "Live AI uses OpenAI. Sending a message shares your question and up to eight recent turns from this AI chat with OpenAI via our server."
     : "On-device search uses the catalogue in this browser. Your questions stay in this tab.";
-  const selector = liveAvailable
+  const selector = !interview && liveAvailable
     ? `<fieldset class="chat-modes"><legend>How would you like to search?</legend>
     <label><input type="radio" name="chat-mode" value="live" ${live ? "checked" : ""}> Live AI</label>
     <label><input type="radio" name="chat-mode" value="local" ${live ? "" : "checked"}> On-device search</label></fieldset>`
     : "";
 
-  const byId = new Map(roles.map((role) => [role.id, role]));
+  const byId = interview ? null : new Map(roles.map((role) => [role.id, role]));
   const messages = turns
     .map(
       ({ input, reply }) =>
         `<article class="chat-turn"><p class="asked"><span class="sr">You asked: </span>${e(input)}</p>
-      <div class="answered"><span class="chat-source">${reply.provider === "openai" ? "OpenAI · " + e(reply.model) : "On-device search"}</span><p class="chat-answer">${e(reply.text)}</p>
+      <div class="answered">${interview ? interviewReply(reply) : `<span class="chat-source">${reply.provider === "openai" ? "OpenAI · " + e(reply.model) : "On-device search"}</span><p class="chat-answer">${e(reply.text)}</p>
        ${recommendations(reply.matches, reply.details, byId, "Matching roles")}
-       ${recommendations(reply.toConfirm, reply.details, byId, "To confirm with the organiser")}
+       ${recommendations(reply.toConfirm, reply.details, byId, "To confirm with the organiser")}`}
       </div></article>`,
     )
     .join("");
-  const prompts = starters
-    .map(
-      (prompt) =>
-        `<button type="button" data-prompt="${e(prompt)}">${e(prompt)} ${icon("next", 15)}</button>`,
-    )
-    .join("");
+  const prompts = interview
+    ? casePrompts()
+    : starters.map(prompt => promptButton(prompt)).join("");
+  const placeholder = interview
+    ? (turns.length ? "e.g. My travel limit is 5 miles." : "Paste the volunteer case here…")
+    : "e.g. Can I help at weekends?";
+  const input = `<textarea id="chat-input" name="message" rows="${interview ? 3 : 1}" maxlength="${interview ? 1200 : 600}" required placeholder="${placeholder}" autocomplete="off" aria-describedby="chat-disclosure" ${pending ? "disabled" : ""}>${e(draft)}</textarea>`;
   return `<section class="chat-page"><header class="chat-header">
     <div class="chat-mark">${icon("chat", 26)}</div><h1>Ask the role finder</h1>
-    <p>Tell me what you’d like to do, when you’re free or what access you need. I’ll look through the demo roles with you.</p></header>
+    <p>${interview ? "Paste the volunteer’s case or choose a supplied example. You can change one condition in a follow-up." : "Tell me what you’d like to do, when you’re free or what access you need."}</p></header>
+    <fieldset class="chat-sources"><legend>Which opportunities should I search?</legend>
+      <label><input type="radio" name="chat-source" value="community" ${interview ? "" : "checked"}>Community catalogue</label>
+      <label><input type="radio" name="chat-source" value="exercise" ${interview ? "checked" : ""}>Interview exercise · 7 roles</label>
+    </fieldset>
     ${selector}
-    <p class="chat-disclosure" id="chat-disclosure">${e(disclosure)}</p>
+    <p class="chat-disclosure" id="chat-disclosure">${e(disclosure)}${interview ? "" : " The supplied Case A and B prompts open the interview exercise on this device."}</p>
     ${turns.length || pending ? '<div class="chat-tools"><button class="text-btn" data-restart-chat>Start a new chat</button></div>' : '<div class="chat-starters" aria-label="Example questions">' + prompts + "</div>"}
     <div class="chat-history">${messages}${pending ? `<article class="chat-turn"><p class="asked"><span class="sr">You asked: </span>${e(pending)}</p><div class="answered"><p role="status">Waiting for OpenAI…</p></div></article>` : ""}</div>
+    ${interview && turns.length ? interviewFollowups(turns.at(-1).reply.state) : ""}
     ${error ? `<p class="chat-error" role="alert">${e(error)}</p>` : ""}
-    <form id="chat-form" class="chat-composer"><label for="chat-input">${turns.length ? "Ask a follow-up" : "Your question"}</label>
-      <div><input type="text" id="chat-input" name="message" maxlength="600" required placeholder="e.g. Can I help at weekends?" autocomplete="off" value="${e(draft)}" aria-describedby="chat-disclosure" ${pending ? "disabled" : ""}>
+    <form id="chat-form" class="chat-composer"><label for="chat-input">${turns.length ? "Ask a follow-up" : interview ? "Your volunteer case" : "Your question"}</label>
+      <div>${input}
       ${pending ? '<button type="button" class="primary" data-cancel-chat>Cancel</button>' : `<button type="submit" class="primary">Ask ${icon("next", 16)}</button>`}</div>
       <small>Reloading clears the conversation from this tab.</small>
-    </form></section>`;
+    </form>${interview ? '<a class="chat-exercise-link" href="#exercise">Inspect the seven records and matching rules</a>' : ""}</section>`;
 }

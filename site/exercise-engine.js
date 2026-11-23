@@ -52,6 +52,12 @@ export const exerciseRoles = [
   },
 ];
 
+// Verbatim volunteer statements from the candidate exercise.
+export const EXERCISE_CASE_TEXT = {
+  A: "I’d like to help people one to one, ideally using the digital support skills I already have. I can only volunteer on weekday evenings. Online is fine, but I can’t travel more than three miles. I don’t know if my safeguarding clearance is valid for a new role.",
+  B: "The same volunteer can no longer volunteer online. Everything else stays the same.",
+};
+
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function exerciseProfile(caseId = "A") {

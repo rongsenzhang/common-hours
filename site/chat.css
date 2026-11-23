@@ -39,6 +39,38 @@
   max-width: 58ch;
   color: var(--muted);
 }
+.chat-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  border: 0;
+  padding: 0;
+  margin: 0 0 1.2rem;
+}
+.chat-sources legend {
+  padding: 0;
+  margin-bottom: .5rem;
+  font-weight: 650;
+}
+.chat-sources label {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 42px;
+  padding: .45rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+}
+.chat-sources label:has(:checked) {
+  background: #e8efd9;
+  border-color: var(--green);
+}
+.chat-sources input {
+  margin: 0;
+  accent-color: var(--green);
+}
 .chat-starters {
   display: flex;
   flex-wrap: wrap;
@@ -122,6 +154,32 @@
 .chat-options li p {
   margin-top: 0.3rem;
 }
+.chat-shortlist {
+  list-style: decimal inside;
+}
+.chat-shortlist li::marker {
+  font-weight: 700;
+  color: var(--green);
+}
+.chat-pending li {
+  border-left: 3px solid #b58137;
+}
+.chat-criteria {
+  margin-top: .6rem;
+  color: var(--muted);
+  font-size: .92rem;
+}
+.chat-criteria strong {
+  display: block;
+  color: var(--green);
+}
+.chat-followups {
+  margin-bottom: .9rem;
+}
+.chat-exercise-link {
+  display: inline-block;
+  margin-top: .9rem;
+}
 .chat-composer {
   padding: 1rem;
   background: #f0f3e8;
@@ -138,7 +196,7 @@
   display: flex;
   gap: 0.55rem;
 }
-.chat-composer input {
+.chat-composer input, .chat-composer textarea {
   flex: 1;
   min-width: 0;
   width: 100%;
@@ -146,6 +204,19 @@
   border: 1px solid #aebbaf;
   border-radius: 7px;
   background: white;
+}
+.chat-composer textarea {
+  resize: vertical;
+  max-width: 100%;
+  font: inherit;
+  line-height: 1.45;
+}
+.chat-composer textarea:focus-visible {
+  outline: 3px solid #b36523;
+  outline-offset: 3px;
+}
+.chat-composer:has(textarea) .primary {
+  align-self: flex-end;
 }
 .chat-composer .primary {
   display: inline-flex;
@@ -171,6 +242,9 @@
   }
   .chat-composer {
     padding: 0.75rem;
+  }
+  .chat-sources label {
+    flex-grow: 1;
   }
 }
 

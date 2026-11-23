@@ -6,7 +6,7 @@ Find volunteering opportunities around Greater Manchester and ask follow-up ques
 
 ## Panel matching exercise
 
-Open **Matching exercise** beside Discover. Run either supplied case, then try a hypothetical venue distance for the form-filling role. Compare the shortlist, inspect the original seven records, or check how different wording is interpreted. The exercise runs in your browser without a login or an API key. [Run the cases and inspect the code](docs/matching-exercise.md)
+Open **Matching exercise** beside Discover. Run either supplied case, then try a hypothetical venue distance for the form-filling role. Compare the shortlist, inspect the original seven records, or check how different wording is interpreted. You can also paste the volunteer’s description into the role finder and change one condition in a follow-up. Both interfaces use the same matching rules in your browser. [Try the seven roles in chat](https://rongsenzhang.github.io/common-hours/#ask-exercise) · [Run the cases and inspect the code](docs/matching-exercise.md)
 
 ## Try it
 
