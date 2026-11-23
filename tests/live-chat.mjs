@@ -166,3 +166,18 @@ test("the pre-send disclosure matches the selected mode and labels are escaped",
   assert.match(live, /OpenAI · test-model/);
   assert.doesNotMatch(live, /<script>|<b>unsafe/);
 });
+
+test("a live follow-up preserves checked volunteer constraints while keeping unrelated response fields out of history", async () => {
+  const profile = {days: ["Tue"], period: "evening", maxMiles: 3, mode: "in-person",
+    clearance: "unknown", verifiedRoleId: null, individual: true, digital: true, stepFree: false};
+  const first = await requestLiveReply({...base, fetchImpl: async () =>
+    json({...reply, caseProfile: {...profile, unrelated: "ignore"}})});
+  let body;
+  await requestLiveReply({...base, turns: [{input: "Case B", reply: first}], fetchImpl: async (_url, opts) => {
+    body = JSON.parse(opts.body);
+    return json(reply);
+  }});
+  assert.deepEqual(body.history[0].caseProfile, profile);
+  await assert.rejects(requestLiveReply({...base, fetchImpl: async () =>
+    json({...reply, caseProfile: {...profile, maxMiles: -1}})}), {kind: "invalid"});
+});

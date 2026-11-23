@@ -7,6 +7,21 @@ const week = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const weekdays = week.slice(0, 5);
 const weekend = week.slice(5);
 
+export function validCommunityProfile(profile, known) {
+  return profile && Array.isArray(profile.days) && profile.days.every(day => week.includes(day))
+    && new Set(profile.days).size === profile.days.length
+    && ["any", "daytime", "evening"].includes(profile.period) && ["either", "in-person", "online"].includes(profile.mode)
+    && (profile.maxMiles === null || (Number.isFinite(profile.maxMiles) && profile.maxMiles >= 0))
+    && ["unknown", "none", "verified"].includes(profile.clearance)
+    && (profile.verifiedRoleId === null || (profile.clearance === "verified" && known.has(profile.verifiedRoleId)))
+    && ["individual", "digital", "stepFree"].every(key => typeof profile[key] === "boolean");
+}
+
+export function copyCommunityProfile(profile) {
+  const {days, period, mode, maxMiles, clearance, verifiedRoleId, individual, digital, stepFree} = profile;
+  return {days: [...days], period, mode, maxMiles, clearance, verifiedRoleId, individual, digital, stepFree};
+}
+
 function checkTime(role, profile, confirmed, missing, conflicts) {
   if (!profile.days.length) {
     conflicts.push("There are no available days in the volunteer profile.");

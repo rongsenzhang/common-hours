@@ -107,6 +107,7 @@ export function renderChat(
     : starters.map(prompt => promptButton(prompt)).join("")
       + (live ? promptButton("I'd like to volunteer but I'm not sure what I'd be good at.", "Help me find my strengths") : "")
       + casePrompts();
+  const whyPrompt = /[\u3400-\u9fff]/u.test(turns.at(-1)?.input ?? "") ? "为什么这些岗位适合我？" : "Why do these roles suit me?";
   const placeholder = interview
     ? (turns.length ? "e.g. My travel limit is 5 miles." : "Paste the volunteer case here…")
     : "e.g. Case A, or tell me what you’re looking for…";
@@ -119,7 +120,7 @@ export function renderChat(
     ${turns.length || pending ? '<div class="chat-tools"><button class="text-btn" data-restart-chat>Start a new chat</button></div>' : '<div class="chat-starters" aria-label="Example questions">' + prompts + "</div>"}
     <div class="chat-history">${messages}${pending ? `<article class="chat-turn"><p class="asked"><span class="sr">You asked: </span>${e(pending)}</p><div class="answered"><p role="status">Waiting for OpenAI…</p></div></article>` : ""}</div>
     ${interview && turns.length ? interviewFollowups(turns.at(-1).reply.state) : ""}
-    ${live && !pending && turns.at(-1)?.reply.matches?.length ? '<div class="chat-starters chat-followups" aria-label="Explore these recommendations">' + promptButton("Why do these roles suit me?") + "</div>" : ""}
+    ${live && !pending && turns.at(-1)?.reply.matches?.length ? '<div class="chat-starters chat-followups" aria-label="Explore these recommendations">' + promptButton(whyPrompt) + "</div>" : ""}
     ${error ? `<p class="chat-error" role="alert">${e(error)}</p>` : ""}
     <form id="chat-form" class="chat-composer"><label for="chat-input">${turns.length ? "Ask a follow-up" : interview ? "Your volunteer case" : "Your question"}</label>
       <div>${input}

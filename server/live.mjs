@@ -1,5 +1,5 @@
 // This module is server-only. The catalogue is loaded by the host, never from the chat request.
-import { checkedEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, validCommunityProfile } from "./community-chat.mjs";
+import { checkedEvidence, explainEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, validCommunityProfile } from "./community-chat.mjs";
 import { EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
 import { matchOpportunities } from "../site/engine.js";
 
@@ -20,6 +20,7 @@ const INTENTS = [
   "detail",
   "application",
 ];
+const PROFILE_FIELDS = ["days", "period", "mode", "maxMiles", "clearance", "verifiedRoleId", "individual", "digital", "stepFree"];
 const TIMES = ["any", "weekday", "weekend"];
 const MODES = ["any", "onsite", "remote"];
 
@@ -80,6 +81,7 @@ export function validateTurn({ message, history = [] }, roles) {
       !turn ||
       !boundedText(turn.user, 1200) ||
       !boundedText(turn.text, 1200) ||
+      (turn.caseProfile != null && !validCommunityProfile(turn.caseProfile, known)) ||
       !validIds(turn.matches ?? [], known, 3) ||
       !validIds(turn.toConfirm ?? [], known, 3) ||
       new Set([...(turn.matches ?? []), ...(turn.toConfirm ?? [])]).size !==
@@ -91,6 +93,7 @@ export function validateTurn({ message, history = [] }, roles) {
       text: turn.text.trim(),
       matches: turn.matches ?? [],
       toConfirm: turn.toConfirm ?? [],
+      ...(turn.caseProfile && {caseProfile: Object.fromEntries(PROFILE_FIELDS.map(key => [key, turn.caseProfile[key]]))}),
     };
   });
   return { message: message.trim(), history: turns };
@@ -113,12 +116,14 @@ function planSchema(roles) {
       items: enumString(roles.map((role) => role.id)),
     },
     case_profile: communityProfileSchema(),
+    required_activity_quote: {type:"string"},
+    changed_fields: {type: ["array", "null"], items: enumString(PROFILE_FIELDS)},
     role_evidence: {
       type: "array", maxItems: 6,
       items: {
         type: "object", additionalProperties: false,
-        properties: {role_id: enumString(roles.map(role => role.id)), quote: {type:"string"}, user_quote: {type:"string"}},
-        required: ["role_id", "quote", "user_quote"],
+        properties: {role_id: enumString(roles.map(role => role.id)), quote: {type:"string"}, user_quote: {type:"string"}, reason: {type:"string"}},
+        required: ["role_id", "quote", "user_quote", "reason"],
       },
     },
     follow_up: {type: "string"},
@@ -151,8 +156,8 @@ Choose one intent:
 
 candidate_ids: choose all genuinely relevant catalogue IDs in order, considering actual tasks and interests. For a recommendation, include topically suitable roles before time/mode/access filtering (the server enforces these facts). Return [] if the activity is absent. For "walk dogs" both dog walking roles qualify, the supply sorter and litter walk do not. Sorting cycle workshop kit and repairing a bicycle are different activities. For a broad search without a named activity use an empty activity. The server will then consider all records. A short interest such as "food" is enough for a useful first search; nominate food handling and preparation roles and optionally ask which kind of work appeals. For explicit alternatives or exclusions respect the visitor's request. Never pad a shortlist.
 
-case_profile: required non-null only for case_search and for detail/more/explain continuing such a profile, otherwise null. Interpret evidence semantically in English or Chinese. days is the set of available days; use all seven if unspecified. period is any, daytime or evening. Use either mode for "online is fine"; only explicit online-only or in-person-only requests restrict mode. maxMiles is null if unrestricted. All example venue distances use one fixed fictional origin. Uncertain or unmentioned clearance is unknown. Only use verifiedRoleId when the visitor explicitly reports verification for that named role. A generic DBS or uncertainty about transfer is unknown; a stated lack of clearance is none. individual and digital are independent preferences. stepFree is a venue requirement if requested. Case A has weekdays/evening/either/3 miles/unknown clearance and both preferences, B changes only mode to in-person. For these kinds of community profile ONLY put an additional distinct activity like dog walking into the activity field and identify its roles; one-to-one, helping someone and digital skills are already represented and do not count as an additional activity. For standard A/B set activity empty. Personally nominate and rank up to eight strongest evidenced options from the full catalogue in candidate_ids, including a potential option where a host must confirm a detail if appropriate. Prefer personal skill and task alignment within the same eligibility/fit tier. The server independently checks *every* role and can promote stronger eligible alternatives. For more/detail/explain retain the profile across turns.
-For search, case_search, more, detail and explain, include role_evidence for up to six genuinely relevant IDs you nominate. For each, select a short exact substring (8–150 characters) from that role's summary, task, individualEvidence or digitalEvidence, plus a verbatim phrase from the visitor's own recent messages that explains *why* that work is a good fit. Set user_quote to "" if no suitable quote exists. Keep quotes in their original language: never translate or paraphrase evidence. Use [] for other intents. For partial profiles optionally add ONE natural, personal follow_up question (maximum 180 characters) that helps narrow a useful unknown. Do not demand unrelated information, repeat known conditions or add factual claims. Use "" when no question is needed. For explore put the question in reply and leave follow_up empty.
+case_profile: required non-null only for case_search and for detail/more/explain continuing such a profile, otherwise null. Interpret evidence semantically in English or Chinese. days is the set of available days; use all seven if unspecified. period is any, daytime or evening. Use either mode for "online is fine"; only explicit online-only or in-person-only requests restrict mode. maxMiles is null if unrestricted. All example venue distances use one fixed fictional origin. Uncertain or unmentioned clearance is unknown. Only use verifiedRoleId when the visitor explicitly reports verification for that named role. A generic DBS or uncertainty about transfer is unknown; a stated lack of clearance is none. individual and digital are independent preferences. stepFree is a venue requirement if requested. Case A has weekdays/evening/either/3 miles/unknown clearance and both preferences, B changes only mode to in-person. For these kinds of community profile ONLY put an additional distinct activity like dog walking into the activity field and identify its roles; one-to-one, helping someone and digital skills are already represented and do not count as an additional activity. required_activity_quote is almost always "". Only for a profile where the visitor specifically requests an extra concrete task (e.g. "I only want to pack food parcels"), quote the exact words requesting it, in their original language. An example of a past strength, enjoying an activity or a soft preference is NOT a required activity. Standard A/B: always "". A Chinese or English visitor explaining that friends ask for help with phones or they like showing one person at a time is offering a strength: leave required_activity_quote empty and rank digital one-to-one roles. A specific separate request to find e.g. a food parcel packing role is different: nominate matching catalogue IDs and quote each role's actual work; the catalogue is in English even when the user is speaking Chinese. For a visitor who says they enjoy helping people use a phone, tablet or computer, recognise soft digital support and individual preferences separately; a past example of a favourite task alone is not a hard device restriction. Use the phone topic to personalise the order and evidence. For standard A/B set activity empty. Personally nominate and rank up to eight strongest evidenced options from the full catalogue in candidate_ids, including a potential option where a host must confirm a detail if appropriate. Prefer personal skill and task alignment within the same eligibility/fit tier. The server independently checks *every* role and can promote stronger eligible alternatives. For more/detail/explain retain the profile across turns. active_profile contains the last checked preferences if available. changed_fields must be null for a fresh profile, new search or named preset chosen afresh. On a case refinement, list ONLY the fields the latest visitor message changes; use [] for explain/more carrying the same conditions. Example: active in-person profile, "I could get to a venue five miles away now" means update maxMiles to 5, changed_fields ["maxMiles"], carry every other condition unchanged, search again. Distances in an ongoing demo profile use the same fictional origin. A volunteer refining their radius does not change a venue record or require a real address. For a request to go to a physical venue for the first time, preserve other prior conditions and update mode if the visitor actually changed mode. Always include the full interpreted case_profile as well. Clear candidate_ids on explore and other conversational intents.
+For search, case_search, more, detail and explain, include role_evidence for up to six genuinely relevant IDs you nominate. For each, select a short exact substring (8–150 characters) from that role's summary, task, individualEvidence or digitalEvidence, plus a verbatim phrase from the visitor's own recent messages that explains *why* that work is a good fit. Write a short original reason linking that user's words to the specific task in a warm and personal way. English reasons should start "You might enjoy", "This could suit you", or "Your interest in"; Chinese reasons can start "你可能", "你喜欢" or "你提到". Explain why they might personally enjoy doing the work. Keep it under 200 characters; never introduce new role facts or assert eligibility, hours, money, travel, safeguarding or access. Set reason and user_quote to "" if no suitable user quote exists. Keep quotes in their original language: never translate or paraphrase evidence. Use [] for other intents. For partial profiles optionally add ONE natural, personal follow_up question (maximum 180 characters) that helps narrow a useful unknown. Do not demand unrelated information, repeat known conditions or add factual claims. Use "" when no question is needed. For explore put the question in reply and leave follow_up empty.
 
 Set time, mode and step_free from all applicable requirements. "Flexible" sessions work on weekdays or weekends. "Hybrid" supports onsite and remote. Missing access is unknown. For an unverified restriction that cannot be represented, use unknown. Treat a new request after "start over" as a fresh one.
 Write reply in the visitor's language, plain text, 1–3 short sentences, at most 650 characters. For social, explore, advice, off_topic and clarify give a direct response without making any specific listing or eligibility claim. For unknown, identify the specific unverified detail and suggest a question to ask the organiser. In all other intents leave reply empty; the server builds the answer from checked records. Do not return links, markup or extraneous fields.`;
@@ -199,10 +204,15 @@ function validatePlan(data, known) {
     !MODES.includes(data.mode) ||
     typeof data.step_free !== "boolean" ||
     !validIds(data.candidate_ids, known, known.size) ||
+    typeof data.required_activity_quote !== "string" || data.required_activity_quote.length > 360 ||
+    (data.changed_fields !== null && (!Array.isArray(data.changed_fields)
+      || data.changed_fields.length > PROFILE_FIELDS.length
+      || !data.changed_fields.every(field => PROFILE_FIELDS.includes(field)))) ||
     !Array.isArray(data.role_evidence) || data.role_evidence.length > 6 ||
     data.role_evidence.some(item => !item || !known.has(item.role_id)
       || typeof item.quote !== "string" || item.quote.length > 190
-      || typeof item.user_quote !== "string" || item.user_quote.length > 200) ||
+      || typeof item.user_quote !== "string" || item.user_quote.length > 200
+      || typeof item.reason !== "string" || item.reason.length > 360) ||
     typeof data.follow_up !== "string" || data.follow_up.length > 200 ||
     (data.intent === "case_search" && !data.case_profile) ||
     (data.case_profile !== null && (!["case_search", "detail", "explain", "more"].includes(data.intent)
@@ -296,6 +306,22 @@ function hasClockTime(message) {
   return /\b\d{1,2}(?::[0-5]\d(?:\s*(?:am|pm))?|\s*(?:am|pm))\b|[上下]午\s*[\d一二三四五六七八九十]|[\d一二三四五六七八九十]+点/iu.test(message);
 }
 
+function latestProfile(history) {
+  const recent = [...history].reverse().find(turn => turn.caseProfile || turn.matches.length || turn.toConfirm.length);
+  return recent?.caseProfile ?? null;
+}
+
+function applyProfileChange(plan, history) {
+  const previous = latestProfile(history);
+  if (!previous || !plan.case_profile) return;
+  const fields = ["explain", "more"].includes(plan.intent) ? [] : plan.changed_fields;
+  if (fields === null) return;
+  const profile = {...previous};
+  for (const key of fields) profile[key] = plan.case_profile[key];
+  if (profile.clearance !== "verified") profile.verifiedRoleId = null;
+  plan.case_profile = profile;
+}
+
 function formatAnswer({ plan, model }, { message, history }, roles) {
   const zh = plan ? plan.language === "zh" : /[\u3400-\u9fff]/u.test(message);
   const say = (en, cn) => (zh ? cn : en);
@@ -305,6 +331,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
     matches: [],
     toConfirm: [],
     details: {},
+    evidence: {},
     text: "",
   };
   const respond = (text) => ({ ...result, text });
@@ -344,6 +371,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
         "目录记录活动的星期与大致时段。请向主办方确认具体日期和时段，再安排行程。",
       ),
     );
+  applyProfileChange(plan, history);
   if (plan.case_profile) return communityAnswer(plan, roles, result, {message, history});
   const byId = new Map(roles.map((role) => [role.id, role]));
   const broadSearch = ["search", "more"].includes(plan.intent) && !plan.activity.trim();
@@ -384,8 +412,10 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
   ].slice(0, 3);
   for (const { group, opportunity } of rows) {
     result[group].push(opportunity.id);
+    const evidence = checkedEvidence(plan, opportunity, [message, ...history.map(turn => turn.user)]);
+    if (evidence) result.evidence[opportunity.id] = evidence;
     result.details[opportunity.id] = [
-      checkedEvidence(plan, opportunity, [message, ...history.map(turn => turn.user)]),
+      explainEvidence(evidence, zh),
       roleDescription(opportunity, zh, wantsDetails),
     ].filter(Boolean).join("\n");
   }
@@ -479,6 +509,7 @@ export async function answerLive({
         input: JSON.stringify({
           catalogue: inputCatalogue(roles),
           named_volunteer_examples: EXERCISE_CASE_TEXT,
+          active_profile: latestProfile(turn.history),
           recent_turns: turn.history,
           latest_message: turn.message,
         }),

@@ -16,6 +16,8 @@ const roles = JSON.parse(
 const basePlan = {
   intent: "search",
   case_profile: null,
+  changed_fields: null,
+  required_activity_quote: "",
   role_evidence: [],
   follow_up: "",
   language: "en",
@@ -256,9 +258,9 @@ test("provider interpretation ranks equally strong community listings, while har
     // Attempt to promote a partially relevant role, and change the ranking of real peers.
     candidate_ids: ["writing-partner", "video-call-coach", "bus-app-coach", "email-practice-partner"],
     role_evidence: [
-      {role_id: "video-call-coach", quote: "practise video calling", user_quote: "digital support skills"},
-      {role_id: "bus-app-coach", quote: "This experience guarantees a permanent job", user_quote: "digital support skills"},
-      {role_id: "email-practice-partner", quote: "practise email attachments", user_quote: "email is my absolute favourite"},
+      {role_id: "video-call-coach", quote: "practise video calling", user_quote: "digital support skills", reason: "You might enjoy showing a learner how to make a practice call."},
+      {role_id: "bus-app-coach", quote: "This experience guarantees a permanent job", user_quote: "digital support skills", reason: "You might enjoy showing a learner how to make a practice call."},
+      {role_id: "email-practice-partner", quote: "practise email attachments", user_quote: "email is my absolute favourite", reason: "You might enjoy this task."},
     ],
   };
   const a = await run(user, extra);
@@ -286,7 +288,7 @@ test("case explanation is limited to previously displayed roles, source quotatio
   const explanation = await run("Why this one?", {
     intent:"explain", activity:"", case_profile:profile("B"),
     candidate_ids:["bus-app-coach", "writing-partner"],
-    role_evidence:[{role_id:"bus-app-coach",quote:"teach journey planning on a travel app",user_quote:"learn to use their phones"}],
+    role_evidence:[{role_id:"bus-app-coach",quote:"teach journey planning on a travel app",user_quote:"learn to use their phones", reason:"This could suit you because you can practise journey planning together."}],
   }, {history});
   assert.deepEqual(explanation.matches, ["bus-app-coach"]);
   assert.match(explanation.details["bus-app-coach"], /learn to use their phones/);
@@ -305,4 +307,42 @@ test("invalid case fields reject the upstream response and exact clock time stay
   const time = await run("I can only do 6:30pm", {intent:"case_search",activity:"",case_profile:profile("A")});
   assert.deepEqual(time.matches, []);
   assert.match(time.text, /exact day or time/);
+});
+
+test("OpenAI chooses which preferences change; the other profile fields survive follow-ups and casual conversation", async () => {
+  const history = [
+    {user:"Run Case B", text:"Three miles, in person.", matches:["bus-app-coach"], toConfirm:[],
+      caseProfile: {...profile("B"), internalNote:"NOT_PUBLIC"}},
+    {user:"thanks",text:"You're welcome.",matches:[],toConfirm:[]},
+  ];
+  const proposed = {...profile("A"),days:["Sat"],maxMiles:5,individual:false};
+  const fetchImpl = async (_url, req) => {
+    const sent = JSON.parse(JSON.parse(req.body).input);
+    assert.deepEqual(sent.active_profile, profile("B"));
+    assert(!req.body.includes("NOT_PUBLIC"));
+    return completed({...basePlan,activity:"",intent:"case_search",case_profile:proposed,changed_fields:["maxMiles"]});
+  };
+  const revised = await run("I can get to a venue five miles away now.", {}, {history,fetchImpl});
+  assert.deepEqual(revised.caseProfile,{...profile("B"),maxMiles:5});
+  assert.throws(() => validateTurn({message:"Case A",history:[{...history[0],caseProfile:{...profile("A"),mode:"invalid"}}]},roles), LiveError);
+  await assert.rejects(run("Five miles", {intent:"case_search",case_profile:proposed,changed_fields:["invented"]}),{code:"invalid_reply"});
+});
+
+test("bilingual volunteered strengths rank across the catalogue; a required extra activity must cite the visitor and record", async () => {
+  const user = "我喜欢用手机帮助别人，而且我只能在工作日晚上线上参加。";
+  const state = {...profile("A"),mode:"online",maxMiles:null};
+  const skill = {intent:"case_search", activity:"手机指导",language:"zh",case_profile:state,
+    candidate_ids:["video-call-coach"], role_evidence:[{role_id:"video-call-coach",quote:"practise video calling",
+      user_quote:"用手机帮助别人",reason:"你可能会喜欢陪初学者练习如何开始一次视频通话。"}]};
+  const matches = await run(user,skill);
+  assert(matches.matches.includes("video-call-coach") && matches.matches.includes("email-practice-partner"));
+  assert(matches.details["video-call-coach"].includes(skill.role_evidence[0].reason));
+  const visitor = "我只想帮人练习视频通话";
+  const must = await run(visitor,{...skill,required_activity_quote:visitor,candidate_ids:["video-call-coach","email-practice-partner"],
+    role_evidence:[{...skill.role_evidence[0],user_quote:visitor,reason:"你可能会获得时薪 100 英镑。"}]});
+  assert.deepEqual(must.matches,["video-call-coach"]);
+  assert.equal(must.evidence["video-call-coach"].reason,null);
+  const fabricated = await run(user,{...skill,role_evidence:[{
+    ...skill.role_evidence[0],quote:"made up training opportunity",user_quote:"I am a trainer"}]});
+  assert.equal(fabricated.evidence["video-call-coach"],undefined);
 });

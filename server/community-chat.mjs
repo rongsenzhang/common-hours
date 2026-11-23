@@ -1,6 +1,5 @@
 // OpenAI interprets the conversation. The same record checks used by Discover
 // decide whether each suggested role qualifies or needs a host to confirm it.
-import { matchOpportunities } from "../site/engine.js";
 import { matchCommunityCase } from "../site/community-case.js";
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -27,15 +26,7 @@ export function communityProfileSchema() {
   ] };
 }
 
-export function validCommunityProfile(profile, known) {
-  return profile && Array.isArray(profile.days) && profile.days.every(day => days.includes(day))
-    && new Set(profile.days).size === profile.days.length
-    && periods.includes(profile.period) && modes.includes(profile.mode)
-    && (profile.maxMiles === null || (Number.isFinite(profile.maxMiles) && profile.maxMiles >= 0))
-    && clearances.includes(profile.clearance)
-    && (profile.verifiedRoleId === null || (profile.clearance === "verified" && known.has(profile.verifiedRoleId)))
-    && ["individual", "digital", "stepFree"].every(key => typeof profile[key] === "boolean");
-}
+export { validCommunityProfile } from "../site/community-case.js";
 
 function describeProfile(profile, zh) {
   const say = (en, cn) => zh ? cn : en;
@@ -70,17 +61,26 @@ function describeProfile(profile, zh) {
 
 export function checkedEvidence(plan, role, userMessages) {
   const item = plan.role_evidence.find(row => row.role_id === role.id);
-  if (!item || !plan.candidate_ids.includes(role.id)) return "";
+  if (!item || !plan.candidate_ids.includes(role.id)) return null;
   const quote = item.quote.trim(), userQuote = item.user_quote.trim();
   const sources = [role.summary, ...role.tasks, role.caseFacts?.individualEvidence, role.caseFacts?.digitalEvidence];
-  if (quote.length < 8 || !sources.some(source => source?.includes(quote))) return "";
+  if (quote.length < 8 || !sources.some(source => source?.includes(quote))) return null;
   const fromUser = userQuote.length >= 2 && userMessages.some(source => source.includes(userQuote));
-  if (plan.language === "zh") return fromUser
-    ? `你提到“${userQuote}”。岗位说明中与此相符的内容是“${quote}”。`
-    : `AI 从岗位说明中选出的依据是“${quote}”。`;
-  return fromUser
-    ? `You mentioned “${userQuote}”. The relevant part of the listing is “${quote}”.`
-    : `The part of the listing I picked out for you is “${quote}”.`;
+  // Model prose is allowed only as an explicitly subjective fit judgement.
+  // Venue, clearance, numbers, availability and application facts come from
+  // structured records and are rendered separately below.
+  const reason = item.reason.trim();
+  const forbidden = /[<>@\d£$€]|https?:|www\.|\b(?:miles?|hours?|weekdays?|weekends?|evenings?|daytime|mondays?|tuesdays?|wednesdays?|thursdays?|fridays?|saturdays?|sundays?|dbs|clearance|safeguarding|eligible|eligibility|guarantee\w*|certif\w*|pay|paid|salary|booking|application|accessible|accessibility|step-free|unpaid|funding|transport|remote|onsite|venue|postcode)\b|英里|公里|薪|报酬|保证|无需审查|资质|远程|现场|线上参加|线下参加|活动时间|周[一二三四五六日末]|工作日|无障碍/iu;
+  const personal = /^(?:You might enjoy|This could suit you|Your interest in|你的兴趣|你可能|你喜欢|你提到)/iu.test(reason);
+  return {sourceQuote: quote, userQuote: fromUser ? userQuote : null,
+    reason: fromUser && personal && !forbidden.test(reason) ? reason : null};
+}
+
+export function explainEvidence(evidence, zh) {
+  if (!evidence) return "";
+  const {sourceQuote, userQuote, reason} = evidence;
+  if (zh) return [reason, userQuote ? `你提到“${userQuote}”。` : "", `岗位原文是“${sourceQuote}”。`].filter(Boolean).join(" ");
+  return [reason, userQuote ? `You mentioned “${userQuote}”.` : "", `The listing says “${sourceQuote}”.`].filter(Boolean).join(" ");
 }
 
 export function previousRoles(history) {
@@ -99,16 +99,20 @@ export function communityAnswer(plan, roles, result, {message, history}) {
   const profile = plan.case_profile;
   const wantsDetails = ["explain", "detail"].includes(plan.intent);
   const preferenceOrder = new Map(plan.candidate_ids.map((id, index) => [id, index]));
+  const userMessages = [message, ...history.map(turn => turn.user)];
+  const requiredActivity = plan.required_activity_quote.trim();
+  const explicitTask = requiredActivity.length > 1 && userMessages.some(text => text.includes(requiredActivity));
   let candidates = roles;
   if (wantsDetails) {
     const previous = previousRoles(history);
     const ids = plan.candidate_ids.length ? plan.candidate_ids : previous;
     candidates = roles.filter(role => ids.includes(role.id)
       && (plan.intent !== "explain" || previous.includes(role.id)));
-  } else if (plan.activity.trim()) {
-    candidates = roles.filter(role => preferenceOrder.has(role.id));
-    const topical = matchOpportunities(candidates, {query:plan.activity, time:"any", mode:"any", stepFree:false});
-    candidates = [...topical.matches, ...topical.review].map(row => row.opportunity);
+  } else if (explicitTask) {
+    // A specific extra task must be supported by the visitor's words and an
+    // actual listing excerpt. A strength (in any language) is a signal for
+    // ranking, never an English keyword condition on the entire catalogue.
+    candidates = roles.filter(role => preferenceOrder.has(role.id) && checkedEvidence(plan, role, userMessages));
   }
   if (plan.intent === "more") {
     const shown = new Set();
@@ -121,7 +125,6 @@ export function communityAnswer(plan, roles, result, {message, history}) {
   }
 
   const ranked = matchCommunityCase(candidates, profile, {limit: Infinity});
-  const userMessages = [message, ...history.map(turn => turn.user)];
   // Eligibility, confirmation status and strength of evidence take precedence.
   // For equally strong feasible alternatives OpenAI's semantic ranking can
   // personalise the shortlist. Unnominated alternatives retain the stable
@@ -132,7 +135,8 @@ export function communityAnswer(plan, roles, result, {message, history}) {
     for (const {role, fit, reasons} of rows.sort(withinTier).slice(0, 3)) {
       result[group].push(role.id);
       const evidence = checkedEvidence(plan, role, userMessages);
-      result.details[role.id] = [evidence, role.summary, fit, ...reasons].filter(Boolean).join("\n");
+      if (evidence) result.evidence[role.id] = evidence;
+      result.details[role.id] = [explainEvidence(evidence, zh), role.summary, fit, ...reasons].filter(Boolean).join("\n");
     }
   }
   const intro = describeProfile(profile, zh);

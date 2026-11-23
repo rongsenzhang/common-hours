@@ -1,3 +1,5 @@
+import { copyCommunityProfile, validCommunityProfile } from "./community-case.js";
+
 // Configuration comes from the deployed site's own release. URL or form parameters
 // never select where messages are sent.
 export function chatEndpoint(config, pageUrl) {
@@ -42,6 +44,7 @@ function recentLiveHistory(turns) {
       text: reply.text.slice(0, 1200),
       matches: reply.matches,
       toConfirm: reply.toConfirm,
+      ...(reply.caseProfile ? {caseProfile: copyCommunityProfile(reply.caseProfile)} : {}),
     }));
 }
 
@@ -60,6 +63,7 @@ function checkedReply(data, roles) {
   const ids = [...data.matches, ...data.toConfirm];
   const roleIds = new Set(roles.map((role) => role.id));
   if (
+    (data.caseProfile != null && !validCommunityProfile(data.caseProfile, roleIds)) ||
     data.matches.length > 3 || data.toConfirm.length > 3 ||
     (!data.caseProfile && ids.length > 3) ||
     new Set(ids).size !== ids.length ||
@@ -78,6 +82,7 @@ function checkedReply(data, roles) {
     matches: data.matches,
     toConfirm: data.toConfirm,
     details,
+    ...(data.caseProfile ? {caseProfile: copyCommunityProfile(data.caseProfile)} : {}),
   };
 }
 

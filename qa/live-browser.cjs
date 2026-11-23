@@ -46,6 +46,7 @@ async function verifyInterviewChat(page, postBodies, replies) {
   await checkCommunityCase(caseBFollowUp, "in-person");
   assert.equal(postBodies.length, liveCalls + 2);
   assert.equal(postBodies.at(-1).history.at(-1).user, caseA);
+  assert.equal(postBodies.at(-1).history.at(-1).caseProfile.maxMiles, 3);
   await page.locator("[data-restart-chat]").click();
   await page.getByRole("button", {name: "Run Case B"}).click();
   await page.getByText("OpenAI · browser-test-model").waitFor();
@@ -86,7 +87,7 @@ async function verifyInterviewChat(page, postBodies, replies) {
   const {opportunities} = JSON.parse(readFileSync(join(__dirname, "../site/data/catalog.json"), "utf8"));
   const replies = {};
   for (const id of ["A", "B"]) {
-    const caseProfile = exerciseProfile(id);
+    const caseProfile = {...exerciseProfile(id), verifiedRoleId: null, stepFree: false};
     const result = matchCommunityCase(opportunities, caseProfile);
     replies[id] = {matches: result.recommendations.map(row => row.role.id), toConfirm: result.pending.slice(0, 3).map(row => row.role.id), caseProfile};
     assert.ok(replies[id].matches.length);

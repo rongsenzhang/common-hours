@@ -18,21 +18,28 @@ function requireResult(condition) {
 }
 
 async function checkTurn(label, message, history, expected) {
+  let answer;
   try {
-    const answer = await answerLive({ message, history, roles, apiKey, model: DEFAULT_MODEL });
+    answer = await answerLive({ message, history, roles, apiKey, model: DEFAULT_MODEL });
     requireResult(answer.provider === "openai" && answer.model === DEFAULT_MODEL);
     requireResult(typeof answer.text === "string" && answer.text.trim());
     requireResult(Array.isArray(answer.matches) && Array.isArray(answer.toConfirm));
     expected(answer);
     history.push({
       user: message, text: answer.text, matches: answer.matches, toConfirm: answer.toConfirm,
+      ...(answer.caseProfile && {caseProfile: answer.caseProfile}),
     });
     console.log("PASS", label);
     return answer;
   } catch (error) {
     const reason = error instanceof LiveError && safeErrorCodes.has(error.code)
       ? error.code : "unexpected_outcome";
-    throw new Error(`${label}: ${reason}`);
+    // Only these bounded, server-validated enums/numbers and fictional catalogue
+    // IDs are logged. Never print visitor text, provider content or request data.
+    const facts = answer ? JSON.stringify({
+      profile: answer.caseProfile ?? null, recommended: answer.matches, pending: answer.toConfirm,
+    }) : "";
+    throw new Error(`${label}: ${reason} ${facts}`);
   }
 }
 
@@ -82,21 +89,32 @@ async function checkLiveResponses() {
     "I'd like to help out, but I have no idea what I'd be good at. Could you help me work that out?", coaching,
     (reply) => { noRoles(reply); requireResult(/[?？]/u.test(reply.text)); });
   const found = await checkTurn("skills and constraints lead to actionable roles",
-    "I like helping one person at a time learn to use a phone. I can volunteer online on weekday evenings.", coaching,
+    "I like helping one person at a time learn to use a phone. I can only volunteer online on weekday evenings.", coaching,
     reply => {
-      requireResult(reply.caseProfile?.individual && reply.caseProfile?.digital && reply.matches.length > 0);
-      requireResult(reply.matches.every(id => {
-        const role = roles.find(item => item.id === id);
-        return ["remote","hybrid"].includes(role.mode) && role.caseFacts.individualEvidence && role.caseFacts.digitalEvidence;
+      expectProfile({...exerciseProfile("A"), mode:"online", maxMiles:null})(reply);
+      requireResult(reply.matches.slice(0, 2).every(id => {
+        const facts = roles.find(item => item.id === id).caseFacts;
+        return facts.individualEvidence && facts.digitalEvidence;
       }));
+      requireResult(reply.matches.every(id => ["remote","hybrid"].includes(roles.find(role => role.id === id).mode)));
     });
   await checkTurn("why the work suits the volunteer", "Why did you choose these for me?", coaching, reply => {
     requireResult(reply.matches.length > 0 && reply.matches.every(id => found.matches.includes(id)));
-    requireResult(Object.values(reply.details).some(text => /You mentioned|part of the listing I picked/u.test(text)));
+    requireResult(Object.values(reply.evidence).some(item => item.sourceQuote && item.userQuote));
   });
   await checkTurn("an unsupported exact time needs confirmation",
     "One more thing, I can only start at exactly 6:35pm. Which role guarantees that start time?", coaching, noRoles);
-  console.log("Verified twelve real OpenAI turns with", DEFAULT_MODEL);
+  const chinese = [];
+  await checkTurn("Chinese guided discovery", "我想尝试做志愿者，但不知道自己能做什么。", chinese,
+    reply => { noRoles(reply); requireResult(/[?？]/u.test(reply.text)); });
+  const chineseFound = await checkTurn("Chinese volunteer skills stay soft while logistics remain hard",
+    "朋友经常叫我教他们用手机。我喜欢一次帮一个人，而且我只能在工作日晚上线上参加。", chinese,
+    reply => expectProfile({...exerciseProfile("A"), mode:"online", maxMiles:null})(reply));
+  await checkTurn("Chinese personalised recommendation explanation", "我说的哪些经验和这些岗位的工作有关？", chinese, reply => {
+    requireResult(reply.matches.some(id => chineseFound.matches.includes(id)));
+    requireResult(Object.values(reply.evidence).some(item => item.sourceQuote && item.userQuote));
+  });
+  console.log("Verified fifteen real OpenAI turns with", DEFAULT_MODEL);
 }
 
 checkLiveResponses().catch((error) => {

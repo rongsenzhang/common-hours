@@ -10,6 +10,8 @@
 2. 输入 `Why do these roles suit me?`。检查理由能否对应你说过的偏好，以及这份岗位写明的任务或参加条件。
 3. 新开一段对话，输入 `I’d like to volunteer but I’m not sure what I’d be good at.`。回答助手的问题，例如 `People often ask me to help them use their phones. I’m usually free after work.`。再补充 `In person only, within two miles.`，看看哪些岗位还适合，哪些信息需要确认。
 
+也可以全程用中文。先说“我想做志愿者，但不知道自己擅长什么”，再说“朋友常找我教他们用手机。我喜欢一次帮一个人，只能在工作日晚上线上参加”。检查岗位是否支持线上、是否有工作日晚间场次，再问“你为什么觉得这几个岗位适合我？”。教朋友用手机是经验，可以支持相近任务；只能线上参加是限制，纯现场岗位不应进入推荐。如果再要求“必须晚上 6:35 准时开始”，现有记录只有时段，助手应提示向主办方确认。
+
 | 顺序 | 发给助手的消息 | 检查什么 |
 | --- | --- | --- |
 | 1 | Can I walk dogs at weekends? | 应找到 **Shelter dog walking buddy**。点岗位卡可以看时间和活动说明。 |
