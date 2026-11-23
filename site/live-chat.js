@@ -60,7 +60,8 @@ function checkedReply(data, roles) {
   const ids = [...data.matches, ...data.toConfirm];
   const roleIds = new Set(roles.map((role) => role.id));
   if (
-    ids.length > 3 ||
+    data.matches.length > 3 || data.toConfirm.length > 3 ||
+    (!data.caseProfile && ids.length > 3) ||
     new Set(ids).size !== ids.length ||
     ids.some((id) => !roleIds.has(id))
   ) {

@@ -43,10 +43,13 @@ test("broad interests give genuine distinct alternatives, unlike an explicit act
       "animal-supply-sorter",
     ]),
   );
-  assert.deepEqual(
-    new Set(ask("I would like to help with food.", roles).matches),
-    new Set(["pantry-packer", "meal-cook"]),
-  );
+  const first = ask("I would like to help with food.", roles);
+  const next = ask("Show more options", roles, first.state);
+  assert.equal(first.matches.length, 3);
+  assert.deepEqual(new Set([...first.matches, ...next.matches]), new Set([
+    "pantry-packer", "meal-cook", "recipe-copy-editor", "allergen-label-reader", "fruit-stall-steward",
+  ]));
+  assert.ok(next.matches.every((id) => !first.matches.includes(id)));
 });
 
 test("no records are invented and operating on the earlier catalogue reproduces abstention", () => {

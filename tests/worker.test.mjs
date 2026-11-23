@@ -97,7 +97,7 @@ test("schema, content type, declared and streamed bytes checked before reserving
     ['{"message":"hello","apiKey":"bogus"}', 400],
     ['{"message":"x","history":[{}]}', 400],
     ['"oops"', 400],
-    ['{"message":"' + "a".repeat(601) + '"}', 400],
+    ['{"message":"' + "a".repeat(1201) + '"}', 400],
   ]) {
     assert.equal((await worker.fetch(bodyRequest(body), env)).status, status);
   }
@@ -165,6 +165,9 @@ test("accepted requests invoke the configured provider and expose only normalize
       mode: "any",
       step_free: false,
       candidate_ids: [],
+      case_profile: null,
+      role_evidence: [],
+      follow_up: "",
       activity: "",
       reply: "",
     };

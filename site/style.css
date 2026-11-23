@@ -996,3 +996,67 @@ dialog dl {
     scroll-behavior: auto !important;
   }
 }
+
+/* Volunteer case presets in the community directory. */
+#community-cases {
+  margin: 0 0 2rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+  padding: clamp(1rem, 2.4vw, 1.8rem);
+  scroll-margin-top: 1rem;
+}
+.community-case-head, .community-case-links, .community-case-role {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .65rem 1rem;
+}
+.community-case-head { justify-content: space-between; }
+.community-case-head h2 { font-size: clamp(1.2rem, 2.5vw, 1.6rem); }
+.community-case-head p, #community-case-results p { margin-top: .35rem; color: var(--muted); }
+.community-case-links { gap: .5rem; }
+#community-case-results {
+  border-top: 1px solid var(--border);
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+}
+#community-case-results h3 { font-size: 1.3rem; }
+#community-case-shortlist:focus, #community-case-heading:focus { outline: none; }
+#community-case-results .community-case-summary { font-weight: 650; color: var(--green); }
+.community-case-list { max-width: 64rem; padding-left: 1.6rem; }
+.community-case-list > li { padding: .7rem .35rem; border-bottom: 1px solid var(--border); }
+.community-case-list > li::marker { font-weight: 700; }
+.community-case-list p, .community-case-list ul { font-size: .9rem; }
+.community-case-list ul { padding-left: 1.25rem; margin-top: .35rem; }
+.community-case-role button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-weight: 700;
+  color: var(--green);
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: .19em;
+}
+.community-case-role span {
+  color: var(--green);
+  background: #eef4df;
+  border-radius: .35rem;
+  padding: .08em .45em;
+  font-size: .8rem;
+}
+.community-case-controls, .community-case-pending, .community-case-source { margin: 1rem 0 0; }
+.community-case-controls { margin-bottom: .9rem; }
+#community-cases summary { width: fit-content; cursor: pointer; font-weight: 650; }
+.community-case-controls form {
+  margin: .8rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: .65rem;
+  align-items: end;
+}
+.community-case-controls .field { margin: 0; min-width: 0; }
+.community-case-controls select, .community-case-controls input { margin-top: .3rem; width: 100%; }
+.community-case-controls select { appearance: auto; }
+#community-case-results .community-case-source { margin-top: 1.1rem; font-size: .9rem; }

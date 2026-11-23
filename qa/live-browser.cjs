@@ -1,6 +1,8 @@
 // Deterministic browser verification of the live transport UI with a stub endpoint.
 // Run a local packaged preview before this script. No OpenAI requests are made.
 const assert = require("node:assert/strict");
+const { readFileSync } = require("node:fs");
+const { join } = require("node:path");
 const { chromium } = require("playwright");
 const base = new URL(process.argv[2] || "http://127.0.0.1:8754/");
 const config = new URL("data/chat-config.json", base).href;
@@ -26,42 +28,29 @@ async function checkCaseAnswer(page, expectedRoles) {
   assert.match(await answer.locator(".chat-criteria").innerText(), /3|three/i);
 }
 
-async function verifyInterviewChat(page, postBodies) {
+async function verifyInterviewChat(page, postBodies, replies) {
   const liveCalls = postBodies.length;
-  const exerciseSource = page.locator('[name="chat-source"][value="exercise"]');
-  const communitySource = page.locator('[name="chat-source"][value="community"]');
-  const history = page.locator(".chat-history");
-  assert.ok(await communitySource.isChecked());
   assert.ok(await page.getByRole("radio", {name: "Live AI", exact: true}).isChecked());
-
-  // Paste the supplied A straight into the regular Ask entry point.
-  await ask(page, caseA);
-  await checkCaseAnswer(page, ["Digital access buddy", "Digital skills facilitator"]);
-  assert.ok(await exerciseSource.isChecked());
-  assert.equal(await page.locator('[name="chat-mode"]:visible').count(), 0);
-  assert.doesNotMatch(await history.innerText(), /Confirmed by the demo catalogue/);
-  await ask(page, caseBFollowUp);
-  await checkCaseAnswer(page, ["Digital skills facilitator"]);
-  assert.equal(postBodies.length, liveCalls, "Both supplied cases must stay on-device.");
-
-  const input = page.locator("#chat-input");
-  await input.fill("A private exercise draft");
-  await communitySource.check();
-  assert.equal(await input.inputValue(), "");
-  assert.equal(await page.locator(".chat-turn").count(), 1);
-  assert.doesNotMatch(await history.innerText(), /Digital skills facilitator|safeguarding clearance/i);
-  await ask(page, "Can I walk dogs at weekends?");
-  await page.waitForFunction(() => document.querySelectorAll(".chat-source").length === 2);
-  assert.equal(postBodies.length, liveCalls + 1);
-  assert.deepEqual(postBodies.at(-1).history.map(turn => turn.user), [postBodies[0].message]);
-  assert.doesNotMatch(JSON.stringify(postBodies), /safeguarding clearance|same volunteer|private exercise draft/i);
-  await exerciseSource.check();
-  assert.equal(await input.inputValue(), "A private exercise draft");
-  assert.equal(await page.locator(".chat-turn").count(), 2);
-  await checkCaseAnswer(page, ["Digital skills facilitator"]);
+  async function checkCommunityCase(question, mode) {
+    await ask(page, question);
+    const answer = page.locator(".chat-turn").last();
+    await answer.getByText("OpenAI · browser-test-model").waitFor();
+    const ids = await answer.locator("[data-detail]").evaluateAll(cards => cards.map(card => card.dataset.detail));
+    const expected = replies[mode === "either" ? "A" : "B"];
+    assert.deepEqual(ids, [...expected.matches, ...expected.toConfirm]);
+    assert.equal(new URL(page.url()).hash, "#ask");
+    assert.equal(postBodies.at(-1).message, question);
+    assert.equal(await answer.locator("[data-exercise-title]").count(), 0);
+  }
+  await checkCommunityCase(caseA, "either");
+  await checkCommunityCase(caseBFollowUp, "in-person");
+  assert.equal(postBodies.length, liveCalls + 2);
+  assert.equal(postBodies.at(-1).history.at(-1).user, caseA);
   await page.locator("[data-restart-chat]").click();
-  assert.equal(await input.inputValue(), "");
-  assert.equal(await page.locator(".chat-turn").count(), 0);
+  await page.getByRole("button", {name: "Run Case B"}).click();
+  await page.getByText("OpenAI · browser-test-model").waitFor();
+  assert.equal(postBodies.at(-1).message, "Case B");
+  assert.equal(postBodies.at(-1).history.length, 0);
 
   // Open the interview link as a new visitor. Watch all requests before the
   // document loads, including configuration and catalogue reads.
@@ -71,8 +60,7 @@ async function verifyInterviewChat(page, postBodies) {
   page.on("request", track);
   try {
     await page.goto(new URL("#ask-exercise", base).href);
-    await exerciseSource.waitFor();
-    assert.ok(await exerciseSource.isChecked());
+    await page.getByRole("heading", {name: "Seven-role exercise chat"}).waitFor();
     await ask(page, "Case B");
     await checkCaseAnswer(page, ["Digital skills facilitator"]);
     const latest = page.locator(".chat-turn").last();
@@ -93,6 +81,16 @@ async function verifyInterviewChat(page, postBodies) {
 }
 
 (async () => {
+  const {matchCommunityCase} = await import("../site/community-case.js");
+  const {exerciseProfile} = await import("../site/exercise-engine.js");
+  const {opportunities} = JSON.parse(readFileSync(join(__dirname, "../site/data/catalog.json"), "utf8"));
+  const replies = {};
+  for (const id of ["A", "B"]) {
+    const caseProfile = exerciseProfile(id);
+    const result = matchCommunityCase(opportunities, caseProfile);
+    replies[id] = {matches: result.recommendations.map(row => row.role.id), toConfirm: result.pending.slice(0, 3).map(row => row.role.id), caseProfile};
+    assert.ok(replies[id].matches.length);
+  }
   const browser = await chromium.launch(
     process.env.CHROME_EXECUTABLE
       ? { executablePath: process.env.CHROME_EXECUTABLE }
@@ -125,13 +123,14 @@ async function verifyInterviewChat(page, postBodies) {
             });
           if (next === "fail")
             return route.fulfill({ status: 503, body: "offline" });
+          const question = messages.at(-1).message;
+          const preset = [caseA, caseBFollowUp, "Case B"].includes(question);
           return route.fulfill({
             json: {
               provider: "openai",
               model: "browser-test-model",
               text: "Confirmed by the demo catalogue.",
-              matches: ["shelter-dog-walker"],
-              toConfirm: [],
+              ...(preset ? replies[question === caseA ? "A" : "B"] : {matches: ["shelter-dog-walker"], toConfirm: []}),
               details: {},
             },
           });
@@ -187,7 +186,7 @@ async function verifyInterviewChat(page, postBodies) {
           false,
         );
         next = "success";
-        await verifyInterviewChat(page, messages);
+        await verifyInterviewChat(page, messages, replies);
         assert.deepEqual(unexpectedPosts, []);
         console.log(
           width +

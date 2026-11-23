@@ -1,7 +1,8 @@
-"""Join three authored source feeds in SQLite; publish a deterministic catalogue."""
+"""Join the authored fictional records in SQLite; publish a deterministic catalogue."""
 import argparse
 import csv
 import json
+import math
 import os
 from pathlib import Path
 import sqlite3
@@ -20,6 +21,8 @@ CREATE TABLE roles (id TEXT PRIMARY KEY, host_id TEXT NOT NULL REFERENCES hosts(
     title TEXT NOT NULL, theme TEXT NOT NULL, summary TEXT NOT NULL, interests TEXT NOT NULL, tasks TEXT NOT NULL);
 CREATE TABLE sessions (role_id TEXT PRIMARY KEY REFERENCES roles(id), session_id TEXT UNIQUE NOT NULL,
     time TEXT NOT NULL, mode TEXT NOT NULL, stepFree TEXT NOT NULL, contactNote TEXT NOT NULL);
+CREATE TABLE case_facts (role_id TEXT PRIMARY KEY REFERENCES roles(id), slots TEXT NOT NULL,
+    distance_miles REAL, clearance TEXT NOT NULL, individual_evidence TEXT, digital_evidence TEXT);
 CREATE TABLE follow_ups (id TEXT NOT NULL REFERENCES roles(id), field TEXT NOT NULL, value TEXT NOT NULL,
     note TEXT NOT NULL, source TEXT UNIQUE NOT NULL, PRIMARY KEY(id,field));
 """
@@ -47,6 +50,24 @@ def grouped(raw):
     return [clean(part) for part in raw.split("|")]
 
 
+def case_slots(raw, availability):
+    slots = []
+    days_seen = set()
+    for item in raw.split("|") if raw else []:
+        day, period = item.split()
+        if day not in ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun") or period not in ("daytime", "evening"):
+            raise ValueError(f"Invalid case slot: {item}")
+        if (day, period) in days_seen:
+            raise ValueError(f"Repeated case slot: {item}")
+        days_seen.add((day, period))
+        slots.append({"day": day, "period": period})
+    bands = {"weekend" if day in ("Sat", "Sun") else "weekday" for day, _ in days_seen}
+    expected = {"weekday", "weekend"} if availability == "flexible" else {availability}
+    if slots and bands != expected:
+        raise ValueError(f"Case slots disagree with listed availability: {raw}, {availability}")
+    return slots
+
+
 def build(fixtures, db_path):
     with sqlite3.connect(db_path) as db:
         db.row_factory = sqlite3.Row
@@ -68,10 +89,24 @@ def build(fixtures, db_path):
         missing = db.execute("SELECT id FROM roles LEFT JOIN sessions ON roles.id=sessions.role_id WHERE role_id IS NULL").fetchall()
         if missing:
             raise ValueError(f"Missing session records: {[row['id'] for row in missing]}")
+        for row in read_csv(fixtures / "case-facts.csv"):
+            distance = float(row["distance_miles"]) if row["distance_miles"] else None
+            if distance is not None and (not math.isfinite(distance) or distance < 0):
+                raise ValueError(f"Invalid reference distance for {row['role_id']}")
+            if row["clearance"] not in ("none-listed", "required", "unknown"):
+                raise ValueError(f"Invalid clearance value for {row['role_id']}")
+            db.execute("INSERT INTO case_facts VALUES(?,?,?,?,?,?)", (
+                clean(row["role_id"]), row["slots"], distance, row["clearance"],
+                row["individual_evidence"] or None, row["digital_evidence"] or None))
+        missing_facts = db.execute("SELECT id FROM roles LEFT JOIN case_facts ON roles.id=case_facts.role_id WHERE case_facts.role_id IS NULL").fetchall()
+        if missing_facts:
+            raise ValueError(f"Missing community case facts: {[row['id'] for row in missing_facts]}")
         linked = db.execute("""
             SELECT roles.*,hosts.name AS organisation,hosts.area,sessions.session_id,sessions.time,
-                   sessions.mode,sessions.stepFree,sessions.contactNote
+                   sessions.mode,sessions.stepFree,sessions.contactNote,
+                   case_facts.slots,case_facts.distance_miles,case_facts.clearance,case_facts.individual_evidence,case_facts.digital_evidence
             FROM roles JOIN hosts ON roles.host_id=hosts.id JOIN sessions ON roles.id=sessions.role_id
+                       JOIN case_facts ON roles.id=case_facts.role_id
             ORDER BY roles.id
         """)
         opportunities = []
@@ -83,9 +118,20 @@ def build(fixtures, db_path):
                                           "time", "mode", "stepFree", "contactNote")}
             entry["interests"] = grouped(row["interests"])
             entry["tasks"] = grouped(row["tasks"])
+            if row["mode"] == "remote" and row["distance_miles"] is not None:
+                raise ValueError(f"A home-based role has no venue distance: {row['id']}")
+            for quote in (row["individual_evidence"], row["digital_evidence"]):
+                if quote and not any(quote in text for text in (entry["summary"], *entry["tasks"])):
+                    raise ValueError(f"Case preference evidence missing from listing: {row['id']}, {quote!r}")
+            entry["caseFacts"] = {
+                "slots": case_slots(row["slots"], row["time"]), "distanceMiles": row["distance_miles"],
+                "clearance": row["clearance"], "individualEvidence": row["individual_evidence"],
+                "digitalEvidence": row["digital_evidence"],
+            }
             entry["sources"] = dict.fromkeys(("id", "title", "theme", "summary", "interests", "tasks"), role_ref)
             entry["sources"].update(dict.fromkeys(("organisation", "area"), host_ref))
             entry["sources"].update(dict.fromkeys(("time", "mode", "stepFree", "contactNote"), session_ref))
+            entry["sources"]["caseFacts"] = f"case-facts.csv:{row['id']}"
             opportunities.append(entry)
         follow_ups = json.loads((fixtures / "follow-ups.json").read_text())
         by_id = {row["id"]: row for row in opportunities}
@@ -98,7 +144,7 @@ def build(fixtures, db_path):
             db.execute("INSERT INTO follow_ups VALUES(?,?,?,?,?)", [clean(update[k]) for k in ("id","field","value","note","source")])
         counts = {field: dict(sorted(Counter(row[field] for row in opportunities).items()))
                   for field in ("time","mode","stepFree","theme")}
-        return {"version":"1.1.0","provenance":"All organisations, opportunities, timings and follow-ups are fictional.",
+        return {"version":"1.2.0","provenance":"All organisations, opportunities, timings and follow-ups are fictional. Venue distances are illustrative distances from the case volunteer's fictional starting point.",
                 "summary":{"roleCount":len(opportunities),"hostCount":len(hosts),"counts":counts},
                 "opportunities":opportunities,"followUps":follow_ups}
 

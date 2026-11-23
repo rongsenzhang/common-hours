@@ -1,8 +1,11 @@
 import { escapeText as e } from "./html.js";
+import { communityRoleFacts, discoverCaseFromHash, profileFromCommunityForm, renderCommunityCases } from "./community-case-view.js";
 import { matchOpportunities } from "./engine.js";
 import { icon, mark } from "./icons.js";
+import { communityCaseId, matchCommunityCase } from "./community-case.js";
+import { exerciseProfile } from "./exercise-engine.js";
 import { answerVolunteerQuestion } from "./assistant.js";
-import { askExercise, isExerciseChatRequest } from "./exercise-chat.js";
+import { askExercise } from "./exercise-chat.js";
 import { renderChat } from "./chat-view.js";
 import { mountExercise } from "./exercise-view.js";
 import {
@@ -40,6 +43,7 @@ let liveRequest = null;
 let chatError = "";
 let leaveExercise;
 let catalogueRequest;
+let communityConditions;
 function activeChat() {
   return chats[page === "ask-exercise" ? "exercise" : chatMode];
 }
@@ -163,7 +167,7 @@ function selectHtml(name, title, options) {
 }
 function filterHtml() {
   return `<aside class="filters" aria-label="Search preferences"><div class="filter-head"><div>${icon("filter", 20)}<h2>Your preferences</h2></div><button class="mobile-filter" type="button" data-filter-toggle aria-expanded="${expandedFilters}">${expandedFilters ? "Hide" : "Edit"}</button></div>
- <form id="pref-form" class="${expandedFilters ? "is-open" : ""}"><label class="field">Interests or skills<span class="input-wrap">${icon("search", 17)}<input type="search" name="query" maxlength="180" placeholder="e.g. growing food" value="${e(prefs.query)}"></span></label>
+ <form id="pref-form" class="${expandedFilters ? "is-open" : ""}"><label class="field">Interests or skills<span class="input-wrap">${icon("search", 17)}<input type="search" name="query" maxlength="1200" placeholder="e.g. growing food or Case A" value="${e(prefs.query)}"></span></label>
  ${selectHtml("time", "Availability", [
    ["any", "Any time"],
    ["weekday", "Weekdays"],
@@ -239,9 +243,16 @@ function showResults() {
  }</section>`;
 }
 function discover() {
-  return (
-    hero() + '<div class="directory">' + filterHtml() + showResults() + "</div>"
-  );
+  const caseId = discoverCaseFromHash(location.hash);
+  return hero() + renderCommunityCases(catalog.opportunities, caseId, communityConditions)
+    + '<div class="directory">' + filterHtml() + showResults() + "</div>";
+}
+function focusCommunityCase() {
+  const heading = main.querySelector("#community-case-shortlist");
+  if (!heading) return false;
+  heading.focus({preventScroll: true});
+  main.querySelector("#community-cases").scrollIntoView({block: "start"});
+  return true;
 }
 function refreshResults() {
   const target = document.querySelector("#results");
@@ -269,16 +280,10 @@ function render(scroll = false) {
     main.innerHTML = '<p class="loading">Opening the volunteer catalogue…</p>';
     catalogueRequest ??= openCatalogue();
   }
-  if (scroll) {
+  if (scroll && !focusCommunityCase()) {
     main.focus({ preventScroll: true });
     window.scrollTo(0, 0);
   }
-}
-function selectChatSource(source) {
-  const destination = source === "exercise" ? "ask-exercise" : "ask";
-  if (page === destination) return;
-  history.pushState(null, "", "#" + destination);
-  render();
 }
 function detail(id) {
   const r = catalog.opportunities.find((x) => x.id === id);
@@ -295,7 +300,7 @@ function detail(id) {
   dialog.innerHTML = `<div class="modal-head"><span class="themelabel"><span class="tile ${e(r.theme)}">${icon(t[0], 22)}</span>${e(t[1])}</span><button autofocus class="close" aria-label="Close role details" data-close>${icon("close")}</button></div>
  <h2 id="dialog-title">${e(r.title)}</h2><p class="org">${e(r.organisation)} · ${e(r.area)}</p><p>${e(r.summary)}</p>
  <h3>What you would do</h3><ul>${r.tasks.map((x) => "<li>" + e(x) + "</li>").join("")}</ul>
- <h3>Role details</h3><dl class="fact-grid">${fields.map((f) => "<div><dt>" + e(labels[f]) + "</dt><dd>" + e(f === "stepFree" && r.mode === "remote" ? "No venue visit" : labels[r[f]]) + "</dd></div>").join("")}</dl>
+ <h3>Role details</h3><dl class="fact-grid">${fields.map((f) => "<div><dt>" + e(labels[f]) + "</dt><dd>" + e(f === "stepFree" && r.mode === "remote" ? "No venue visit" : labels[r[f]]) + "</dd></div>").join("")}${communityRoleFacts(r)}</dl>
  ${r.contactNote ? "<h3>Before you take part</h3><p>" + e(r.contactNote) + "</p>" : ""}
  ${qs.length ? `<div class="question"><h3>What to ask the organiser</h3>${qs.map((q) => "<p>" + e(q.question) + "</p>").join("")}</div>` : ""}
  <div class="modal-foot"><button class="primary" data-dialog-save="${e(id)}">${icon("save", 17)} ${saved.has(id) ? "Remove from saved" : "Save role"}</button></div>`;
@@ -310,11 +315,6 @@ function toggleSaved(id) {
 async function ask(message) {
   const input = message.trim();
   if (!input || liveRequest) return;
-  // Route a pasted recruitment case before constructing any external request.
-  if (page === "ask" && isExerciseChatRequest(input)) {
-    activeChat().draft = "";
-    selectChatSource("exercise");
-  }
   const chat = activeChat();
   chat.draft = "";
   let reply;
@@ -346,8 +346,23 @@ async function ask(message) {
     if (liveRequest !== request) return;
     liveRequest = null;
   } else {
-    reply = answerVolunteerQuestion(input, catalog.opportunities, chat.state);
-    chat.state = reply.state;
+    const caseId = communityCaseId(input);
+    if (caseId) {
+      const result = matchCommunityCase(catalog.opportunities, exerciseProfile(caseId));
+      const confirmed = result.recommendations;
+      const pending = result.pending.slice(0, 3);
+      reply = {
+        text: `Case ${caseId} checked against ${catalog.opportunities.length} community roles on this device. ${confirmed.length ? "These are the strongest evidenced matches." : "No confirmed match for these conditions."} Open Discover to adjust the case conditions.`,
+        matches: confirmed.map(row => row.role.id),
+        toConfirm: pending.map(row => row.role.id),
+        details: Object.fromEntries([...confirmed, ...pending].map(row => [row.role.id, row.reasons.join(" ")])),
+        caseId,
+      };
+      chat.state = null;
+    } else {
+      reply = answerVolunteerQuestion(input, catalog.opportunities, chat.state);
+      chat.state = reply.state;
+    }
   }
   chat.turns.push({ input, reply });
   updateChat(true);
@@ -356,6 +371,14 @@ async function ask(message) {
     ?.scrollIntoView({ block: "nearest" });
   announce(page === "ask-exercise" ? reply.reply : reply.text);
 }
+document.addEventListener("paste", (ev) => {
+  const input = ev.target;
+  if (!input.matches('#pref-form input[name=query]') || !ev.clipboardData) return;
+  const pasted = ev.clipboardData.getData("text/plain");
+  if (!/[\r\n]/.test(pasted) || !communityCaseId(pasted)) return;
+  ev.preventDefault();
+  input.setRangeText(pasted.replace(/\s+/g, " ").trim(), input.selectionStart, input.selectionEnd, "end");
+});
 document.addEventListener("input", (ev) => {
   if (ev.target.id === "chat-input") activeChat().draft = ev.target.value;
 });
@@ -366,13 +389,6 @@ document.addEventListener("keydown", (ev) => {
   }
 });
 document.addEventListener("change", (ev) => {
-  if (ev.target.name === "chat-source") {
-    const source = ev.target.value;
-    if (source !== "exercise" && source !== "community") return;
-    selectChatSource(source);
-    main.querySelector(`[name="chat-source"][value="${source}"]`)?.focus();
-    return;
-  }
   if (ev.target.name !== "chat-mode" || !endpoint) return;
   const mode = ev.target.value;
   if (!["live", "local"].includes(mode) || mode === chatMode) return;
@@ -382,6 +398,13 @@ document.addEventListener("change", (ev) => {
   main.querySelector(`[name="chat-mode"][value="${mode}"]`)?.focus();
 });
 document.addEventListener("click", (ev) => {
+  const activePreset = ev.target.closest(".community-case-links a[aria-current]");
+  if (activePreset && !ev.ctrlKey && !ev.metaKey && !ev.shiftKey && !ev.altKey) {
+    ev.preventDefault();
+    communityConditions = undefined;
+    render(true);
+    return;
+  }
   const b = ev.target.closest("button");
   if (!b) return;
   const d = b.dataset;
@@ -467,25 +490,54 @@ document.addEventListener("submit", (ev) => {
     ask(String(new FormData(ev.target).get("message") || ""));
     return;
   }
+  if (ev.target.id === "community-case-form") {
+    ev.preventDefault();
+    const caseId = discoverCaseFromHash(location.hash);
+    if (!caseId) return;
+    communityConditions = profileFromCommunityForm(caseId, new FormData(ev.target));
+    main.querySelector("#community-cases").outerHTML = renderCommunityCases(catalog.opportunities, caseId, communityConditions);
+    focusCommunityCase();
+    announce("Community shortlist updated.");
+    return;
+  }
   if (ev.target.id !== "pref-form") return;
   ev.preventDefault();
   const f = new FormData(ev.target);
+  const query = String(f.get("query") || "").trim();
+  const caseId = communityCaseId(query);
+  if (caseId) {
+    const target = "#discover-case-" + caseId.toLowerCase();
+    if (location.hash === target) {
+      communityConditions = undefined;
+      render(true);
+    } else location.hash = target;
+    return;
+  }
+  const wasCase = Boolean(discoverCaseFromHash(location.hash));
+  if (wasCase) {
+    history.replaceState(null, "", "#discover");
+    communityConditions = undefined;
+  }
   prefs = {
-    query: String(f.get("query") || "").trim(),
+    query,
     time: f.get("time"),
     mode: f.get("mode"),
     stepFree: f.has("stepFree"),
   };
   resultLimit = 6;
   section = "matches";
-  refreshResults();
+  if (wasCase) render();
+  else refreshResults();
   const r = ranking();
   announce(r.matches.length + " matches, " + r.review.length + " to confirm.");
-  if (matchMedia("(max-width:760px)").matches)
+  if (wasCase || matchMedia("(max-width:760px)").matches)
     main.querySelector("#results").scrollIntoView();
 });
 window.addEventListener("hashchange", () => {
-  if (location.hash !== "#main") render(true);
+  if (location.hash !== "#main") {
+    communityConditions = undefined;
+    render(true);
+  }
 });
 async function loadJson(file) {
   const response = await fetch("./data/" + file);
@@ -502,7 +554,10 @@ async function openCatalogue() {
     ]);
     endpoint = chatEndpoint(config, location.href);
     chatMode = endpoint ? "live" : "local";
-    if (page === "ask" || page === "discover") main.innerHTML = page === "ask" ? chatContents() : discover();
+    if (page === "ask" || page === "discover") {
+      main.innerHTML = page === "ask" ? chatContents() : discover();
+      if (page === "discover") focusCommunityCase();
+    }
   } catch {
     if (page === "ask" || page === "discover") main.innerHTML =
       '<div class="empty"><h1>The catalogue could not open</h1><p>Reload the page to try again, or <a href="#ask-exercise">open the interview cases</a>.</p></div>';

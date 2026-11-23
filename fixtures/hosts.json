@@ -11,5 +11,20 @@
   {"id":"habitat","name":"Hedge & Hollow Club","area":"Didsbury"},
   {"id":"paw-yard","name":"Willow Yard Animal Shelter","area":"Wythenshawe"},
   {"id":"pet-circle","name":"Neighbourhood Pet Circle","area":"Withington"},
-  {"id":"cycle-shed","name":"Fern Street Cycle Shed","area":"Hulme"}
+  {"id":"cycle-shed","name":"Fern Street Cycle Shed","area":"Hulme"},
+  {"id": "link-room", "name": "Copper Link Room", "area": "Salford"},
+  {"id": "route-desk", "name": "Corner Route Exchange", "area": "Hulme"},
+  {"id": "sound-bench", "name": "Millgate Sound Bench", "area": "Oldham"},
+  {"id": "textile", "name": "Shuttle Street Makers", "area": "Rochdale"},
+  {"id": "waterclub", "name": "Brookbend Water Club", "area": "Trafford"},
+  {"id": "playhall", "name": "Mosaic Play Hall", "area": "Stockport"},
+  {"id": "theatre", "name": "Curtain Yard Players", "area": "Bolton"},
+  {"id": "museum", "name": "Clockface Heritage Room", "area": "Wigan"},
+  {"id": "library-loans", "name": "Turnleaf Lending Room", "area": "Bury"},
+  {"id": "accessible-sport", "name": "Sidegate Sport Collective", "area": "Tameside"},
+  {"id": "music", "name": "Red Spool Music Circle", "area": "Manchester"},
+  {"id": "reuse", "name": "Roundhouse Reuse Store", "area": "Salford"},
+  {"id": "lang", "name": "Two Tables Language Club", "area": "Rusholme"},
+  {"id": "table", "name": "Elm Table Collective", "area": "Longsight"},
+  {"id": "town-guide", "name": "Beech Corner Neighbours", "area": "Stockport"}
 ]

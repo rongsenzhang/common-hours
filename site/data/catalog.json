@@ -1,42 +1,138 @@
 {
-  "version": "1.1.0",
-  "provenance": "All organisations, opportunities, timings and follow-ups are fictional.",
+  "version": "1.2.0",
+  "provenance": "All organisations, opportunities, timings and follow-ups are fictional. Venue distances are illustrative distances from the case volunteer's fictional starting point.",
   "summary": {
-    "roleCount": 19,
-    "hostCount": 13,
+    "roleCount": 100,
+    "hostCount": 28,
     "counts": {
       "time": {
-        "flexible": 3,
+        "flexible": 6,
         "unknown": 1,
-        "weekday": 7,
-        "weekend": 8
+        "weekday": 63,
+        "weekend": 30
       },
       "mode": {
-        "hybrid": 1,
-        "onsite": 13,
-        "remote": 4,
+        "hybrid": 5,
+        "onsite": 69,
+        "remote": 25,
         "unknown": 1
       },
       "stepFree": {
-        "na": 4,
-        "no": 2,
-        "unknown": 3,
-        "yes": 10
+        "na": 25,
+        "no": 4,
+        "unknown": 5,
+        "yes": 66
       },
       "theme": {
         "animals": 3,
-        "arts": 3,
-        "community": 3,
-        "digital": 2,
-        "food": 2,
+        "arts": 22,
+        "community": 18,
+        "digital": 11,
+        "food": 8,
         "growing": 2,
-        "learning": 1,
-        "nature": 2,
-        "repair": 1
+        "learning": 13,
+        "nature": 11,
+        "repair": 12
       }
     }
   },
   "opportunities": [
+    {
+      "id": "accessible-map-checker",
+      "title": "Venue map label checker",
+      "organisation": "Corner Route Exchange",
+      "area": "Hulme",
+      "theme": "community",
+      "summary": "Compare drafted venue maps with approved floor plans and flag unclear symbols.",
+      "time": "weekday",
+      "mode": "hybrid",
+      "stepFree": "yes",
+      "contactNote": "The same plans are available online and at the project desk.",
+      "interests": [
+        "accessibility",
+        "mapping",
+        "checking"
+      ],
+      "tasks": [
+        "Match entrances to labels",
+        "Flag a missing lift symbol"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 1.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:accessible-map-checker",
+        "title": "roles.csv:accessible-map-checker",
+        "theme": "roles.csv:accessible-map-checker",
+        "summary": "roles.csv:accessible-map-checker",
+        "interests": "roles.csv:accessible-map-checker",
+        "tasks": "roles.csv:accessible-map-checker",
+        "organisation": "hosts.json:route-desk",
+        "area": "hosts.json:route-desk",
+        "time": "sessions.csv:S75",
+        "mode": "sessions.csv:S75",
+        "stepFree": "sessions.csv:S75",
+        "contactNote": "sessions.csv:S75",
+        "caseFacts": "case-facts.csv:accessible-map-checker"
+      }
+    },
+    {
+      "id": "allergen-label-reader",
+      "title": "Menu label proofreader",
+      "organisation": "Elm Table Collective",
+      "area": "Longsight",
+      "theme": "food",
+      "summary": "Compare printed menu labels against an approved ingredient sheet and flag discrepancies to the kitchen lead.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The kitchen lead approves and signs all final labels.",
+      "interests": [
+        "food",
+        "checking",
+        "writing"
+      ],
+      "tasks": [
+        "Match label names",
+        "Underline missing ingredient lines"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.2,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:allergen-label-reader",
+        "title": "roles.csv:allergen-label-reader",
+        "theme": "roles.csv:allergen-label-reader",
+        "summary": "roles.csv:allergen-label-reader",
+        "interests": "roles.csv:allergen-label-reader",
+        "tasks": "roles.csv:allergen-label-reader",
+        "organisation": "hosts.json:table",
+        "area": "hosts.json:table",
+        "time": "sessions.csv:S67",
+        "mode": "sessions.csv:S67",
+        "stepFree": "sessions.csv:S67",
+        "contactNote": "sessions.csv:S67",
+        "caseFacts": "case-facts.csv:allergen-label-reader"
+      }
+    },
     {
       "id": "animal-supply-sorter",
       "title": "Animal shelter supply sorter",
@@ -56,6 +152,18 @@
         "Sort clean blankets",
         "Label supply boxes"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.2,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:animal-supply-sorter",
         "title": "roles.csv:animal-supply-sorter",
@@ -68,7 +176,8 @@
         "time": "sessions.csv:S18",
         "mode": "sessions.csv:S18",
         "stepFree": "sessions.csv:S18",
-        "contactNote": "sessions.csv:S18"
+        "contactNote": "sessions.csv:S18",
+        "caseFacts": "case-facts.csv:animal-supply-sorter"
       }
     },
     {
@@ -90,6 +199,22 @@
         "Transcribe letters",
         "Check historical names"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          },
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:archive-transcriber",
         "title": "roles.csv:archive-transcriber",
@@ -102,7 +227,396 @@
         "time": "sessions.csv:S06",
         "mode": "sessions.csv:S06",
         "stepFree": "sessions.csv:S06",
-        "contactNote": "sessions.csv:S06"
+        "contactNote": "sessions.csv:S06",
+        "caseFacts": "case-facts.csv:archive-transcriber"
+      }
+    },
+    {
+      "id": "audio-level-checker",
+      "title": "Spoken recording quality checker",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Listen for inaudible words and abrupt changes in volume in short spoken recordings.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Headphones and sample clips are needed.",
+      "interests": [
+        "audio",
+        "listening",
+        "quality"
+      ],
+      "tasks": [
+        "Compare two takes",
+        "Log the time of an unclear passage"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:audio-level-checker",
+        "title": "roles.csv:audio-level-checker",
+        "theme": "roles.csv:audio-level-checker",
+        "summary": "roles.csv:audio-level-checker",
+        "interests": "roles.csv:audio-level-checker",
+        "tasks": "roles.csv:audio-level-checker",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S44",
+        "mode": "sessions.csv:S44",
+        "stepFree": "sessions.csv:S44",
+        "contactNote": "sessions.csv:S44",
+        "caseFacts": "case-facts.csv:audio-level-checker"
+      }
+    },
+    {
+      "id": "banner-letter-maker",
+      "title": "Community banner letter maker",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Cut and arrange felt letters for a neighbourhood celebration banner.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The organisers supply the wording and materials.",
+      "interests": [
+        "craft",
+        "design",
+        "events"
+      ],
+      "tasks": [
+        "Trace large letters",
+        "Pin the layout to a backing panel"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:banner-letter-maker",
+        "title": "roles.csv:banner-letter-maker",
+        "theme": "roles.csv:banner-letter-maker",
+        "summary": "roles.csv:banner-letter-maker",
+        "interests": "roles.csv:banner-letter-maker",
+        "tasks": "roles.csv:banner-letter-maker",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S53",
+        "mode": "sessions.csv:S53",
+        "stepFree": "sessions.csv:S53",
+        "contactNote": "sessions.csv:S53",
+        "caseFacts": "case-facts.csv:banner-letter-maker"
+      }
+    },
+    {
+      "id": "boccia-score-helper",
+      "title": "Boccia score table helper",
+      "organisation": "Sidegate Sport Collective",
+      "area": "Tameside",
+      "theme": "community",
+      "summary": "Record round scores called by the session leader during a community boccia evening.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A referee makes all scoring decisions.",
+      "interests": [
+        "sport",
+        "counting",
+        "events"
+      ],
+      "tasks": [
+        "Prepare score sheets",
+        "Read back the round total"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.5,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:boccia-score-helper",
+        "title": "roles.csv:boccia-score-helper",
+        "theme": "roles.csv:boccia-score-helper",
+        "summary": "roles.csv:boccia-score-helper",
+        "interests": "roles.csv:boccia-score-helper",
+        "tasks": "roles.csv:boccia-score-helper",
+        "organisation": "hosts.json:accessible-sport",
+        "area": "hosts.json:accessible-sport",
+        "time": "sessions.csv:S81",
+        "mode": "sessions.csv:S81",
+        "stepFree": "sessions.csv:S81",
+        "contactNote": "sessions.csv:S81",
+        "caseFacts": "case-facts.csv:boccia-score-helper"
+      }
+    },
+    {
+      "id": "book-bundle-curator",
+      "title": "Beginner book bundle curator",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Choose short books with clear print for learners borrowing a first reading bundle.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A tutor gives a reading-level guide.",
+      "interests": [
+        "literacy",
+        "organising",
+        "books"
+      ],
+      "tasks": [
+        "Match texts by reading level",
+        "Write a one-line introduction"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:book-bundle-curator",
+        "title": "roles.csv:book-bundle-curator",
+        "theme": "roles.csv:book-bundle-curator",
+        "summary": "roles.csv:book-bundle-curator",
+        "interests": "roles.csv:book-bundle-curator",
+        "tasks": "roles.csv:book-bundle-curator",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S34",
+        "mode": "sessions.csv:S34",
+        "stepFree": "sessions.csv:S34",
+        "contactNote": "sessions.csv:S34",
+        "caseFacts": "case-facts.csv:book-bundle-curator"
+      }
+    },
+    {
+      "id": "bookplate-designer",
+      "title": "Loan collection bookplate designer",
+      "organisation": "Turnleaf Lending Room",
+      "area": "Bury",
+      "theme": "learning",
+      "summary": "Create simple bookplate designs from a supplied brief for donated reading collections.",
+      "time": "flexible",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The collection lead reviews draft designs.",
+      "interests": [
+        "design",
+        "books",
+        "art"
+      ],
+      "tasks": [
+        "Sketch two designs",
+        "Check that text is readable"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "evening"
+          },
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:bookplate-designer",
+        "title": "roles.csv:bookplate-designer",
+        "theme": "roles.csv:bookplate-designer",
+        "summary": "roles.csv:bookplate-designer",
+        "interests": "roles.csv:bookplate-designer",
+        "tasks": "roles.csv:bookplate-designer",
+        "organisation": "hosts.json:library-loans",
+        "area": "hosts.json:library-loans",
+        "time": "sessions.csv:S100",
+        "mode": "sessions.csv:S100",
+        "stepFree": "sessions.csv:S100",
+        "contactNote": "sessions.csv:S100",
+        "caseFacts": "case-facts.csv:bookplate-designer"
+      }
+    },
+    {
+      "id": "bus-app-coach",
+      "title": "Journey app coach",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Sit one to one with a visitor to teach journey planning on a travel app using a test journey.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Loan tablets are available at the drop-in desk.",
+      "interests": [
+        "teaching",
+        "digital",
+        "travel"
+      ],
+      "tasks": [
+        "Enter a sample destination",
+        "Compare two departure times"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.0,
+        "clearance": "none-listed",
+        "individualEvidence": "one to one",
+        "digitalEvidence": "teach journey planning on a travel app"
+      },
+      "sources": {
+        "id": "roles.csv:bus-app-coach",
+        "title": "roles.csv:bus-app-coach",
+        "theme": "roles.csv:bus-app-coach",
+        "summary": "roles.csv:bus-app-coach",
+        "interests": "roles.csv:bus-app-coach",
+        "tasks": "roles.csv:bus-app-coach",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S21",
+        "mode": "sessions.csv:S21",
+        "stepFree": "sessions.csv:S21",
+        "contactNote": "sessions.csv:S21",
+        "caseFacts": "case-facts.csv:bus-app-coach"
+      }
+    },
+    {
+      "id": "bus-stop-sign-reader",
+      "title": "Bus stop sign surveyor",
+      "organisation": "Corner Route Exchange",
+      "area": "Hulme",
+      "theme": "community",
+      "summary": "Record whether local bus stop signs can be read from a marked viewing point.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "The coordinator can discuss the survey route.",
+      "interests": [
+        "travel",
+        "accessibility",
+        "survey"
+      ],
+      "tasks": [
+        "Follow the agreed survey route",
+        "Note obstructed signs"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 1.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:bus-stop-sign-reader",
+        "title": "roles.csv:bus-stop-sign-reader",
+        "theme": "roles.csv:bus-stop-sign-reader",
+        "summary": "roles.csv:bus-stop-sign-reader",
+        "interests": "roles.csv:bus-stop-sign-reader",
+        "tasks": "roles.csv:bus-stop-sign-reader",
+        "organisation": "hosts.json:route-desk",
+        "area": "hosts.json:route-desk",
+        "time": "sessions.csv:S74",
+        "mode": "sessions.csv:S74",
+        "stepFree": "sessions.csv:S74",
+        "contactNote": "sessions.csv:S74",
+        "caseFacts": "case-facts.csv:bus-stop-sign-reader"
+      }
+    },
+    {
+      "id": "canal-sample-steward",
+      "title": "Canal sample kit steward",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Prepare labelled containers and recording sheets for a supervised water sampling team.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The steward works onshore at the kit desk.",
+      "interests": [
+        "environment",
+        "equipment",
+        "organising"
+      ],
+      "tasks": [
+        "Number sample bottles",
+        "Match sheets to kit labels"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:canal-sample-steward",
+        "title": "roles.csv:canal-sample-steward",
+        "theme": "roles.csv:canal-sample-steward",
+        "summary": "roles.csv:canal-sample-steward",
+        "interests": "roles.csv:canal-sample-steward",
+        "tasks": "roles.csv:canal-sample-steward",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S64",
+        "mode": "sessions.csv:S64",
+        "stepFree": "sessions.csv:S64",
+        "contactNote": "sessions.csv:S64",
+        "caseFacts": "case-facts.csv:canal-sample-steward"
       }
     },
     {
@@ -124,6 +638,18 @@
         "Edit captions",
         "Check transcripts"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:caption-editor",
         "title": "roles.csv:caption-editor",
@@ -136,7 +662,247 @@
         "time": "sessions.csv:S15",
         "mode": "sessions.csv:S15",
         "stepFree": "sessions.csv:S15",
-        "contactNote": "sessions.csv:S15"
+        "contactNote": "sessions.csv:S15",
+        "caseFacts": "case-facts.csv:caption-editor"
+      }
+    },
+    {
+      "id": "choir-score-librarian",
+      "title": "Choir score librarian",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Keep the community choir's printed music in order and issue folders for rehearsals.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Music folders fit on a seated worktable.",
+      "interests": [
+        "music",
+        "organising"
+      ],
+      "tasks": [
+        "Number spare copies",
+        "Record returned folders"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 5.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:choir-score-librarian",
+        "title": "roles.csv:choir-score-librarian",
+        "theme": "roles.csv:choir-score-librarian",
+        "summary": "roles.csv:choir-score-librarian",
+        "interests": "roles.csv:choir-score-librarian",
+        "tasks": "roles.csv:choir-score-librarian",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S40",
+        "mode": "sessions.csv:S40",
+        "stepFree": "sessions.csv:S40",
+        "contactNote": "sessions.csv:S40",
+        "caseFacts": "case-facts.csv:choir-score-librarian"
+      }
+    },
+    {
+      "id": "coffee-kit-sorter",
+      "title": "Coffee morning kit organiser",
+      "organisation": "Elm Table Collective",
+      "area": "Longsight",
+      "theme": "food",
+      "summary": "Pack clean cups and stirrers into labelled crates before community breakfasts.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A staff member moves full crates.",
+      "interests": [
+        "hospitality",
+        "organising",
+        "equipment"
+      ],
+      "tasks": [
+        "Count cups per crate",
+        "Label the return boxes"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.2,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:coffee-kit-sorter",
+        "title": "roles.csv:coffee-kit-sorter",
+        "theme": "roles.csv:coffee-kit-sorter",
+        "summary": "roles.csv:coffee-kit-sorter",
+        "interests": "roles.csv:coffee-kit-sorter",
+        "tasks": "roles.csv:coffee-kit-sorter",
+        "organisation": "hosts.json:table",
+        "area": "hosts.json:table",
+        "time": "sessions.csv:S69",
+        "mode": "sessions.csv:S69",
+        "stepFree": "sessions.csv:S69",
+        "contactNote": "sessions.csv:S69",
+        "caseFacts": "case-facts.csv:coffee-kit-sorter"
+      }
+    },
+    {
+      "id": "community-tea-steward",
+      "title": "Community tea station steward",
+      "organisation": "Elm Table Collective",
+      "area": "Longsight",
+      "theme": "food",
+      "summary": "Lay out cups and refill the tea flasks at a neighbourhood lunch.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The lunch lead manages food preparation.",
+      "interests": [
+        "drinks",
+        "hospitality",
+        "organising"
+      ],
+      "tasks": [
+        "Set out sugar and milk",
+        "Wash the empty flasks"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.2,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:community-tea-steward",
+        "title": "roles.csv:community-tea-steward",
+        "theme": "roles.csv:community-tea-steward",
+        "summary": "roles.csv:community-tea-steward",
+        "interests": "roles.csv:community-tea-steward",
+        "tasks": "roles.csv:community-tea-steward",
+        "organisation": "hosts.json:table",
+        "area": "hosts.json:table",
+        "time": "sessions.csv:S65",
+        "mode": "sessions.csv:S65",
+        "stepFree": "sessions.csv:S65",
+        "contactNote": "sessions.csv:S65",
+        "caseFacts": "case-facts.csv:community-tea-steward"
+      }
+    },
+    {
+      "id": "costume-rail-helper",
+      "title": "Costume rail helper",
+      "organisation": "Curtain Yard Players",
+      "area": "Bolton",
+      "theme": "arts",
+      "summary": "Organise labelled costumes in performance order before the dress rehearsal.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A rehearsal assistant works alongside the volunteer.",
+      "interests": [
+        "theatre",
+        "organising",
+        "textiles"
+      ],
+      "tasks": [
+        "Check change labels",
+        "Add dividers between scenes"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 5.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:costume-rail-helper",
+        "title": "roles.csv:costume-rail-helper",
+        "theme": "roles.csv:costume-rail-helper",
+        "summary": "roles.csv:costume-rail-helper",
+        "interests": "roles.csv:costume-rail-helper",
+        "tasks": "roles.csv:costume-rail-helper",
+        "organisation": "hosts.json:theatre",
+        "area": "hosts.json:theatre",
+        "time": "sessions.csv:S90",
+        "mode": "sessions.csv:S90",
+        "stepFree": "sessions.csv:S90",
+        "contactNote": "sessions.csv:S90",
+        "caseFacts": "case-facts.csv:costume-rail-helper"
+      }
+    },
+    {
+      "id": "crossing-survey-counter",
+      "title": "Crossing survey counter",
+      "organisation": "Corner Route Exchange",
+      "area": "Hulme",
+      "theme": "community",
+      "summary": "Count pedestrian crossing cycles with a survey partner during a timed street observation.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "The observation point is outside on the pavement.",
+      "interests": [
+        "travel",
+        "survey",
+        "data"
+      ],
+      "tasks": [
+        "Time each signal phase",
+        "Enter the observation totals"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 1.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:crossing-survey-counter",
+        "title": "roles.csv:crossing-survey-counter",
+        "theme": "roles.csv:crossing-survey-counter",
+        "summary": "roles.csv:crossing-survey-counter",
+        "interests": "roles.csv:crossing-survey-counter",
+        "tasks": "roles.csv:crossing-survey-counter",
+        "organisation": "hosts.json:route-desk",
+        "area": "hosts.json:route-desk",
+        "time": "sessions.csv:S77",
+        "mode": "sessions.csv:S77",
+        "stepFree": "sessions.csv:S77",
+        "contactNote": "sessions.csv:S77",
+        "caseFacts": "case-facts.csv:crossing-survey-counter"
       }
     },
     {
@@ -158,6 +924,18 @@
         "Label helmets",
         "Check the bicycle inventory"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 1.9,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:cycle-workshop",
         "title": "roles.csv:cycle-workshop",
@@ -170,7 +948,56 @@
         "time": "sessions.csv:S19",
         "mode": "sessions.csv:S19",
         "stepFree": "sessions.csv:S19",
-        "contactNote": "sessions.csv:S19"
+        "contactNote": "sessions.csv:S19",
+        "caseFacts": "case-facts.csv:cycle-workshop"
+      }
+    },
+    {
+      "id": "device-loan-auditor",
+      "title": "Device loan inventory helper",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Check the loan register against labelled tablets before they return to circulation.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host provides the stock sheet and a seated station.",
+      "interests": [
+        "digital",
+        "organising",
+        "equipment"
+      ],
+      "tasks": [
+        "Compare asset numbers",
+        "List missing charging cables"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.0,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:device-loan-auditor",
+        "title": "roles.csv:device-loan-auditor",
+        "theme": "roles.csv:device-loan-auditor",
+        "summary": "roles.csv:device-loan-auditor",
+        "interests": "roles.csv:device-loan-auditor",
+        "tasks": "roles.csv:device-loan-auditor",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S28",
+        "mode": "sessions.csv:S28",
+        "stepFree": "sessions.csv:S28",
+        "contactNote": "sessions.csv:S28",
+        "caseFacts": "case-facts.csv:device-loan-auditor"
       }
     },
     {
@@ -192,6 +1019,18 @@
         "Practise email",
         "Explain device settings"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.6,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": "Show library visitors how to use a smartphone"
+      },
       "sources": {
         "id": "roles.csv:digital-helper",
         "title": "roles.csv:digital-helper",
@@ -204,7 +1043,587 @@
         "time": "sessions.csv:S03",
         "mode": "sessions.csv:S03",
         "stepFree": "sessions.csv:S03",
-        "contactNote": "sessions.csv:S03"
+        "contactNote": "sessions.csv:S03",
+        "caseFacts": "case-facts.csv:digital-helper"
+      }
+    },
+    {
+      "id": "display-caption-reader",
+      "title": "Museum caption reader",
+      "organisation": "Clockface Heritage Room",
+      "area": "Wigan",
+      "theme": "arts",
+      "summary": "Check draft display captions against the approved object descriptions and flag ambiguous wording.",
+      "time": "weekday",
+      "mode": "hybrid",
+      "stepFree": "yes",
+      "contactNote": "Both the gallery desk and home sessions use the same text.",
+      "interests": [
+        "heritage",
+        "writing",
+        "accessibility"
+      ],
+      "tasks": [
+        "Read a caption aloud",
+        "Note an unexplained term"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 6.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:display-caption-reader",
+        "title": "roles.csv:display-caption-reader",
+        "theme": "roles.csv:display-caption-reader",
+        "summary": "roles.csv:display-caption-reader",
+        "interests": "roles.csv:display-caption-reader",
+        "tasks": "roles.csv:display-caption-reader",
+        "organisation": "hosts.json:museum",
+        "area": "hosts.json:museum",
+        "time": "sessions.csv:S94",
+        "mode": "sessions.csv:S94",
+        "stepFree": "sessions.csv:S94",
+        "contactNote": "sessions.csv:S94",
+        "caseFacts": "case-facts.csv:display-caption-reader"
+      }
+    },
+    {
+      "id": "email-practice-partner",
+      "title": "Email practice partner",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Meet one adult at a time on a video call to practise email attachments using demonstration files.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The host sends practice files before the call.",
+      "interests": [
+        "teaching",
+        "digital",
+        "email"
+      ],
+      "tasks": [
+        "Attach a sample photo",
+        "Help the learner find a sent message"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": "one adult at a time",
+        "digitalEvidence": "practise email attachments"
+      },
+      "sources": {
+        "id": "roles.csv:email-practice-partner",
+        "title": "roles.csv:email-practice-partner",
+        "theme": "roles.csv:email-practice-partner",
+        "summary": "roles.csv:email-practice-partner",
+        "interests": "roles.csv:email-practice-partner",
+        "tasks": "roles.csv:email-practice-partner",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S20",
+        "mode": "sessions.csv:S20",
+        "stepFree": "sessions.csv:S20",
+        "contactNote": "sessions.csv:S20",
+        "caseFacts": "case-facts.csv:email-practice-partner"
+      }
+    },
+    {
+      "id": "english-idioms-annotator",
+      "title": "Everyday phrases annotator",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Write plain-English examples of common phrases for the club's teaching booklet.",
+      "time": "flexible",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Drafts are reviewed by the session tutor.",
+      "interests": [
+        "writing",
+        "languages",
+        "education"
+      ],
+      "tasks": [
+        "Draft a sample sentence",
+        "Review the tutor's edits"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          },
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:english-idioms-annotator",
+        "title": "roles.csv:english-idioms-annotator",
+        "theme": "roles.csv:english-idioms-annotator",
+        "summary": "roles.csv:english-idioms-annotator",
+        "interests": "roles.csv:english-idioms-annotator",
+        "tasks": "roles.csv:english-idioms-annotator",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S37",
+        "mode": "sessions.csv:S37",
+        "stepFree": "sessions.csv:S37",
+        "contactNote": "sessions.csv:S37",
+        "caseFacts": "case-facts.csv:english-idioms-annotator"
+      }
+    },
+    {
+      "id": "event-listings-editor",
+      "title": "Community listings editor",
+      "organisation": "Beech Corner Neighbours",
+      "area": "Stockport",
+      "theme": "community",
+      "summary": "Check contributed event descriptions for a neighbourhood notice sheet.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Hosts check their listings before printing.",
+      "interests": [
+        "writing",
+        "community",
+        "editing"
+      ],
+      "tasks": [
+        "Confirm the listed opening time",
+        "Shorten a notice for print"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:event-listings-editor",
+        "title": "roles.csv:event-listings-editor",
+        "theme": "roles.csv:event-listings-editor",
+        "summary": "roles.csv:event-listings-editor",
+        "interests": "roles.csv:event-listings-editor",
+        "tasks": "roles.csv:event-listings-editor",
+        "organisation": "hosts.json:town-guide",
+        "area": "hosts.json:town-guide",
+        "time": "sessions.csv:S79",
+        "mode": "sessions.csv:S79",
+        "stepFree": "sessions.csv:S79",
+        "contactNote": "sessions.csv:S79",
+        "caseFacts": "case-facts.csv:event-listings-editor"
+      }
+    },
+    {
+      "id": "exam-room-steward",
+      "title": "Practice exam room steward",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Prepare a quiet room for a timed practice paper and collect unused materials after the session.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A tutor supervises the practice paper.",
+      "interests": [
+        "organising",
+        "education"
+      ],
+      "tasks": [
+        "Set out answer booklets",
+        "Check pencil supplies"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:exam-room-steward",
+        "title": "roles.csv:exam-room-steward",
+        "theme": "roles.csv:exam-room-steward",
+        "summary": "roles.csv:exam-room-steward",
+        "interests": "roles.csv:exam-room-steward",
+        "tasks": "roles.csv:exam-room-steward",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S36",
+        "mode": "sessions.csv:S36",
+        "stepFree": "sessions.csv:S36",
+        "contactNote": "sessions.csv:S36",
+        "caseFacts": "case-facts.csv:exam-room-steward"
+      }
+    },
+    {
+      "id": "family-puzzle-steward",
+      "title": "Family puzzle steward",
+      "organisation": "Mosaic Play Hall",
+      "area": "Stockport",
+      "theme": "community",
+      "summary": "Set out picture puzzles by age range and help families replace missing pieces during open play.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A staff member oversees play and checks safeguarding clearance.",
+      "interests": [
+        "families",
+        "games",
+        "organising"
+      ],
+      "tasks": [
+        "Lay out puzzle trays",
+        "Record missing pieces"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.6,
+        "clearance": "required",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:family-puzzle-steward",
+        "title": "roles.csv:family-puzzle-steward",
+        "theme": "roles.csv:family-puzzle-steward",
+        "summary": "roles.csv:family-puzzle-steward",
+        "interests": "roles.csv:family-puzzle-steward",
+        "tasks": "roles.csv:family-puzzle-steward",
+        "organisation": "hosts.json:playhall",
+        "area": "hosts.json:playhall",
+        "time": "sessions.csv:S86",
+        "mode": "sessions.csv:S86",
+        "stepFree": "sessions.csv:S86",
+        "contactNote": "sessions.csv:S86",
+        "caseFacts": "case-facts.csv:family-puzzle-steward"
+      }
+    },
+    {
+      "id": "fixtures-reader",
+      "title": "Fixture bulletin reader",
+      "organisation": "Sidegate Sport Collective",
+      "area": "Tameside",
+      "theme": "community",
+      "summary": "Record a short spoken bulletin from the club's confirmed fixture list.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The club supplies the confirmed script.",
+      "interests": [
+        "sport",
+        "audio",
+        "reading"
+      ],
+      "tasks": [
+        "Read the dates aloud",
+        "Check the recording against the list"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:fixtures-reader",
+        "title": "roles.csv:fixtures-reader",
+        "theme": "roles.csv:fixtures-reader",
+        "summary": "roles.csv:fixtures-reader",
+        "interests": "roles.csv:fixtures-reader",
+        "tasks": "roles.csv:fixtures-reader",
+        "organisation": "hosts.json:accessible-sport",
+        "area": "hosts.json:accessible-sport",
+        "time": "sessions.csv:S85",
+        "mode": "sessions.csv:S85",
+        "stepFree": "sessions.csv:S85",
+        "contactNote": "sessions.csv:S85",
+        "caseFacts": "case-facts.csv:fixtures-reader"
+      }
+    },
+    {
+      "id": "folk-song-indexer",
+      "title": "Folk song indexer",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Index a collection of donated local song sheets by title and first line.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The collection is handled at a staffed desk.",
+      "interests": [
+        "music",
+        "heritage",
+        "writing"
+      ],
+      "tasks": [
+        "Transcribe song titles",
+        "Group sheets by first line"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 5.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:folk-song-indexer",
+        "title": "roles.csv:folk-song-indexer",
+        "theme": "roles.csv:folk-song-indexer",
+        "summary": "roles.csv:folk-song-indexer",
+        "interests": "roles.csv:folk-song-indexer",
+        "tasks": "roles.csv:folk-song-indexer",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S42",
+        "mode": "sessions.csv:S42",
+        "stepFree": "sessions.csv:S42",
+        "contactNote": "sessions.csv:S42",
+        "caseFacts": "case-facts.csv:folk-song-indexer"
+      }
+    },
+    {
+      "id": "foyer-sign-steward",
+      "title": "Foyer sign steward",
+      "organisation": "Curtain Yard Players",
+      "area": "Bolton",
+      "theme": "arts",
+      "summary": "Set out wayfinding signs in the theatre foyer and check that the arrows point to the correct doors.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A staff member handles emergency access arrangements.",
+      "interests": [
+        "theatre",
+        "accessibility",
+        "events"
+      ],
+      "tasks": [
+        "Match signs to the floor plan",
+        "Report a blocked sign"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 5.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:foyer-sign-steward",
+        "title": "roles.csv:foyer-sign-steward",
+        "theme": "roles.csv:foyer-sign-steward",
+        "summary": "roles.csv:foyer-sign-steward",
+        "interests": "roles.csv:foyer-sign-steward",
+        "tasks": "roles.csv:foyer-sign-steward",
+        "organisation": "hosts.json:theatre",
+        "area": "hosts.json:theatre",
+        "time": "sessions.csv:S91",
+        "mode": "sessions.csv:S91",
+        "stepFree": "sessions.csv:S91",
+        "contactNote": "sessions.csv:S91",
+        "caseFacts": "case-facts.csv:foyer-sign-steward"
+      }
+    },
+    {
+      "id": "fruit-stall-steward",
+      "title": "Surplus fruit stall steward",
+      "organisation": "Elm Table Collective",
+      "area": "Longsight",
+      "theme": "food",
+      "summary": "Arrange donated fruit by variety and help visitors choose a bag to take home.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host provides small trays.",
+      "interests": [
+        "food",
+        "hospitality",
+        "community"
+      ],
+      "tasks": [
+        "Refill display trays",
+        "Count bags at the till-free stall"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.2,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:fruit-stall-steward",
+        "title": "roles.csv:fruit-stall-steward",
+        "theme": "roles.csv:fruit-stall-steward",
+        "summary": "roles.csv:fruit-stall-steward",
+        "interests": "roles.csv:fruit-stall-steward",
+        "tasks": "roles.csv:fruit-stall-steward",
+        "organisation": "hosts.json:table",
+        "area": "hosts.json:table",
+        "time": "sessions.csv:S68",
+        "mode": "sessions.csv:S68",
+        "stepFree": "sessions.csv:S68",
+        "contactNote": "sessions.csv:S68",
+        "caseFacts": "case-facts.csv:fruit-stall-steward"
+      }
+    },
+    {
+      "id": "gallery-light-reader",
+      "title": "Gallery light reading assistant",
+      "organisation": "Clockface Heritage Room",
+      "area": "Wigan",
+      "theme": "arts",
+      "summary": "Take readings from the museum's light meters with a collections assistant.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Staff explain meter use and supervise the work.",
+      "interests": [
+        "heritage",
+        "data",
+        "equipment"
+      ],
+      "tasks": [
+        "Read a meter display",
+        "Copy the value to a room sheet"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:gallery-light-reader",
+        "title": "roles.csv:gallery-light-reader",
+        "theme": "roles.csv:gallery-light-reader",
+        "summary": "roles.csv:gallery-light-reader",
+        "interests": "roles.csv:gallery-light-reader",
+        "tasks": "roles.csv:gallery-light-reader",
+        "organisation": "hosts.json:museum",
+        "area": "hosts.json:museum",
+        "time": "sessions.csv:S97",
+        "mode": "sessions.csv:S97",
+        "stepFree": "sessions.csv:S97",
+        "contactNote": "sessions.csv:S97",
+        "caseFacts": "case-facts.csv:gallery-light-reader"
+      }
+    },
+    {
+      "id": "game-rules-reader",
+      "title": "Board game rules reader",
+      "organisation": "Mosaic Play Hall",
+      "area": "Stockport",
+      "theme": "community",
+      "summary": "Try a new board game's printed instructions with other volunteers and flag confusing steps.",
+      "time": "weekday",
+      "mode": "hybrid",
+      "stepFree": "yes",
+      "contactNote": "The same session runs in the hall and by group video call.",
+      "interests": [
+        "games",
+        "reading",
+        "accessibility"
+      ],
+      "tasks": [
+        "Test the setup sequence",
+        "Note unclear wording"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 4.6,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:game-rules-reader",
+        "title": "roles.csv:game-rules-reader",
+        "theme": "roles.csv:game-rules-reader",
+        "summary": "roles.csv:game-rules-reader",
+        "interests": "roles.csv:game-rules-reader",
+        "tasks": "roles.csv:game-rules-reader",
+        "organisation": "hosts.json:playhall",
+        "area": "hosts.json:playhall",
+        "time": "sessions.csv:S87",
+        "mode": "sessions.csv:S87",
+        "stepFree": "sessions.csv:S87",
+        "contactNote": "sessions.csv:S87",
+        "caseFacts": "case-facts.csv:game-rules-reader"
       }
     },
     {
@@ -226,6 +1645,18 @@
         "Plant seedlings",
         "Water raised beds"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:garden-buddy",
         "title": "roles.csv:garden-buddy",
@@ -238,7 +1669,632 @@
         "time": "sessions.csv:S01",
         "mode": "sessions.csv:S01",
         "stepFree": "sessions.csv:S01",
-        "contactNote": "sessions.csv:S01"
+        "contactNote": "sessions.csv:S01",
+        "caseFacts": "case-facts.csv:garden-buddy"
+      }
+    },
+    {
+      "id": "habitat-sign-reader",
+      "title": "Habitat sign proofreader",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Read draft interpretation signs for a wetland trail and flag unclear wording.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The host sends the draft signs as text.",
+      "interests": [
+        "nature",
+        "writing",
+        "accessibility"
+      ],
+      "tasks": [
+        "Check a plant description",
+        "Suggest a shorter heading"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:habitat-sign-reader",
+        "title": "roles.csv:habitat-sign-reader",
+        "theme": "roles.csv:habitat-sign-reader",
+        "summary": "roles.csv:habitat-sign-reader",
+        "interests": "roles.csv:habitat-sign-reader",
+        "tasks": "roles.csv:habitat-sign-reader",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S63",
+        "mode": "sessions.csv:S63",
+        "stepFree": "sessions.csv:S63",
+        "contactNote": "sessions.csv:S63",
+        "caseFacts": "case-facts.csv:habitat-sign-reader"
+      }
+    },
+    {
+      "id": "instrument-label-maker",
+      "title": "Instrument label maker",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Prepare easy-to-read name cards for instruments used in introductory music sessions.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host provides card and reference pictures.",
+      "interests": [
+        "music",
+        "design",
+        "education"
+      ],
+      "tasks": [
+        "Copy instrument names",
+        "Attach a matching picture"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 5.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:instrument-label-maker",
+        "title": "roles.csv:instrument-label-maker",
+        "theme": "roles.csv:instrument-label-maker",
+        "summary": "roles.csv:instrument-label-maker",
+        "interests": "roles.csv:instrument-label-maker",
+        "tasks": "roles.csv:instrument-label-maker",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S45",
+        "mode": "sessions.csv:S45",
+        "stepFree": "sessions.csv:S45",
+        "contactNote": "sessions.csv:S45",
+        "caseFacts": "case-facts.csv:instrument-label-maker"
+      }
+    },
+    {
+      "id": "junior-coding-mentor",
+      "title": "Junior coding mentor",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Meet one young learner at the club and teach visual programming with a set of puzzles.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The coordinator verifies safeguarding clearance before sessions.",
+      "interests": [
+        "digital",
+        "teaching",
+        "coding"
+      ],
+      "tasks": [
+        "Arrange blocks to move a sprite",
+        "Test the learner's sequence"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.0,
+        "clearance": "required",
+        "individualEvidence": "one young learner",
+        "digitalEvidence": "teach visual programming"
+      },
+      "sources": {
+        "id": "roles.csv:junior-coding-mentor",
+        "title": "roles.csv:junior-coding-mentor",
+        "theme": "roles.csv:junior-coding-mentor",
+        "summary": "roles.csv:junior-coding-mentor",
+        "interests": "roles.csv:junior-coding-mentor",
+        "tasks": "roles.csv:junior-coding-mentor",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S25",
+        "mode": "sessions.csv:S25",
+        "stepFree": "sessions.csv:S25",
+        "contactNote": "sessions.csv:S25",
+        "caseFacts": "case-facts.csv:junior-coding-mentor"
+      }
+    },
+    {
+      "id": "kit-exchange-host",
+      "title": "Sports kit exchange host",
+      "organisation": "Sidegate Sport Collective",
+      "area": "Tameside",
+      "theme": "community",
+      "summary": "Help visitors find donated sports clothing in suitable sizes at a community exchange.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host supplies garment rails at two heights.",
+      "interests": [
+        "sport",
+        "reuse",
+        "welcome"
+      ],
+      "tasks": [
+        "Group jerseys by size",
+        "Record requests for unavailable kit"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.5,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:kit-exchange-host",
+        "title": "roles.csv:kit-exchange-host",
+        "theme": "roles.csv:kit-exchange-host",
+        "summary": "roles.csv:kit-exchange-host",
+        "interests": "roles.csv:kit-exchange-host",
+        "tasks": "roles.csv:kit-exchange-host",
+        "organisation": "hosts.json:accessible-sport",
+        "area": "hosts.json:accessible-sport",
+        "time": "sessions.csv:S84",
+        "mode": "sessions.csv:S84",
+        "stepFree": "sessions.csv:S84",
+        "contactNote": "sessions.csv:S84",
+        "caseFacts": "case-facts.csv:kit-exchange-host"
+      }
+    },
+    {
+      "id": "knit-instructions-reader",
+      "title": "Knitting instructions reader",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Read a pattern aloud for one participant during a drop-in craft session.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host supplies large-print patterns.",
+      "interests": [
+        "listening",
+        "craft",
+        "accessibility"
+      ],
+      "tasks": [
+        "Read the next row",
+        "Mark the stopping point"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 6.1,
+        "clearance": "none-listed",
+        "individualEvidence": "one participant",
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:knit-instructions-reader",
+        "title": "roles.csv:knit-instructions-reader",
+        "theme": "roles.csv:knit-instructions-reader",
+        "summary": "roles.csv:knit-instructions-reader",
+        "interests": "roles.csv:knit-instructions-reader",
+        "tasks": "roles.csv:knit-instructions-reader",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S55",
+        "mode": "sessions.csv:S55",
+        "stepFree": "sessions.csv:S55",
+        "contactNote": "sessions.csv:S55",
+        "caseFacts": "case-facts.csv:knit-instructions-reader"
+      }
+    },
+    {
+      "id": "landmark-card-maker",
+      "title": "Landmark directions card maker",
+      "organisation": "Corner Route Exchange",
+      "area": "Hulme",
+      "theme": "community",
+      "summary": "Write short directions using recognisable landmarks for visitors to a fictional community hall.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "A local steward checks the suggested routes.",
+      "interests": [
+        "travel",
+        "writing",
+        "accessibility"
+      ],
+      "tasks": [
+        "Check the order of turns",
+        "Label the entrance photo"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:landmark-card-maker",
+        "title": "roles.csv:landmark-card-maker",
+        "theme": "roles.csv:landmark-card-maker",
+        "summary": "roles.csv:landmark-card-maker",
+        "interests": "roles.csv:landmark-card-maker",
+        "tasks": "roles.csv:landmark-card-maker",
+        "organisation": "hosts.json:route-desk",
+        "area": "hosts.json:route-desk",
+        "time": "sessions.csv:S73",
+        "mode": "sessions.csv:S73",
+        "stepFree": "sessions.csv:S73",
+        "contactNote": "sessions.csv:S73",
+        "caseFacts": "case-facts.csv:landmark-card-maker"
+      }
+    },
+    {
+      "id": "language-table-setter",
+      "title": "Language table steward",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Set up themed conversation stations and welcome learners to their chosen table.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A tutor runs each conversation station.",
+      "interests": [
+        "languages",
+        "welcome",
+        "organising"
+      ],
+      "tasks": [
+        "Lay out topic cards",
+        "Introduce the session theme"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:language-table-setter",
+        "title": "roles.csv:language-table-setter",
+        "theme": "roles.csv:language-table-setter",
+        "summary": "roles.csv:language-table-setter",
+        "interests": "roles.csv:language-table-setter",
+        "tasks": "roles.csv:language-table-setter",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S31",
+        "mode": "sessions.csv:S31",
+        "stepFree": "sessions.csv:S31",
+        "contactNote": "sessions.csv:S31",
+        "caseFacts": "case-facts.csv:language-table-setter"
+      }
+    },
+    {
+      "id": "large-print-list-editor",
+      "title": "Large-print book list editor",
+      "organisation": "Turnleaf Lending Room",
+      "area": "Bury",
+      "theme": "learning",
+      "summary": "Compare a list of large-print titles with the lending catalogue and correct mismatched entries.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "A librarian approves the final list.",
+      "interests": [
+        "books",
+        "accessibility",
+        "checking"
+      ],
+      "tasks": [
+        "Check edition details",
+        "Flag an unavailable title"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:large-print-list-editor",
+        "title": "roles.csv:large-print-list-editor",
+        "theme": "roles.csv:large-print-list-editor",
+        "summary": "roles.csv:large-print-list-editor",
+        "interests": "roles.csv:large-print-list-editor",
+        "tasks": "roles.csv:large-print-list-editor",
+        "organisation": "hosts.json:library-loans",
+        "area": "hosts.json:library-loans",
+        "time": "sessions.csv:S98",
+        "mode": "sessions.csv:S98",
+        "stepFree": "sessions.csv:S98",
+        "contactNote": "sessions.csv:S98",
+        "caseFacts": "case-facts.csv:large-print-list-editor"
+      }
+    },
+    {
+      "id": "leaf-press-cataloguer",
+      "title": "Pressed leaf cataloguer",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "File pressed leaf samples in labelled envelopes for the club's teaching collection.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The workroom has adjustable chairs.",
+      "interests": [
+        "nature",
+        "heritage",
+        "organising"
+      ],
+      "tasks": [
+        "Read each specimen label",
+        "Assign a storage drawer"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:leaf-press-cataloguer",
+        "title": "roles.csv:leaf-press-cataloguer",
+        "theme": "roles.csv:leaf-press-cataloguer",
+        "summary": "roles.csv:leaf-press-cataloguer",
+        "interests": "roles.csv:leaf-press-cataloguer",
+        "tasks": "roles.csv:leaf-press-cataloguer",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S60",
+        "mode": "sessions.csv:S60",
+        "stepFree": "sessions.csv:S60",
+        "contactNote": "sessions.csv:S60",
+        "caseFacts": "case-facts.csv:leaf-press-cataloguer"
+      }
+    },
+    {
+      "id": "loom-warp-counter",
+      "title": "Community loom preparation helper",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Lay out counted lengths of yarn for the next supervised weaving session.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The work takes place at waist-height tables.",
+      "interests": [
+        "textiles",
+        "practical",
+        "weaving"
+      ],
+      "tasks": [
+        "Count yarn strands",
+        "Tie bundles with colour markers"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:loom-warp-counter",
+        "title": "roles.csv:loom-warp-counter",
+        "theme": "roles.csv:loom-warp-counter",
+        "summary": "roles.csv:loom-warp-counter",
+        "interests": "roles.csv:loom-warp-counter",
+        "tasks": "roles.csv:loom-warp-counter",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S51",
+        "mode": "sessions.csv:S51",
+        "stepFree": "sessions.csv:S51",
+        "contactNote": "sessions.csv:S51",
+        "caseFacts": "case-facts.csv:loom-warp-counter"
+      }
+    },
+    {
+      "id": "market-info-steward",
+      "title": "Neighbourhood market information steward",
+      "organisation": "Beech Corner Neighbours",
+      "area": "Stockport",
+      "theme": "community",
+      "summary": "Help visitors locate stalls and the accessible facilities on a market plan.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The information desk is near the entrance.",
+      "interests": [
+        "welcome",
+        "events",
+        "travel"
+      ],
+      "tasks": [
+        "Point out the meeting place",
+        "Hand out paper maps"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:market-info-steward",
+        "title": "roles.csv:market-info-steward",
+        "theme": "roles.csv:market-info-steward",
+        "summary": "roles.csv:market-info-steward",
+        "interests": "roles.csv:market-info-steward",
+        "tasks": "roles.csv:market-info-steward",
+        "organisation": "hosts.json:town-guide",
+        "area": "hosts.json:town-guide",
+        "time": "sessions.csv:S78",
+        "mode": "sessions.csv:S78",
+        "stepFree": "sessions.csv:S78",
+        "contactNote": "sessions.csv:S78",
+        "caseFacts": "case-facts.csv:market-info-steward"
+      }
+    },
+    {
+      "id": "material-donation-weigher",
+      "title": "Fabric donation weigher",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Weigh incoming bags of reclaimed cloth and record the amount available for workshops.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A colleague moves the bags to the weighing table.",
+      "interests": [
+        "reuse",
+        "organising",
+        "textiles"
+      ],
+      "tasks": [
+        "Weigh donated cloth",
+        "Write the batch weight"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:material-donation-weigher",
+        "title": "roles.csv:material-donation-weigher",
+        "theme": "roles.csv:material-donation-weigher",
+        "summary": "roles.csv:material-donation-weigher",
+        "interests": "roles.csv:material-donation-weigher",
+        "tasks": "roles.csv:material-donation-weigher",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S54",
+        "mode": "sessions.csv:S54",
+        "stepFree": "sessions.csv:S54",
+        "contactNote": "sessions.csv:S54",
+        "caseFacts": "case-facts.csv:material-donation-weigher"
+      }
+    },
+    {
+      "id": "maths-games-helper",
+      "title": "Number games helper",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Use counters and dice to practise arithmetic with a small group of adults.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The coordinator provides the activities.",
+      "interests": [
+        "numeracy",
+        "teaching",
+        "games"
+      ],
+      "tasks": [
+        "Lay out number tiles",
+        "Invite learners to explain a calculation"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:maths-games-helper",
+        "title": "roles.csv:maths-games-helper",
+        "theme": "roles.csv:maths-games-helper",
+        "summary": "roles.csv:maths-games-helper",
+        "interests": "roles.csv:maths-games-helper",
+        "tasks": "roles.csv:maths-games-helper",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S32",
+        "mode": "sessions.csv:S32",
+        "stepFree": "sessions.csv:S32",
+        "contactNote": "sessions.csv:S32",
+        "caseFacts": "case-facts.csv:maths-games-helper"
       }
     },
     {
@@ -260,6 +2316,18 @@
         "Chop vegetables",
         "Prepare meals"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.8,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:meal-cook",
         "title": "roles.csv:meal-cook",
@@ -272,7 +2340,248 @@
         "time": "sessions.csv:S09",
         "mode": "sessions.csv:S09",
         "stepFree": "sessions.csv:S09",
-        "contactNote": "sessions.csv:S09"
+        "contactNote": "sessions.csv:S09",
+        "caseFacts": "case-facts.csv:meal-cook"
+      }
+    },
+    {
+      "id": "memory-box-steward",
+      "title": "Memory box steward",
+      "organisation": "Clockface Heritage Room",
+      "area": "Wigan",
+      "theme": "arts",
+      "summary": "Gather labelled handling objects for a social history activity using a checklist.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Only approved handling objects are used.",
+      "interests": [
+        "heritage",
+        "organising",
+        "events"
+      ],
+      "tasks": [
+        "Match objects to trays",
+        "Replace missing information cards"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:memory-box-steward",
+        "title": "roles.csv:memory-box-steward",
+        "theme": "roles.csv:memory-box-steward",
+        "summary": "roles.csv:memory-box-steward",
+        "interests": "roles.csv:memory-box-steward",
+        "tasks": "roles.csv:memory-box-steward",
+        "organisation": "hosts.json:museum",
+        "area": "hosts.json:museum",
+        "time": "sessions.csv:S95",
+        "mode": "sessions.csv:S95",
+        "stepFree": "sessions.csv:S95",
+        "contactNote": "sessions.csv:S95",
+        "caseFacts": "case-facts.csv:memory-box-steward"
+      }
+    },
+    {
+      "id": "microphone-steward",
+      "title": "Open mic equipment steward",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Prepare microphones and stands for performers at a community open mic night.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A sound technician handles all electrical connections.",
+      "interests": [
+        "music",
+        "equipment",
+        "events"
+      ],
+      "tasks": [
+        "Count microphone leads",
+        "Label the stage positions"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 5.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:microphone-steward",
+        "title": "roles.csv:microphone-steward",
+        "theme": "roles.csv:microphone-steward",
+        "summary": "roles.csv:microphone-steward",
+        "interests": "roles.csv:microphone-steward",
+        "tasks": "roles.csv:microphone-steward",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S39",
+        "mode": "sessions.csv:S39",
+        "stepFree": "sessions.csv:S39",
+        "contactNote": "sessions.csv:S39",
+        "caseFacts": "case-facts.csv:microphone-steward"
+      }
+    },
+    {
+      "id": "mock-interview-partner",
+      "title": "Practice interview partner",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Rehearse a short job interview with one adult and share notes on how their answers came across.",
+      "time": "weekday",
+      "mode": "hybrid",
+      "stepFree": "yes",
+      "contactNote": "Each slot can be attended in the room or from home.",
+      "interests": [
+        "mentoring",
+        "communication",
+        "employment"
+      ],
+      "tasks": [
+        "Read a sample question",
+        "Give feedback on an answer"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.3,
+        "clearance": "none-listed",
+        "individualEvidence": "with one adult",
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:mock-interview-partner",
+        "title": "roles.csv:mock-interview-partner",
+        "theme": "roles.csv:mock-interview-partner",
+        "summary": "roles.csv:mock-interview-partner",
+        "interests": "roles.csv:mock-interview-partner",
+        "tasks": "roles.csv:mock-interview-partner",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S33",
+        "mode": "sessions.csv:S33",
+        "stepFree": "sessions.csv:S33",
+        "contactNote": "sessions.csv:S33",
+        "caseFacts": "case-facts.csv:mock-interview-partner"
+      }
+    },
+    {
+      "id": "moth-record-clerk",
+      "title": "Moth survey record clerk",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Enter the survey leader's observations from a supervised moth count into a tally sheet.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The survey leader handles the specimens.",
+      "interests": [
+        "wildlife",
+        "organising",
+        "observation"
+      ],
+      "tasks": [
+        "Copy species names",
+        "Check tally totals"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 3.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:moth-record-clerk",
+        "title": "roles.csv:moth-record-clerk",
+        "theme": "roles.csv:moth-record-clerk",
+        "summary": "roles.csv:moth-record-clerk",
+        "interests": "roles.csv:moth-record-clerk",
+        "tasks": "roles.csv:moth-record-clerk",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S59",
+        "mode": "sessions.csv:S59",
+        "stepFree": "sessions.csv:S59",
+        "contactNote": "sessions.csv:S59",
+        "caseFacts": "case-facts.csv:moth-record-clerk"
+      }
+    },
+    {
+      "id": "music-request-host",
+      "title": "Music request table host",
+      "organisation": "Red Spool Music Circle",
+      "area": "Manchester",
+      "theme": "arts",
+      "summary": "Collect audience requests for a community listening night and pass them to the programme lead.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host checks music permissions.",
+      "interests": [
+        "music",
+        "events",
+        "welcome"
+      ],
+      "tasks": [
+        "Write down track titles",
+        "Group requests by theme"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 3.2,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:music-request-host",
+        "title": "roles.csv:music-request-host",
+        "theme": "roles.csv:music-request-host",
+        "summary": "roles.csv:music-request-host",
+        "interests": "roles.csv:music-request-host",
+        "tasks": "roles.csv:music-request-host",
+        "organisation": "hosts.json:music",
+        "area": "hosts.json:music",
+        "time": "sessions.csv:S92",
+        "mode": "sessions.csv:S92",
+        "stepFree": "sessions.csv:S92",
+        "contactNote": "sessions.csv:S92",
+        "caseFacts": "case-facts.csv:music-request-host"
       }
     },
     {
@@ -295,6 +2604,18 @@
         "Meet the owner with the coordinator",
         "Walk a dog along the marked route"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.0,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:neighbourhood-dog-walker",
         "title": "roles.csv:neighbourhood-dog-walker",
@@ -307,7 +2628,104 @@
         "time": "sessions.csv:S17",
         "mode": "sessions.csv:S17",
         "stepFree": "sessions.csv:S17",
-        "contactNote": "sessions.csv:S17"
+        "contactNote": "sessions.csv:S17",
+        "caseFacts": "case-facts.csv:neighbourhood-dog-walker"
+      }
+    },
+    {
+      "id": "oral-history-logger",
+      "title": "Oral history recording logger",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Listen to recorded local memories and note timestamps where a new topic begins.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The host supplies recordings cleared for volunteer use.",
+      "interests": [
+        "heritage",
+        "listening",
+        "audio"
+      ],
+      "tasks": [
+        "Mark the topic change",
+        "Prepare a short index"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:oral-history-logger",
+        "title": "roles.csv:oral-history-logger",
+        "theme": "roles.csv:oral-history-logger",
+        "summary": "roles.csv:oral-history-logger",
+        "interests": "roles.csv:oral-history-logger",
+        "tasks": "roles.csv:oral-history-logger",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S38",
+        "mode": "sessions.csv:S38",
+        "stepFree": "sessions.csv:S38",
+        "contactNote": "sessions.csv:S38",
+        "caseFacts": "case-facts.csv:oral-history-logger"
+      }
+    },
+    {
+      "id": "paint-swatch-sorter",
+      "title": "Paint reuse swatch organiser",
+      "organisation": "Roundhouse Reuse Store",
+      "area": "Salford",
+      "theme": "repair",
+      "summary": "Sort dried paint samples into colour families to help visitors choose a donated tin.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Work with dry sample cards at a table.",
+      "interests": [
+        "art",
+        "reuse",
+        "organising"
+      ],
+      "tasks": [
+        "Group swatches by shade",
+        "Match sample labels to tins"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.0,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:paint-swatch-sorter",
+        "title": "roles.csv:paint-swatch-sorter",
+        "theme": "roles.csv:paint-swatch-sorter",
+        "summary": "roles.csv:paint-swatch-sorter",
+        "interests": "roles.csv:paint-swatch-sorter",
+        "tasks": "roles.csv:paint-swatch-sorter",
+        "organisation": "hosts.json:reuse",
+        "area": "hosts.json:reuse",
+        "time": "sessions.csv:S72",
+        "mode": "sessions.csv:S72",
+        "stepFree": "sessions.csv:S72",
+        "contactNote": "sessions.csv:S72",
+        "caseFacts": "case-facts.csv:paint-swatch-sorter"
       }
     },
     {
@@ -329,6 +2747,18 @@
         "Check tins",
         "Pack grocery bags"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.8,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:pantry-packer",
         "title": "roles.csv:pantry-packer",
@@ -341,7 +2771,104 @@
         "time": "sessions.csv:S02",
         "mode": "sessions.csv:S02",
         "stepFree": "sessions.csv:S02",
-        "contactNote": "sessions.csv:S02"
+        "contactNote": "sessions.csv:S02",
+        "caseFacts": "case-facts.csv:pantry-packer"
+      }
+    },
+    {
+      "id": "patch-project-companion",
+      "title": "Mending practice companion",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Sit with one person at a time and practise hand stitching on a patch sampler.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "This outreach session meets in a local ground-floor hall.",
+      "interests": [
+        "sewing",
+        "teaching",
+        "repair"
+      ],
+      "tasks": [
+        "Choose a sample patch",
+        "Practise a running stitch together"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.6,
+        "clearance": "none-listed",
+        "individualEvidence": "with one person at a time",
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:patch-project-companion",
+        "title": "roles.csv:patch-project-companion",
+        "theme": "roles.csv:patch-project-companion",
+        "summary": "roles.csv:patch-project-companion",
+        "interests": "roles.csv:patch-project-companion",
+        "tasks": "roles.csv:patch-project-companion",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S52",
+        "mode": "sessions.csv:S52",
+        "stepFree": "sessions.csv:S52",
+        "contactNote": "sessions.csv:S52",
+        "caseFacts": "case-facts.csv:patch-project-companion"
+      }
+    },
+    {
+      "id": "pattern-proofreader",
+      "title": "Pattern instruction proofreader",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Read draft craft patterns and mark any missing steps before the instructions go to print.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The coordinator supplies editable drafts.",
+      "interests": [
+        "writing",
+        "craft",
+        "proofreading"
+      ],
+      "tasks": [
+        "Check the materials list",
+        "Flag unexplained abbreviations"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:pattern-proofreader",
+        "title": "roles.csv:pattern-proofreader",
+        "theme": "roles.csv:pattern-proofreader",
+        "summary": "roles.csv:pattern-proofreader",
+        "interests": "roles.csv:pattern-proofreader",
+        "tasks": "roles.csv:pattern-proofreader",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S49",
+        "mode": "sessions.csv:S49",
+        "stepFree": "sessions.csv:S49",
+        "contactNote": "sessions.csv:S49",
+        "caseFacts": "case-facts.csv:pattern-proofreader"
       }
     },
     {
@@ -363,6 +2890,22 @@
         "Listen on a call",
         "Record a check-in"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          },
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "unknown",
+        "individualEvidence": "an isolated neighbour",
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:phone-companion",
         "title": "roles.csv:phone-companion",
@@ -375,7 +2918,200 @@
         "time": "sessions.csv:S04",
         "mode": "sessions.csv:S04",
         "stepFree": "sessions.csv:S04",
-        "contactNote": "sessions.csv:S04"
+        "contactNote": "sessions.csv:S04",
+        "caseFacts": "case-facts.csv:phone-companion"
+      }
+    },
+    {
+      "id": "photo-transfer-tutor",
+      "title": "Photo transfer tutor",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Help an individual learner to transfer photos from a phone and organise them in a sample album.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The organiser is choosing between two accessible venues.",
+      "interests": [
+        "digital",
+        "teaching",
+        "photos"
+      ],
+      "tasks": [
+        "Copy practice images",
+        "Rename the sample album"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": "an individual learner",
+        "digitalEvidence": "transfer photos from a phone"
+      },
+      "sources": {
+        "id": "roles.csv:photo-transfer-tutor",
+        "title": "roles.csv:photo-transfer-tutor",
+        "theme": "roles.csv:photo-transfer-tutor",
+        "summary": "roles.csv:photo-transfer-tutor",
+        "interests": "roles.csv:photo-transfer-tutor",
+        "tasks": "roles.csv:photo-transfer-tutor",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S23",
+        "mode": "sessions.csv:S23",
+        "stepFree": "sessions.csv:S23",
+        "contactNote": "sessions.csv:S23",
+        "caseFacts": "case-facts.csv:photo-transfer-tutor"
+      }
+    },
+    {
+      "id": "photograph-date-helper",
+      "title": "Historic photograph date researcher",
+      "organisation": "Clockface Heritage Room",
+      "area": "Wigan",
+      "theme": "arts",
+      "summary": "Compare archive photographs with an approved list of dated street features and note possible date ranges.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The curator checks every suggested date.",
+      "interests": [
+        "heritage",
+        "research",
+        "photography"
+      ],
+      "tasks": [
+        "Identify a street feature",
+        "Record the reference used"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:photograph-date-helper",
+        "title": "roles.csv:photograph-date-helper",
+        "theme": "roles.csv:photograph-date-helper",
+        "summary": "roles.csv:photograph-date-helper",
+        "interests": "roles.csv:photograph-date-helper",
+        "tasks": "roles.csv:photograph-date-helper",
+        "organisation": "hosts.json:museum",
+        "area": "hosts.json:museum",
+        "time": "sessions.csv:S96",
+        "mode": "sessions.csv:S96",
+        "stepFree": "sessions.csv:S96",
+        "contactNote": "sessions.csv:S96",
+        "caseFacts": "case-facts.csv:photograph-date-helper"
+      }
+    },
+    {
+      "id": "poetry-evening-host",
+      "title": "Poetry evening host",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Introduce readers and keep a friendly running order at a neighbourhood poetry night.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The venue has a ground-level performance area.",
+      "interests": [
+        "performance",
+        "events",
+        "welcome"
+      ],
+      "tasks": [
+        "Check the reading list",
+        "Introduce the next speaker"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 5.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:poetry-evening-host",
+        "title": "roles.csv:poetry-evening-host",
+        "theme": "roles.csv:poetry-evening-host",
+        "summary": "roles.csv:poetry-evening-host",
+        "interests": "roles.csv:poetry-evening-host",
+        "tasks": "roles.csv:poetry-evening-host",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S43",
+        "mode": "sessions.csv:S43",
+        "stepFree": "sessions.csv:S43",
+        "contactNote": "sessions.csv:S43",
+        "caseFacts": "case-facts.csv:poetry-evening-host"
+      }
+    },
+    {
+      "id": "pond-sketch-helper",
+      "title": "Pond sketch session helper",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Prepare drawing boards for a group sketching aquatic plants from the bank.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "no",
+      "contactNote": "There are steps to the observation platform.",
+      "interests": [
+        "nature",
+        "drawing",
+        "outdoors"
+      ],
+      "tasks": [
+        "Set out drawing boards",
+        "Collect finished sketches"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:pond-sketch-helper",
+        "title": "roles.csv:pond-sketch-helper",
+        "theme": "roles.csv:pond-sketch-helper",
+        "summary": "roles.csv:pond-sketch-helper",
+        "interests": "roles.csv:pond-sketch-helper",
+        "tasks": "roles.csv:pond-sketch-helper",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S57",
+        "mode": "sessions.csv:S57",
+        "stepFree": "sessions.csv:S57",
+        "contactNote": "sessions.csv:S57",
+        "caseFacts": "case-facts.csv:pond-sketch-helper"
       }
     },
     {
@@ -397,6 +3133,22 @@
         "Design posters",
         "Prepare digital artwork"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          },
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:poster-maker",
         "title": "roles.csv:poster-maker",
@@ -409,7 +3161,248 @@
         "time": "sessions.csv:S10",
         "mode": "sessions.csv:S10",
         "stepFree": "sessions.csv:S10",
-        "contactNote": "sessions.csv:S10"
+        "contactNote": "sessions.csv:S10",
+        "caseFacts": "case-facts.csv:poster-maker"
+      }
+    },
+    {
+      "id": "practice-account-helper",
+      "title": "Practice account guide",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Work individually with an adult to practise signing in to a demo account during a daytime workshop.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Only training accounts are used in the workshop.",
+      "interests": [
+        "digital",
+        "teaching",
+        "adult learning"
+      ],
+      "tasks": [
+        "Review the demo sign-in steps",
+        "Reset the practice password"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.0,
+        "clearance": "none-listed",
+        "individualEvidence": "individually with an adult",
+        "digitalEvidence": "practise signing in to a demo account"
+      },
+      "sources": {
+        "id": "roles.csv:practice-account-helper",
+        "title": "roles.csv:practice-account-helper",
+        "theme": "roles.csv:practice-account-helper",
+        "summary": "roles.csv:practice-account-helper",
+        "interests": "roles.csv:practice-account-helper",
+        "tasks": "roles.csv:practice-account-helper",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S27",
+        "mode": "sessions.csv:S27",
+        "stepFree": "sessions.csv:S27",
+        "contactNote": "sessions.csv:S27",
+        "caseFacts": "case-facts.csv:practice-account-helper"
+      }
+    },
+    {
+      "id": "programme-proofreader",
+      "title": "Theatre programme proofreader",
+      "organisation": "Curtain Yard Players",
+      "area": "Bolton",
+      "theme": "arts",
+      "summary": "Proofread a draft performance programme against the cast-approved running order.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Drafts are shared as accessible text files.",
+      "interests": [
+        "theatre",
+        "writing",
+        "checking"
+      ],
+      "tasks": [
+        "Check the scene titles",
+        "Flag a mismatched name"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:programme-proofreader",
+        "title": "roles.csv:programme-proofreader",
+        "theme": "roles.csv:programme-proofreader",
+        "summary": "roles.csv:programme-proofreader",
+        "interests": "roles.csv:programme-proofreader",
+        "tasks": "roles.csv:programme-proofreader",
+        "organisation": "hosts.json:theatre",
+        "area": "hosts.json:theatre",
+        "time": "sessions.csv:S89",
+        "mode": "sessions.csv:S89",
+        "stepFree": "sessions.csv:S89",
+        "contactNote": "sessions.csv:S89",
+        "caseFacts": "case-facts.csv:programme-proofreader"
+      }
+    },
+    {
+      "id": "pronunciation-cards",
+      "title": "Pronunciation card maker",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Prepare illustrated word cards for facilitators to use in a beginners' English class.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Use the club's approved word list.",
+      "interests": [
+        "literacy",
+        "design",
+        "languages"
+      ],
+      "tasks": [
+        "Choose a picture for each word",
+        "Check the spelling list"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:pronunciation-cards",
+        "title": "roles.csv:pronunciation-cards",
+        "theme": "roles.csv:pronunciation-cards",
+        "summary": "roles.csv:pronunciation-cards",
+        "interests": "roles.csv:pronunciation-cards",
+        "tasks": "roles.csv:pronunciation-cards",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S29",
+        "mode": "sessions.csv:S29",
+        "stepFree": "sessions.csv:S29",
+        "contactNote": "sessions.csv:S29",
+        "caseFacts": "case-facts.csv:pronunciation-cards"
+      }
+    },
+    {
+      "id": "prop-cataloguer",
+      "title": "Stage prop cataloguer",
+      "organisation": "Curtain Yard Players",
+      "area": "Bolton",
+      "theme": "arts",
+      "summary": "Describe reusable stage props so production teams can find them in the cupboard.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "no",
+      "contactNote": "The props cupboard is up one flight of stairs.",
+      "interests": [
+        "theatre",
+        "heritage",
+        "organising"
+      ],
+      "tasks": [
+        "Check the prop number",
+        "Record the shelf location"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 5.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:prop-cataloguer",
+        "title": "roles.csv:prop-cataloguer",
+        "theme": "roles.csv:prop-cataloguer",
+        "summary": "roles.csv:prop-cataloguer",
+        "interests": "roles.csv:prop-cataloguer",
+        "tasks": "roles.csv:prop-cataloguer",
+        "organisation": "hosts.json:theatre",
+        "area": "hosts.json:theatre",
+        "time": "sessions.csv:S88",
+        "mode": "sessions.csv:S88",
+        "stepFree": "sessions.csv:S88",
+        "contactNote": "sessions.csv:S88",
+        "caseFacts": "case-facts.csv:prop-cataloguer"
+      }
+    },
+    {
+      "id": "rain-gauge-reader",
+      "title": "Rain gauge reader",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Record the water level in a labelled rain gauge for a neighbourhood weather diary.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The gauge is accessible from a paved path.",
+      "interests": [
+        "weather",
+        "nature",
+        "observation"
+      ],
+      "tasks": [
+        "Read the gauge scale",
+        "Enter the reading on a paper chart"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:rain-gauge-reader",
+        "title": "roles.csv:rain-gauge-reader",
+        "theme": "roles.csv:rain-gauge-reader",
+        "summary": "roles.csv:rain-gauge-reader",
+        "interests": "roles.csv:rain-gauge-reader",
+        "tasks": "roles.csv:rain-gauge-reader",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S56",
+        "mode": "sessions.csv:S56",
+        "stepFree": "sessions.csv:S56",
+        "contactNote": "sessions.csv:S56",
+        "caseFacts": "case-facts.csv:rain-gauge-reader"
       }
     },
     {
@@ -431,6 +3424,18 @@
         "Read aloud",
         "Practise English"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:reading-partner",
         "title": "roles.csv:reading-partner",
@@ -443,7 +3448,104 @@
         "time": "sessions.csv:S08",
         "mode": "sessions.csv:S08",
         "stepFree": "sessions.csv:S08",
-        "contactNote": "sessions.csv:S08"
+        "contactNote": "sessions.csv:S08",
+        "caseFacts": "case-facts.csv:reading-partner"
+      }
+    },
+    {
+      "id": "recipe-copy-editor",
+      "title": "Community recipe copy editor",
+      "organisation": "Elm Table Collective",
+      "area": "Longsight",
+      "theme": "food",
+      "summary": "Turn handwritten recipe contributions into consistent recipe cards for a shared booklet.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "A coordinator approves quantities with contributors.",
+      "interests": [
+        "food",
+        "writing",
+        "editing"
+      ],
+      "tasks": [
+        "Check the order of instructions",
+        "Mark missing quantities for the author"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:recipe-copy-editor",
+        "title": "roles.csv:recipe-copy-editor",
+        "theme": "roles.csv:recipe-copy-editor",
+        "summary": "roles.csv:recipe-copy-editor",
+        "interests": "roles.csv:recipe-copy-editor",
+        "tasks": "roles.csv:recipe-copy-editor",
+        "organisation": "hosts.json:table",
+        "area": "hosts.json:table",
+        "time": "sessions.csv:S66",
+        "mode": "sessions.csv:S66",
+        "stepFree": "sessions.csv:S66",
+        "contactNote": "sessions.csv:S66",
+        "caseFacts": "case-facts.csv:recipe-copy-editor"
+      }
+    },
+    {
+      "id": "rehearsal-notes-helper",
+      "title": "Rehearsal notes helper",
+      "organisation": "Red Spool Music Circle",
+      "area": "Manchester",
+      "theme": "arts",
+      "summary": "Turn a music leader's rehearsal notes into a short practice list for choir members.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The choir leader reviews the list.",
+      "interests": [
+        "music",
+        "writing",
+        "organising"
+      ],
+      "tasks": [
+        "Group notes by song",
+        "Check bar numbers with the leader"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:rehearsal-notes-helper",
+        "title": "roles.csv:rehearsal-notes-helper",
+        "theme": "roles.csv:rehearsal-notes-helper",
+        "summary": "roles.csv:rehearsal-notes-helper",
+        "interests": "roles.csv:rehearsal-notes-helper",
+        "tasks": "roles.csv:rehearsal-notes-helper",
+        "organisation": "hosts.json:music",
+        "area": "hosts.json:music",
+        "time": "sessions.csv:S93",
+        "mode": "sessions.csv:S93",
+        "stepFree": "sessions.csv:S93",
+        "contactNote": "sessions.csv:S93",
+        "caseFacts": "case-facts.csv:rehearsal-notes-helper"
       }
     },
     {
@@ -465,6 +3567,13 @@
         "Sort tools",
         "Help with mending"
       ],
+      "caseFacts": {
+        "slots": [],
+        "distanceMiles": 4.5,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:repair-cafe",
         "title": "roles.csv:repair-cafe",
@@ -477,7 +3586,56 @@
         "time": "sessions.csv:S05",
         "mode": "sessions.csv:S05",
         "stepFree": "sessions.csv:S05",
-        "contactNote": "sessions.csv:S05"
+        "contactNote": "sessions.csv:S05",
+        "caseFacts": "case-facts.csv:repair-cafe"
+      }
+    },
+    {
+      "id": "rhythm-session-helper",
+      "title": "Rhythm circle helper",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Set up hand percussion instruments for a group session and support turn-taking games.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A session leader runs the musical activities.",
+      "interests": [
+        "music",
+        "group activities",
+        "events"
+      ],
+      "tasks": [
+        "Lay out shakers",
+        "Collect instruments after the circle"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 5.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:rhythm-session-helper",
+        "title": "roles.csv:rhythm-session-helper",
+        "theme": "roles.csv:rhythm-session-helper",
+        "summary": "roles.csv:rhythm-session-helper",
+        "interests": "roles.csv:rhythm-session-helper",
+        "tasks": "roles.csv:rhythm-session-helper",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S46",
+        "mode": "sessions.csv:S46",
+        "stepFree": "sessions.csv:S46",
+        "contactNote": "sessions.csv:S46",
+        "caseFacts": "case-facts.csv:rhythm-session-helper"
       }
     },
     {
@@ -499,6 +3657,18 @@
         "Collect litter",
         "Sort recycling"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:river-walk",
         "title": "roles.csv:river-walk",
@@ -511,7 +3681,156 @@
         "time": "sessions.csv:S07",
         "mode": "sessions.csv:S07",
         "stepFree": "sessions.csv:S07",
-        "contactNote": "sessions.csv:S07"
+        "contactNote": "sessions.csv:S07",
+        "caseFacts": "case-facts.csv:river-walk"
+      }
+    },
+    {
+      "id": "screen-reader-study",
+      "title": "Screen reader study partner",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Work one to one to practise screen reader shortcuts with a learner using a demonstration laptop.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Loan laptops have headphones and the software installed.",
+      "interests": [
+        "digital",
+        "accessibility",
+        "teaching"
+      ],
+      "tasks": [
+        "Navigate a sample heading list",
+        "Compare two keyboard commands"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 5.2,
+        "clearance": "none-listed",
+        "individualEvidence": "one to one",
+        "digitalEvidence": "practise screen reader shortcuts"
+      },
+      "sources": {
+        "id": "roles.csv:screen-reader-study",
+        "title": "roles.csv:screen-reader-study",
+        "theme": "roles.csv:screen-reader-study",
+        "summary": "roles.csv:screen-reader-study",
+        "interests": "roles.csv:screen-reader-study",
+        "tasks": "roles.csv:screen-reader-study",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S24",
+        "mode": "sessions.csv:S24",
+        "stepFree": "sessions.csv:S24",
+        "contactNote": "sessions.csv:S24",
+        "caseFacts": "case-facts.csv:screen-reader-study"
+      }
+    },
+    {
+      "id": "seasonal-calendar-maker",
+      "title": "Seasonal calendar maker",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Arrange the club's observations of blossom and first leaves into a seasonal calendar.",
+      "time": "flexible",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "A club member reviews the draft calendar.",
+      "interests": [
+        "nature",
+        "design",
+        "writing"
+      ],
+      "tasks": [
+        "Check observation dates",
+        "Add the plant names"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          },
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:seasonal-calendar-maker",
+        "title": "roles.csv:seasonal-calendar-maker",
+        "theme": "roles.csv:seasonal-calendar-maker",
+        "summary": "roles.csv:seasonal-calendar-maker",
+        "interests": "roles.csv:seasonal-calendar-maker",
+        "tasks": "roles.csv:seasonal-calendar-maker",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S62",
+        "mode": "sessions.csv:S62",
+        "stepFree": "sessions.csv:S62",
+        "contactNote": "sessions.csv:S62",
+        "caseFacts": "case-facts.csv:seasonal-calendar-maker"
+      }
+    },
+    {
+      "id": "seated-game-steward",
+      "title": "Seated games steward",
+      "organisation": "Sidegate Sport Collective",
+      "area": "Tameside",
+      "theme": "community",
+      "summary": "Lay out adapted game equipment and demonstrate the session leader's warm-up activity.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A trained leader runs the session.",
+      "interests": [
+        "sport",
+        "accessibility",
+        "games"
+      ],
+      "tasks": [
+        "Place the markers",
+        "Return beanbags to their baskets"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.5,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:seated-game-steward",
+        "title": "roles.csv:seated-game-steward",
+        "theme": "roles.csv:seated-game-steward",
+        "summary": "roles.csv:seated-game-steward",
+        "interests": "roles.csv:seated-game-steward",
+        "tasks": "roles.csv:seated-game-steward",
+        "organisation": "hosts.json:accessible-sport",
+        "area": "hosts.json:accessible-sport",
+        "time": "sessions.csv:S83",
+        "mode": "sessions.csv:S83",
+        "stepFree": "sessions.csv:S83",
+        "contactNote": "sessions.csv:S83",
+        "caseFacts": "case-facts.csv:seated-game-steward"
       }
     },
     {
@@ -533,6 +3852,18 @@
         "Sort seeds",
         "Label seed packets"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:seed-sorter",
         "title": "roles.csv:seed-sorter",
@@ -545,7 +3876,8 @@
         "time": "sessions.csv:S14",
         "mode": "sessions.csv:S14",
         "stepFree": "sessions.csv:S14",
-        "contactNote": "sessions.csv:S14"
+        "contactNote": "sessions.csv:S14",
+        "caseFacts": "case-facts.csv:seed-sorter"
       }
     },
     {
@@ -568,6 +3900,18 @@
         "Walk dogs in pairs",
         "Return leads after the walk"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.2,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:shelter-dog-walker",
         "title": "roles.csv:shelter-dog-walker",
@@ -580,7 +3924,536 @@
         "time": "sessions.csv:S16",
         "mode": "sessions.csv:S16",
         "stepFree": "sessions.csv:S16",
-        "contactNote": "sessions.csv:S16"
+        "contactNote": "sessions.csv:S16",
+        "caseFacts": "case-facts.csv:shelter-dog-walker"
+      }
+    },
+    {
+      "id": "sound-map-editor",
+      "title": "Neighbourhood sound map editor",
+      "organisation": "Millgate Sound Bench",
+      "area": "Oldham",
+      "theme": "arts",
+      "summary": "Link recorded street sounds to marked locations on a public listening map.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "A coordinator approves every location before publication.",
+      "interests": [
+        "audio",
+        "mapping",
+        "heritage"
+      ],
+      "tasks": [
+        "Check each place label",
+        "Write a short sound description"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:sound-map-editor",
+        "title": "roles.csv:sound-map-editor",
+        "theme": "roles.csv:sound-map-editor",
+        "summary": "roles.csv:sound-map-editor",
+        "interests": "roles.csv:sound-map-editor",
+        "tasks": "roles.csv:sound-map-editor",
+        "organisation": "hosts.json:sound-bench",
+        "area": "hosts.json:sound-bench",
+        "time": "sessions.csv:S41",
+        "mode": "sessions.csv:S41",
+        "stepFree": "sessions.csv:S41",
+        "contactNote": "sessions.csv:S41",
+        "caseFacts": "case-facts.csv:sound-map-editor"
+      }
+    },
+    {
+      "id": "story-bag-steward",
+      "title": "Story bag steward",
+      "organisation": "Turnleaf Lending Room",
+      "area": "Bury",
+      "theme": "learning",
+      "summary": "Prepare book and puppet sets for family storytelling sessions.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The role prepares resources at a staffed desk.",
+      "interests": [
+        "books",
+        "families",
+        "organising"
+      ],
+      "tasks": [
+        "Match each puppet to its book",
+        "Check sets on return"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.8,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:story-bag-steward",
+        "title": "roles.csv:story-bag-steward",
+        "theme": "roles.csv:story-bag-steward",
+        "summary": "roles.csv:story-bag-steward",
+        "interests": "roles.csv:story-bag-steward",
+        "tasks": "roles.csv:story-bag-steward",
+        "organisation": "hosts.json:library-loans",
+        "area": "hosts.json:library-loans",
+        "time": "sessions.csv:S99",
+        "mode": "sessions.csv:S99",
+        "stepFree": "sessions.csv:S99",
+        "contactNote": "sessions.csv:S99",
+        "caseFacts": "case-facts.csv:story-bag-steward"
+      }
+    },
+    {
+      "id": "story-sequence-helper",
+      "title": "Picture sequence workshop helper",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Help families arrange picture cards into a story and retell the sequence aloud.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The family programme checks safeguarding clearance.",
+      "interests": [
+        "families",
+        "storytelling",
+        "teaching"
+      ],
+      "tasks": [
+        "Lay out story cards",
+        "Encourage turn-taking"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.3,
+        "clearance": "required",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:story-sequence-helper",
+        "title": "roles.csv:story-sequence-helper",
+        "theme": "roles.csv:story-sequence-helper",
+        "summary": "roles.csv:story-sequence-helper",
+        "interests": "roles.csv:story-sequence-helper",
+        "tasks": "roles.csv:story-sequence-helper",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S35",
+        "mode": "sessions.csv:S35",
+        "stepFree": "sessions.csv:S35",
+        "contactNote": "sessions.csv:S35",
+        "caseFacts": "case-facts.csv:story-sequence-helper"
+      }
+    },
+    {
+      "id": "stream-photo-annotator",
+      "title": "Stream photograph annotator",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Compare fixed-point photographs of a stream and describe changes in its banks.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "The club provides dated image pairs.",
+      "interests": [
+        "nature",
+        "observation",
+        "photography"
+      ],
+      "tasks": [
+        "Match two camera viewpoints",
+        "Describe visible erosion"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:stream-photo-annotator",
+        "title": "roles.csv:stream-photo-annotator",
+        "theme": "roles.csv:stream-photo-annotator",
+        "summary": "roles.csv:stream-photo-annotator",
+        "interests": "roles.csv:stream-photo-annotator",
+        "tasks": "roles.csv:stream-photo-annotator",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S61",
+        "mode": "sessions.csv:S61",
+        "stepFree": "sessions.csv:S61",
+        "contactNote": "sessions.csv:S61",
+        "caseFacts": "case-facts.csv:stream-photo-annotator"
+      }
+    },
+    {
+      "id": "supper-signup-helper",
+      "title": "Supper reservations helper",
+      "organisation": "Elm Table Collective",
+      "area": "Longsight",
+      "theme": "food",
+      "summary": "Contact registered guests to confirm their places at a neighbourhood supper.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "Use the host's call system and booking guidance.",
+      "interests": [
+        "hospitality",
+        "listening",
+        "organising"
+      ],
+      "tasks": [
+        "Read the agreed call script",
+        "Record attendance numbers"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "unknown",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:supper-signup-helper",
+        "title": "roles.csv:supper-signup-helper",
+        "theme": "roles.csv:supper-signup-helper",
+        "summary": "roles.csv:supper-signup-helper",
+        "interests": "roles.csv:supper-signup-helper",
+        "tasks": "roles.csv:supper-signup-helper",
+        "organisation": "hosts.json:table",
+        "area": "hosts.json:table",
+        "time": "sessions.csv:S70",
+        "mode": "sessions.csv:S70",
+        "stepFree": "sessions.csv:S70",
+        "contactNote": "sessions.csv:S70",
+        "caseFacts": "case-facts.csv:supper-signup-helper"
+      }
+    },
+    {
+      "id": "swim-kit-steward",
+      "title": "Swim kit steward",
+      "organisation": "Sidegate Sport Collective",
+      "area": "Tameside",
+      "theme": "community",
+      "summary": "Sort clean floats and number the equipment baskets used for an inclusive swim session.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The role takes place on the dry side of the pool.",
+      "interests": [
+        "sport",
+        "equipment",
+        "organising"
+      ],
+      "tasks": [
+        "Label baskets",
+        "Check floats against the list"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.5,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:swim-kit-steward",
+        "title": "roles.csv:swim-kit-steward",
+        "theme": "roles.csv:swim-kit-steward",
+        "summary": "roles.csv:swim-kit-steward",
+        "interests": "roles.csv:swim-kit-steward",
+        "tasks": "roles.csv:swim-kit-steward",
+        "organisation": "hosts.json:accessible-sport",
+        "area": "hosts.json:accessible-sport",
+        "time": "sessions.csv:S82",
+        "mode": "sessions.csv:S82",
+        "stepFree": "sessions.csv:S82",
+        "contactNote": "sessions.csv:S82",
+        "caseFacts": "case-facts.csv:swim-kit-steward"
+      }
+    },
+    {
+      "id": "tablet-basics-host",
+      "title": "Tablet practice group host",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Guide a small group as they practise tablet settings on loan devices at the centre.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The session uses the screens in the ground-floor training room.",
+      "interests": [
+        "digital",
+        "teaching",
+        "accessibility"
+      ],
+      "tasks": [
+        "Demonstrate larger text",
+        "Guide the group through display settings"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 1.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": "practise tablet settings"
+      },
+      "sources": {
+        "id": "roles.csv:tablet-basics-host",
+        "title": "roles.csv:tablet-basics-host",
+        "theme": "roles.csv:tablet-basics-host",
+        "summary": "roles.csv:tablet-basics-host",
+        "interests": "roles.csv:tablet-basics-host",
+        "tasks": "roles.csv:tablet-basics-host",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S26",
+        "mode": "sessions.csv:S26",
+        "stepFree": "sessions.csv:S26",
+        "contactNote": "sessions.csv:S26",
+        "caseFacts": "case-facts.csv:tablet-basics-host"
+      }
+    },
+    {
+      "id": "tool-loan-clerk",
+      "title": "Tool library loans clerk",
+      "organisation": "Roundhouse Reuse Store",
+      "area": "Salford",
+      "theme": "repair",
+      "summary": "Welcome borrowers and check numbered hand tools against a lending sheet.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The workshop lead checks that returned tools are safe.",
+      "interests": [
+        "equipment",
+        "organising",
+        "welcome"
+      ],
+      "tasks": [
+        "Issue a loan slip",
+        "Record returned items"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.0,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:tool-loan-clerk",
+        "title": "roles.csv:tool-loan-clerk",
+        "theme": "roles.csv:tool-loan-clerk",
+        "summary": "roles.csv:tool-loan-clerk",
+        "interests": "roles.csv:tool-loan-clerk",
+        "tasks": "roles.csv:tool-loan-clerk",
+        "organisation": "hosts.json:reuse",
+        "area": "hosts.json:reuse",
+        "time": "sessions.csv:S71",
+        "mode": "sessions.csv:S71",
+        "stepFree": "sessions.csv:S71",
+        "contactNote": "sessions.csv:S71",
+        "caseFacts": "case-facts.csv:tool-loan-clerk"
+      }
+    },
+    {
+      "id": "tree-label-checker",
+      "title": "Tree label checker",
+      "organisation": "Brookbend Water Club",
+      "area": "Trafford",
+      "theme": "nature",
+      "summary": "Check the numbered labels on a marked trail against an illustrated tree list.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The checked route follows the level entrance path.",
+      "interests": [
+        "trees",
+        "observation",
+        "outdoors"
+      ],
+      "tasks": [
+        "Read the tree marker",
+        "Note a damaged label"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.3,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:tree-label-checker",
+        "title": "roles.csv:tree-label-checker",
+        "theme": "roles.csv:tree-label-checker",
+        "summary": "roles.csv:tree-label-checker",
+        "interests": "roles.csv:tree-label-checker",
+        "tasks": "roles.csv:tree-label-checker",
+        "organisation": "hosts.json:waterclub",
+        "area": "hosts.json:waterclub",
+        "time": "sessions.csv:S58",
+        "mode": "sessions.csv:S58",
+        "stepFree": "sessions.csv:S58",
+        "contactNote": "sessions.csv:S58",
+        "caseFacts": "case-facts.csv:tree-label-checker"
+      }
+    },
+    {
+      "id": "upcycled-bag-helper",
+      "title": "Bag making workshop helper",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Prepare reclaimed fabric pieces for a group making reusable shopping bags.",
+      "time": "weekend",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Cutting tools are issued by the session leader.",
+      "interests": [
+        "craft",
+        "reuse",
+        "sewing"
+      ],
+      "tasks": [
+        "Trace a handle template",
+        "Bundle matching panels"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sat",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:upcycled-bag-helper",
+        "title": "roles.csv:upcycled-bag-helper",
+        "theme": "roles.csv:upcycled-bag-helper",
+        "summary": "roles.csv:upcycled-bag-helper",
+        "interests": "roles.csv:upcycled-bag-helper",
+        "tasks": "roles.csv:upcycled-bag-helper",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S50",
+        "mode": "sessions.csv:S50",
+        "stepFree": "sessions.csv:S50",
+        "contactNote": "sessions.csv:S50",
+        "caseFacts": "case-facts.csv:upcycled-bag-helper"
+      }
+    },
+    {
+      "id": "video-call-coach",
+      "title": "Video call practice companion",
+      "organisation": "Copper Link Room",
+      "area": "Salford",
+      "theme": "digital",
+      "summary": "Support one learner per call as they practise video calling a test account on their own device.",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "A coordinator schedules a supervised introductory call.",
+      "interests": [
+        "teaching",
+        "digital",
+        "communication"
+      ],
+      "tasks": [
+        "Set up a practice call",
+        "Try the mute and caption controls"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": "one learner per call",
+        "digitalEvidence": "practise video calling"
+      },
+      "sources": {
+        "id": "roles.csv:video-call-coach",
+        "title": "roles.csv:video-call-coach",
+        "theme": "roles.csv:video-call-coach",
+        "summary": "roles.csv:video-call-coach",
+        "interests": "roles.csv:video-call-coach",
+        "tasks": "roles.csv:video-call-coach",
+        "organisation": "hosts.json:link-room",
+        "area": "hosts.json:link-room",
+        "time": "sessions.csv:S22",
+        "mode": "sessions.csv:S22",
+        "stepFree": "sessions.csv:S22",
+        "contactNote": "sessions.csv:S22",
+        "caseFacts": "case-facts.csv:video-call-coach"
       }
     },
     {
@@ -602,6 +4475,18 @@
         "Check navigation",
         "Write bug reports"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:website-tester",
         "title": "roles.csv:website-tester",
@@ -614,7 +4499,8 @@
         "time": "sessions.csv:S12",
         "mode": "sessions.csv:S12",
         "stepFree": "sessions.csv:S12",
-        "contactNote": "sessions.csv:S12"
+        "contactNote": "sessions.csv:S12",
+        "caseFacts": "case-facts.csv:website-tester"
       }
     },
     {
@@ -636,6 +4522,18 @@
         "Meet visitors",
         "Give directions"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Mon",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 2.4,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:welcome-desk",
         "title": "roles.csv:welcome-desk",
@@ -648,7 +4546,104 @@
         "time": "sessions.csv:S11",
         "mode": "sessions.csv:S11",
         "stepFree": "sessions.csv:S11",
-        "contactNote": "sessions.csv:S11"
+        "contactNote": "sessions.csv:S11",
+        "caseFacts": "case-facts.csv:welcome-desk"
+      }
+    },
+    {
+      "id": "welcome-pack-assembler",
+      "title": "New neighbour welcome pack assembler",
+      "organisation": "Beech Corner Neighbours",
+      "area": "Stockport",
+      "theme": "community",
+      "summary": "Gather local service leaflets into welcome packs and check each pack against the current list.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A seated work area is available.",
+      "interests": [
+        "community",
+        "organising",
+        "welcome"
+      ],
+      "tasks": [
+        "Sort the leaflets",
+        "Remove out-of-date copies"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 3.7,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:welcome-pack-assembler",
+        "title": "roles.csv:welcome-pack-assembler",
+        "theme": "roles.csv:welcome-pack-assembler",
+        "summary": "roles.csv:welcome-pack-assembler",
+        "interests": "roles.csv:welcome-pack-assembler",
+        "tasks": "roles.csv:welcome-pack-assembler",
+        "organisation": "hosts.json:town-guide",
+        "area": "hosts.json:town-guide",
+        "time": "sessions.csv:S80",
+        "mode": "sessions.csv:S80",
+        "stepFree": "sessions.csv:S80",
+        "contactNote": "sessions.csv:S80",
+        "caseFacts": "case-facts.csv:welcome-pack-assembler"
+      }
+    },
+    {
+      "id": "welcome-route-host",
+      "title": "Arrival route companion",
+      "organisation": "Corner Route Exchange",
+      "area": "Hulme",
+      "theme": "community",
+      "summary": "Meet one new visitor at a nearby bus stop and accompany them to a staffed welcome desk.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "The host confirms the route with the visitor.",
+      "interests": [
+        "travel",
+        "welcome",
+        "people"
+      ],
+      "tasks": [
+        "Agree a meeting landmark",
+        "Introduce the reception steward"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 1.7,
+        "clearance": "unknown",
+        "individualEvidence": "one new visitor",
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:welcome-route-host",
+        "title": "roles.csv:welcome-route-host",
+        "theme": "roles.csv:welcome-route-host",
+        "summary": "roles.csv:welcome-route-host",
+        "interests": "roles.csv:welcome-route-host",
+        "tasks": "roles.csv:welcome-route-host",
+        "organisation": "hosts.json:route-desk",
+        "area": "hosts.json:route-desk",
+        "time": "sessions.csv:S76",
+        "mode": "sessions.csv:S76",
+        "stepFree": "sessions.csv:S76",
+        "contactNote": "sessions.csv:S76",
+        "caseFacts": "case-facts.csv:welcome-route-host"
       }
     },
     {
@@ -670,6 +4665,18 @@
         "Identify birds",
         "Record sightings"
       ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Sun",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 4.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
       "sources": {
         "id": "roles.csv:wildlife-counter",
         "title": "roles.csv:wildlife-counter",
@@ -682,7 +4689,152 @@
         "time": "sessions.csv:S13",
         "mode": "sessions.csv:S13",
         "stepFree": "sessions.csv:S13",
-        "contactNote": "sessions.csv:S13"
+        "contactNote": "sessions.csv:S13",
+        "caseFacts": "case-facts.csv:wildlife-counter"
+      }
+    },
+    {
+      "id": "writing-partner",
+      "title": "Letter writing partner",
+      "organisation": "Two Tables Language Club",
+      "area": "Rusholme",
+      "theme": "learning",
+      "summary": "Help one adult at a time practise writing a short everyday letter on paper.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "Learners choose their own non-sensitive examples.",
+      "interests": [
+        "writing",
+        "teaching",
+        "literacy"
+      ],
+      "tasks": [
+        "Draft a greeting",
+        "Read the letter back together"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.3,
+        "clearance": "none-listed",
+        "individualEvidence": "one adult at a time",
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:writing-partner",
+        "title": "roles.csv:writing-partner",
+        "theme": "roles.csv:writing-partner",
+        "summary": "roles.csv:writing-partner",
+        "interests": "roles.csv:writing-partner",
+        "tasks": "roles.csv:writing-partner",
+        "organisation": "hosts.json:lang",
+        "area": "hosts.json:lang",
+        "time": "sessions.csv:S30",
+        "mode": "sessions.csv:S30",
+        "stepFree": "sessions.csv:S30",
+        "contactNote": "sessions.csv:S30",
+        "caseFacts": "case-facts.csv:writing-partner"
+      }
+    },
+    {
+      "id": "yarn-swatch-filer",
+      "title": "Yarn swatch filer",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Organise small knitted samples by fibre and texture for a shared materials cupboard.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A seated station is available beside the cupboard.",
+      "interests": [
+        "textiles",
+        "organising",
+        "craft"
+      ],
+      "tasks": [
+        "Tie on sample labels",
+        "Group swatches by texture"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "daytime"
+          }
+        ],
+        "distanceMiles": 6.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:yarn-swatch-filer",
+        "title": "roles.csv:yarn-swatch-filer",
+        "theme": "roles.csv:yarn-swatch-filer",
+        "summary": "roles.csv:yarn-swatch-filer",
+        "interests": "roles.csv:yarn-swatch-filer",
+        "tasks": "roles.csv:yarn-swatch-filer",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S48",
+        "mode": "sessions.csv:S48",
+        "stepFree": "sessions.csv:S48",
+        "contactNote": "sessions.csv:S48",
+        "caseFacts": "case-facts.csv:yarn-swatch-filer"
+      }
+    },
+    {
+      "id": "zip-practice-helper",
+      "title": "Zip practice table helper",
+      "organisation": "Shuttle Street Makers",
+      "area": "Rochdale",
+      "theme": "repair",
+      "summary": "Prepare fabric samples for people learning how to fit a zip for the first time.",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "yes",
+      "contactNote": "A tutor demonstrates the sewing machine.",
+      "interests": [
+        "sewing",
+        "practical",
+        "teaching"
+      ],
+      "tasks": [
+        "Mark the zip position",
+        "Pin a sample seam"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 6.1,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "sources": {
+        "id": "roles.csv:zip-practice-helper",
+        "title": "roles.csv:zip-practice-helper",
+        "theme": "roles.csv:zip-practice-helper",
+        "summary": "roles.csv:zip-practice-helper",
+        "interests": "roles.csv:zip-practice-helper",
+        "tasks": "roles.csv:zip-practice-helper",
+        "organisation": "hosts.json:textile",
+        "area": "hosts.json:textile",
+        "time": "sessions.csv:S47",
+        "mode": "sessions.csv:S47",
+        "stepFree": "sessions.csv:S47",
+        "contactNote": "sessions.csv:S47",
+        "caseFacts": "case-facts.csv:zip-practice-helper"
       }
     }
   ],

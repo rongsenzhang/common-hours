@@ -1,4 +1,6 @@
 // This module is server-only. The catalogue is loaded by the host, never from the chat request.
+import { checkedEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, validCommunityProfile } from "./community-chat.mjs";
+import { EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
 import { matchOpportunities } from "../site/engine.js";
 
 export const DEFAULT_MODEL = "gpt-5.4-mini-2026-03-17";
@@ -11,6 +13,9 @@ const INTENTS = [
   "clarify",
   "unknown",
   "search",
+  "case_search",
+  "explain",
+  "explore",
   "more",
   "detail",
   "application",
@@ -64,7 +69,7 @@ function validIds(values, known, limit) {
 
 export function validateTurn({ message, history = [] }, roles) {
   if (
-    !boundedText(message, 600) ||
+    !boundedText(message, 1200) ||
     !Array.isArray(history) ||
     history.length > 8
   )
@@ -73,11 +78,12 @@ export function validateTurn({ message, history = [] }, roles) {
   const turns = history.map((turn) => {
     if (
       !turn ||
-      !boundedText(turn.user, 600) ||
+      !boundedText(turn.user, 1200) ||
       !boundedText(turn.text, 1200) ||
       !validIds(turn.matches ?? [], known, 3) ||
       !validIds(turn.toConfirm ?? [], known, 3) ||
-      (turn.matches?.length ?? 0) + (turn.toConfirm?.length ?? 0) > 3
+      new Set([...(turn.matches ?? []), ...(turn.toConfirm ?? [])]).size !==
+        (turn.matches?.length ?? 0) + (turn.toConfirm?.length ?? 0)
     )
       throw badInput();
     return {
@@ -106,6 +112,16 @@ function planSchema(roles) {
       type: "array",
       items: enumString(roles.map((role) => role.id)),
     },
+    case_profile: communityProfileSchema(),
+    role_evidence: {
+      type: "array", maxItems: 6,
+      items: {
+        type: "object", additionalProperties: false,
+        properties: {role_id: enumString(roles.map(role => role.id)), quote: {type:"string"}, user_quote: {type:"string"}},
+        required: ["role_id", "quote", "user_quote"],
+      },
+    },
+    follow_up: {type: "string"},
     reply: { type: "string" },
   };
   return {
@@ -121,19 +137,25 @@ const INSTRUCTIONS = `You are Common Hours, an OpenAI-powered assistant for find
 Choose one intent:
 - social: greet, answer a pleasantry naturally, then briefly invite a volunteering question. "How are you?" and "Do you like dogs?" can be small talk. Do not treat them as new search topics.
 - identity: questions about who, what model, whether Gemini or ChatGPT, or how the assistant works. The server supplies the actual identity.
+- explore: an undecided visitor asks for help getting started, identifying skills, or choosing a direction and has offered too little to recommend a specific role. Answer warmly and ask ONE specific, easy discovery question, grounded in what they said (e.g. what others ask them to help with, a task they enjoy, or when they are usually free). Once they offer usable information, move to search/case_search, retain it across the conversation and recommend even if some optional preferences are unknown. Never guess a travel radius, timing, safeguarding status, skills or exclusions.
+- explain: "why these?", "why would that suit me?", or differences between earlier options. Use only referenced or most recently displayed IDs. Retain the active case profile, if any, and select per-role evidence explaining how each relates to the user.
 - advice: useful general volunteering advice, for instance what to ask at a first shift or how to choose between roles. Write an original brief reply, tailored to the question.
 - off_topic: unrelated chat, creative requests, weather or general-purpose tasks. Gently redirect to volunteering, and keep the last search intact.
 - clarify: ask one focused question when an intended activity or a reference such as "the first one" is ambiguous.
-- unknown: a requested requirement cannot be checked in these records, e.g. exact start time, age eligibility, wheelchair needs beyond step-free routes, pay, live vacancies or individual-day availability. Carry such requirements forward until the visitor explicitly changes them. Ask the host to confirm. Never turn a specific date or time into a confirmed weekday/weekend match.
+- unknown: a requested requirement cannot be checked in these records, e.g. exact start time, age eligibility, wheelchair needs beyond step-free routes, pay or live vacancies. Carry such requirements forward until the visitor explicitly changes them. Ask the host to confirm. Never reduce an exact clock time or calendar date to a general day or period.
 - application: real booking, contact or applying.
 - search: actual requests to find an activity, including a follow-up modifying a preference. Read the preceding visitor messages and displayed role IDs. Carry forward the active activity and requirements across social, identity and off-topic exchanges. Only replace a preference the visitor changes. Preserve exclusions. Use an empty activity only when the user genuinely wants to browse broadly. Use concise English search terms grounded in the activity, translating natural language as needed (e.g. "walk dogs", "allotment" or "reading"). Never drop the distinguishing object in a request, such as "horses" in "walk horses".
+- case_search: interpret a volunteer profile, a specific weekly day, day/evening period, travel radius, interest in one-to-one/digital support, safeguarding requirements, a named Case A/B, or follow-up that changes any active profile constraint. Use case_search even for a pasted interview case. The search is ALWAYS across the community catalogue. The named case statements are example volunteer inputs, not a separate list of roles. "Case B" alone refers to A with online participation removed. "The same volunteer can no longer volunteer online" retains the last profile, or A if there is no earlier one. Preserve unchanged constraints even after small talk. If a different literal case profile is pasted in full, interpret its actual wording. Mark unsupported mandatory conditions unknown and explain what to ask. Examples: exact clock times, "mornings only" (daytime is too broad), a specific street address or actual distance from the visitor's own home, or a hard prohibition on any group activity when the record only describes some individual support. For contradictions clarify.
 - more: the next page of an existing search. Keep the previous criteria.
 - detail: explicit question about an identifiable role, several named roles, the first/second previously shown option, or its tasks, location, accessibility or schedule. Select only the referenced ID(s). If an asked-for detail isn't in the catalogue use unknown.
 
-candidate_ids: choose all genuinely relevant catalogue IDs in order, considering actual tasks and interests. For a recommendation, include topically suitable roles before time/mode/access filtering (the server enforces these facts). Return [] if the activity is absent. For "walk dogs" both dog walking roles qualify, the supply sorter and litter walk do not. Sorting cycle workshop kit and repairing a bicycle are different activities. For a broad request such as remote work, include every plausible option. For explicit alternatives or exclusions respect the visitor's request. Never pad a shortlist.
+candidate_ids: choose all genuinely relevant catalogue IDs in order, considering actual tasks and interests. For a recommendation, include topically suitable roles before time/mode/access filtering (the server enforces these facts). Return [] if the activity is absent. For "walk dogs" both dog walking roles qualify, the supply sorter and litter walk do not. Sorting cycle workshop kit and repairing a bicycle are different activities. For a broad search without a named activity use an empty activity. The server will then consider all records. For explicit alternatives or exclusions respect the visitor's request. Never pad a shortlist.
+
+case_profile: required non-null only for case_search and for detail/more/explain continuing such a profile, otherwise null. Interpret evidence semantically in English or Chinese. days is the set of available days; use all seven if unspecified. period is any, daytime or evening. Use either mode for "online is fine"; only explicit online-only or in-person-only requests restrict mode. maxMiles is null if unrestricted. All example venue distances use one fixed fictional origin. Uncertain or unmentioned clearance is unknown. Only use verifiedRoleId when the visitor explicitly reports verification for that named role. A generic DBS or uncertainty about transfer is unknown; a stated lack of clearance is none. individual and digital are independent preferences. stepFree is a venue requirement if requested. Case A has weekdays/evening/either/3 miles/unknown clearance and both preferences, B changes only mode to in-person. For these kinds of community profile ONLY put an additional distinct activity like dog walking into the activity field and identify its roles; one-to-one, helping someone and digital skills are already represented and do not count as an additional activity. For standard A/B set activity empty. Personally nominate and rank up to eight strongest evidenced options from the full catalogue in candidate_ids, including a potential option where a host must confirm a detail if appropriate. Prefer personal skill and task alignment within the same eligibility/fit tier. The server independently checks *every* role and can promote stronger eligible alternatives. For more/detail/explain retain the profile across turns.
+For search, case_search, more, detail and explain, include role_evidence for up to six genuinely relevant IDs you nominate. For each, select a short exact substring (8–150 characters) from that role's summary, task, individualEvidence or digitalEvidence, plus a verbatim phrase from the visitor's own recent messages that explains *why* that work is a good fit. Set user_quote to "" if no suitable quote exists. Keep quotes in their original language: never translate or paraphrase evidence. Use [] for other intents. For partial profiles optionally add ONE natural, personal follow_up question (maximum 180 characters) that helps narrow a useful unknown. Do not demand unrelated information, repeat known conditions or add factual claims. Use "" when no question is needed. For explore put the question in reply and leave follow_up empty.
 
 Set time, mode and step_free from all applicable requirements. "Flexible" sessions work on weekdays or weekends. "Hybrid" supports onsite and remote. Missing access is unknown. For an unverified restriction that cannot be represented, use unknown. Treat a new request after "start over" as a fresh one.
-Write reply in the visitor's language, plain text, 1–3 short sentences, at most 650 characters. For social, advice, off_topic and clarify give a direct response without making any specific listing or eligibility claim. For unknown, identify the specific unverified detail and suggest a question to ask the organiser. In all other intents leave reply empty; the server builds the answer from checked records. Do not return links, markup or extraneous fields.`;
+Write reply in the visitor's language, plain text, 1–3 short sentences, at most 650 characters. For social, explore, advice, off_topic and clarify give a direct response without making any specific listing or eligibility claim. For unknown, identify the specific unverified detail and suggest a question to ask the organiser. In all other intents leave reply empty; the server builds the answer from checked records. Do not return links, markup or extraneous fields.`;
 
 function inputCatalogue(roles) {
   // Exclude internal source references, provider records, benchmark labels and host correspondence.
@@ -149,6 +171,7 @@ function inputCatalogue(roles) {
       mode,
       stepFree,
       contactNote,
+      caseFacts,
     }) => ({
       id,
       title,
@@ -160,6 +183,7 @@ function inputCatalogue(roles) {
       mode,
       stepFree,
       contactNote,
+      caseFacts,
     }),
   );
 }
@@ -175,6 +199,14 @@ function validatePlan(data, known) {
     !MODES.includes(data.mode) ||
     typeof data.step_free !== "boolean" ||
     !validIds(data.candidate_ids, known, known.size) ||
+    !Array.isArray(data.role_evidence) || data.role_evidence.length > 6 ||
+    data.role_evidence.some(item => !item || !known.has(item.role_id)
+      || typeof item.quote !== "string" || item.quote.length > 190
+      || typeof item.user_quote !== "string" || item.user_quote.length > 200) ||
+    typeof data.follow_up !== "string" || data.follow_up.length > 200 ||
+    (data.intent === "case_search" && !data.case_profile) ||
+    (data.case_profile !== null && (!["case_search", "detail", "explain", "more"].includes(data.intent)
+      || !validCommunityProfile(data.case_profile, known))) ||
     typeof data.reply !== "string" ||
     data.reply.length > 900
   )
@@ -245,10 +277,8 @@ function roleDescription(role, zh) {
     .join("\n");
 }
 
-function hasExactSchedule(message) {
-  return /\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?\b|\b\d{1,2}(?::[0-5]\d|\s*(?:am|pm))\b|周[一二三四五六日天]|星期[一二三四五六日天]|[上下]午\s*[\d一二三四五六七八九十]/iu.test(
-    message,
-  );
+function hasClockTime(message) {
+  return /\b\d{1,2}(?::[0-5]\d(?:\s*(?:am|pm))?|\s*(?:am|pm))\b|[上下]午\s*[\d一二三四五六七八九十]|[\d一二三四五六七八九十]+点/iu.test(message);
 }
 
 function formatAnswer({ plan, model }, { message, history }, roles) {
@@ -285,22 +315,29 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
       ),
     );
   if (
-    ["social", "advice", "clarify", "off_topic", "unknown"].includes(
+    ["social", "explore", "advice", "clarify", "off_topic", "unknown"].includes(
       plan.intent,
     )
   ) {
     if (!plan.reply.trim()) throw invalidReply();
     return respond(plan.reply.trim());
   }
-  if (hasExactSchedule(message))
+  if (hasClockTime(message))
     return respond(
       say(
-        "The listings give broad weekday or weekend availability. Please ask the host to confirm the exact day or time before planning a shift.",
-        "目录只记录工作日或周末。请向主办方确认具体日期和时段，再安排行程。",
+        "The listings give session days and broad periods. Please ask the host to confirm the exact day or time before planning a shift.",
+        "目录记录活动的星期与大致时段。请向主办方确认具体日期和时段，再安排行程。",
       ),
     );
+  if (plan.case_profile) return communityAnswer(plan, roles, result, {message, history});
   const byId = new Map(roles.map((role) => [role.id, role]));
-  let wanted = [...new Set(plan.candidate_ids)];
+  const broadSearch = ["search", "more"].includes(plan.intent) && !plan.activity.trim();
+  let wanted = broadSearch ? [...byId.keys()] : [...new Set(plan.candidate_ids)];
+  const wantsDetails = ["detail", "explain"].includes(plan.intent);
+  if (plan.intent === "explain") {
+    const previous = previousRoles(history);
+    wanted = wanted.length ? wanted.filter(id => previous.includes(id)) : previous;
+  }
   if (plan.intent === "more") {
     // Only skip options from the continuous series at the end of this search. Never lose a
     // matching role because it appeared earlier under different criteria.
@@ -320,7 +357,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
   }
   const candidates = wanted.map((id) => byId.get(id));
   const prefs = {
-    query: plan.intent === "detail" ? "" : plan.activity.trim(),
+    query: wantsDetails ? "" : plan.activity.trim(),
     time: plan.time,
     mode: plan.mode,
     stepFree: plan.step_free,
@@ -332,9 +369,12 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
   ].slice(0, 3);
   for (const { group, opportunity } of rows) {
     result[group].push(opportunity.id);
-    result.details[opportunity.id] = roleDescription(opportunity, zh);
+    result.details[opportunity.id] = [
+      checkedEvidence(plan, opportunity, [message, ...history.map(turn => turn.user)]),
+      roleDescription(opportunity, zh),
+    ].filter(Boolean).join("\n");
   }
-  if (plan.intent === "detail" && !rows.length && ranked.excluded.length) {
+  if (wantsDetails && !rows.length && ranked.excluded.length) {
     const role = ranked.excluded[0].opportunity;
     return respond(
       say(
@@ -355,6 +395,10 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
             "演示目录中没有找到符合该请求的岗位。你想换一种活动，还是调整一个条件？",
           ),
     );
+  if (plan.intent === "explain") return respond(say(
+    "Here is how the work in each listing relates to what you told me.",
+    "下面是各岗位的实际任务与你所述需求之间的联系。",
+  ));
   if (plan.intent === "detail") {
     return respond(
       rows
@@ -377,7 +421,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
         "“待确认”的岗位需要主办方核实相关条件。",
       )
     : "";
-  return respond([intro, uncertain].filter(Boolean).join(" "));
+  return respond([intro, uncertain, suggestedQuestion(plan)].filter(Boolean).join(" "));
 }
 
 export async function answerLive({
@@ -414,10 +458,12 @@ export async function answerLive({
       body: JSON.stringify({
         model,
         store: false,
-        max_output_tokens: 1200,
+        max_output_tokens: 2200,
+        reasoning: { effort: "low" },
         instructions: INSTRUCTIONS,
         input: JSON.stringify({
           catalogue: inputCatalogue(roles),
+          named_volunteer_examples: EXERCISE_CASE_TEXT,
           recent_turns: turn.history,
           latest_message: turn.message,
         }),

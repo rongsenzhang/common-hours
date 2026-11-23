@@ -1,12 +1,18 @@
 # Common Hours
 
-Find volunteering opportunities around Greater Manchester and ask follow-up questions about the activities, timing and access. The independent NTU–TeamKinetic application demo uses 19 fictional roles from 13 fictional hosts. All volunteers can use it without an account.
+Find volunteering opportunities around Greater Manchester and ask follow-up questions about the activities, timing and access. The independent NTU–TeamKinetic application demo uses 100 fictional community opportunities. All volunteers can use it without an account.
 
 [Find a role](https://rongsenzhang.github.io/common-hours/) · [Matching exercise](https://rongsenzhang.github.io/common-hours/#exercise) · [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask) · [实时问答测试指南](docs/testing-live.md) · [Finder and on-device tests](docs/testing-v1.1.md)
 
 ## Panel matching exercise
 
-Open **Matching exercise** beside Discover. Run either supplied case, then try a hypothetical venue distance for the form-filling role. Compare the shortlist, inspect the original seven records, or check how different wording is interpreted. You can also paste the volunteer’s description into the role finder and change one condition in a follow-up. Both interfaces use the same matching rules in your browser. [Try the seven roles in chat](https://rongsenzhang.github.io/common-hours/#ask-exercise) · [Run the cases and inspect the code](docs/matching-exercise.md)
+Open **Matching exercise** beside Discover. Run either supplied case, then try a hypothetical venue distance for the form-filling role. Compare the shortlist, inspect the original seven records, or check how different wording is interpreted. The seven-role exercise also has an on-device chat that uses the same rules. [Try the seven roles in chat](https://rongsenzhang.github.io/common-hours/#ask-exercise) · [Run the cases and inspect the code](docs/matching-exercise.md)
+
+## Try the same volunteer in a larger catalogue
+
+Open [Discover with Case A](https://rongsenzhang.github.io/common-hours/#discover-case-a) or [Discover with Case B](https://rongsenzhang.github.io/common-hours/#discover-case-b), or type either label or the supplied case wording in Discover. Inspect the evidence behind each community recommendation and try changing a condition. Venue distances use a fictional starting point. Remote participation, travel, listed sessions and safeguarding requirements are checked against the selected volunteer profile.
+
+In [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask), select **Live AI** and send the same profile. OpenAI interprets the conversation and proposes roles from the community catalogue. You can start with “I'm not sure what I'd be good at”, describe something people ask you to help with, and then ask “Why do these roles suit me?”. The service checks the proposed roles against their records and distinguishes confirmed opportunities from questions for the organiser.
 
 ## Try it
 
@@ -21,7 +27,7 @@ Open **Matching exercise** beside Discover. Run either supplied case, then try a
 
 The original catalogue had no dog-walking role. A shared word in “walk dogs” and “Riverside litter walk” caused a false recommendation. We preserved the published result and the original inputs. The regression check applies the current search to that original catalogue and expects an empty result. A separate test uses the expanded catalogue and expects both listed dog walks. [Historical release](https://github.com/rongsenzhang/common-hours/releases/tag/v1.0.0) · [Frozen example](fixtures/history/v1.0-B22.json) · [Tests](tests/matching.mjs)
 
-On the current 36 authored cases, the default search placed a relevant role in the first three on 22 of 23 answerable queries and correctly withheld a confirmed recommendation on 13 of 13 no-answer queries. Both numbers describe synthetic examples. Independent judgements and observed use by volunteers and coordinators remain open. The [field workbook](docs/field-workbook.md) sets out those tasks.
+On the 36 authored cases for the original 19-role benchmark, the default search placed a relevant role in the first three on 22 of 23 answerable queries and correctly withheld a confirmed recommendation on 13 of 13 no-answer queries. Both numbers describe synthetic examples. Independent judgements and observed use by volunteers and coordinators remain open. The [field workbook](docs/field-workbook.md) sets out those tasks.
 
 ## Staff workspace
 

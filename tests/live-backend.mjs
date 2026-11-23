@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
+import { matchCommunityCase } from "../site/community-case.js";
 import { readFileSync } from "node:fs";
 import {
   answerLive,
@@ -13,6 +15,9 @@ const roles = JSON.parse(
 ).opportunities;
 const basePlan = {
   intent: "search",
+  case_profile: null,
+  role_evidence: [],
+  follow_up: "",
   language: "en",
   activity: "walk dogs",
   time: "weekend",
@@ -241,4 +246,63 @@ test("provider failures and malformed replies never leak provider body or invent
     run("help", { intent: "social", reply: "" }),
     (err) => err.code === "invalid_reply",
   );
+});
+
+const profile = id => ({...exerciseProfile(id), verifiedRoleId: null, stepFree: false});
+test("provider interpretation ranks equally strong community listings, while hard constraints, tiers and quotes come from server data", async () => {
+  const user = EXERCISE_CASE_TEXT.A;
+  const extra = {
+    intent: "case_search", activity: "", case_profile: profile("A"),
+    // Attempt to promote a partially relevant role, and change the ranking of real peers.
+    candidate_ids: ["writing-partner", "video-call-coach", "bus-app-coach", "email-practice-partner"],
+    role_evidence: [
+      {role_id: "video-call-coach", quote: "practise video calling", user_quote: "digital support skills"},
+      {role_id: "bus-app-coach", quote: "This experience guarantees a permanent job", user_quote: "digital support skills"},
+      {role_id: "email-practice-partner", quote: "practise email attachments", user_quote: "email is my absolute favourite"},
+    ],
+  };
+  const a = await run(user, extra);
+  assert.deepEqual(a.matches, ["video-call-coach", "bus-app-coach", "email-practice-partner"]);
+  assert.match(a.details["video-call-coach"], /You mentioned “digital support skills”/);
+  assert(!JSON.stringify(a).includes("guarantees a permanent job"));
+  assert(!JSON.stringify(a).includes("absolute favourite"));
+  assert(a.toConfirm.includes("photo-transfer-tutor"));
+  const b = await run(EXERCISE_CASE_TEXT.B, {...extra, case_profile: profile("B")});
+  assert.equal(b.matches[0], "bus-app-coach");
+  assert(!b.matches.includes("email-practice-partner") && !b.matches.includes("video-call-coach"));
+  assert.equal(b.caseProfile.mode, "in-person");
+  const available = matchCommunityCase(roles, profile("B"), {limit:Infinity});
+  assert(b.matches.every(id => available.recommendations.some(row => row.role.id === id)));
+  assert(b.toConfirm.every(id => available.pending.some(row => row.role.id === id)));
+  const unknown = await run("weekday evenings, in person", {...extra, case_profile: profile("B"),
+    candidate_ids:["photo-transfer-tutor", "junior-coding-mentor"]});
+  assert(!unknown.matches.some(id => unknown.toConfirm.includes(id)));
+  assert.match(unknown.details["photo-transfer-tutor"], /distance/i);
+});
+
+test("case explanation is limited to previously displayed roles, source quotations and actual volunteer words", async () => {
+  const volunteer = "I can help people learn to use their phones on weekday evenings.";
+  const history = [{user: volunteer,text:"You could help with journey planning.", matches:["bus-app-coach"],toConfirm:[]}];
+  const explanation = await run("Why this one?", {
+    intent:"explain", activity:"", case_profile:profile("B"),
+    candidate_ids:["bus-app-coach", "writing-partner"],
+    role_evidence:[{role_id:"bus-app-coach",quote:"teach journey planning on a travel app",user_quote:"learn to use their phones"}],
+  }, {history});
+  assert.deepEqual(explanation.matches, ["bus-app-coach"]);
+  assert.match(explanation.details["bus-app-coach"], /learn to use their phones/);
+  assert.match(explanation.details["bus-app-coach"], /teach journey planning on a travel app/);
+  assert(!JSON.stringify(explanation).includes("writing-partner"));
+  const explore = await run("I don't know how to help", {intent:"explore", reply:"What do people ask you for help with?"});
+  assert.match(explore.text, /people ask/);
+  assert.deepEqual(explore.matches, []);
+});
+
+test("invalid case fields reject the upstream response and exact clock time stays unresolved", async () => {
+  for (const bad of [{...profile("A"), days:["Mon","Mon"]}, {...profile("B"),maxMiles:-1},
+    {...profile("B"),mode:"onsite"}, {...profile("B"),verifiedRoleId:"made-up"}, null]) {
+    await assert.rejects(run("Case B", {intent:"case_search",case_profile:bad}), {code:"invalid_reply"});
+  }
+  const time = await run("I can only do 6:30pm", {intent:"case_search",activity:"",case_profile:profile("A")});
+  assert.deepEqual(time.matches, []);
+  assert.match(time.text, /exact day or time/);
 });

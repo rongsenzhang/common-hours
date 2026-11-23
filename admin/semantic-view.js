@@ -71,7 +71,8 @@ export function renderSemanticLab(
   const sorted = alphabeticalCases(evaluation.cases);
   const item = sorted.find((row) => row.id === caseId) || sorted[0];
   if (!item) return "";
-  const roles = catalog.opportunities;
+  const roleIds = new Set(evaluation.roleIds ?? catalog.opportunities.map(role => role.id));
+  const roles = catalog.opportunities.filter(role => roleIds.has(role.id));
   const prefs = { ...item.preferences, query: item.query };
   const hybrid = matchOpportunities(roles, prefs, "hybrid");
   const published =

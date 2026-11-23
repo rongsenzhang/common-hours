@@ -5,6 +5,18 @@
   "status": "unconfigured",
   "questions": [
     {
+      "roleId": "bus-stop-sign-reader",
+      "field": "stepFree",
+      "source": "sessions.csv:S74",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
+      "roleId": "crossing-survey-counter",
+      "field": "stepFree",
+      "source": "sessions.csv:S77",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
       "roleId": "garden-buddy",
       "field": "stepFree",
       "source": "sessions.csv:S01",

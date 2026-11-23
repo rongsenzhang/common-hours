@@ -39,3 +39,7 @@ python3 -m http.server 8754 --bind 127.0.0.1 --directory site
 ```
 
 Open [the local exercise](http://127.0.0.1:8754/#exercise). Changes to the volunteer controls take effect in the page. After editing the source, reload the page to try your change. The inputs are fictional and temporary.
+
+## Compare the community catalogue
+
+Use the same volunteer in [Discover Case A](https://rongsenzhang.github.io/common-hours/#discover-case-a), [Discover Case B](https://rongsenzhang.github.io/common-hours/#discover-case-b) or [Live AI](https://rongsenzhang.github.io/common-hours/#ask) to check 100 synthetic community listings. Distances are relative to the fictional volunteer. The seven supplied opportunities and their venue-distance simulation are assessed on the exercise page.

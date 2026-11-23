@@ -29,6 +29,10 @@ export function isSuppliedExerciseCase(message) {
   return suppliedCase(message) !== null;
 }
 
+export function suppliedExerciseCaseId(message) {
+  return suppliedCase(message)?.id ?? null;
+}
+
 // An explicit but edited exercise prompt stays in the exercise even when its
 // extra conditions cannot be interpreted. General catalogue queries stay there.
 export function isExerciseChatRequest(message) {

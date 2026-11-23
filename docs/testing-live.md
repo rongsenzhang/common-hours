@@ -2,7 +2,13 @@
 
 用手机或电脑打开 [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask)，选择 **Live AI**。每条成功的回复旁会显示 OpenAI 和模型名称。示例使用虚构的志愿者岗位。测试时只需输入示例内容。
 
-要测试附件里的 Case A 和 B，请打开[七岗位面试案例入口](https://rongsenzhang.github.io/common-hours/#ask-exercise)，粘贴 Case A，再输入 Case B 的追问。这组结果由评委页的匹配规则在浏览器内生成。下面的实时 AI 示例使用另一组社区岗位。
+**同一位志愿者，两组岗位。** 在 [评委练习](https://rongsenzhang.github.io/common-hours/#exercise) 中先运行 Case A 和 B，查看附件原有的 7 条记录。再打开 [Discover A](https://rongsenzhang.github.io/common-hours/#discover-case-a) 或 [Discover B](https://rongsenzhang.github.io/common-hours/#discover-case-b)，比较同一条件在 100 个虚构岗位中的结果。里程从虚构起点计算。
+
+**在 Live AI 试三种问法。**
+
+1. 输入 `Case A` 或粘贴原文。查看晚间、三英里、一对一及数字支持的解释。接着输入 Case B 原文，检查新推荐中是否还有纯远程岗位。
+2. 输入 `Why do these roles suit me?`。检查理由能否对应你说过的偏好，以及这份岗位写明的任务或参加条件。
+3. 新开一段对话，输入 `I’d like to volunteer but I’m not sure what I’d be good at.`。回答助手的问题，例如 `People often ask me to help them use their phones. I’m usually free after work.`。再补充 `In person only, within two miles.`，看看哪些岗位还适合，哪些信息需要确认。
 
 | 顺序 | 发给助手的消息 | 检查什么 |
 | --- | --- | --- |
@@ -15,4 +21,4 @@
 
 要演示两种模式的区别，可以在 **On-device search** 中试同样的问候，再切回 **Live AI**。两种模式分别保留本标签页内的对话。刷新页面即可重新开始。公开站点达到用量上限时会提示稍后重试，也可立即切到本地查找岗位。
 
-在仓库的 [真实模型测试记录](https://github.com/rongsenzhang/common-hours/actions/workflows/live-smoke.yml) 中可以查看前五个场景的执行结果。浏览器测试使用固定回复，单独检查桌面和手机界面的发送、取消、错误恢复和岗位卡。
+在仓库的 [真实模型测试记录](https://github.com/rongsenzhang/common-hours/actions/workflows/live-smoke.yml) 中可以查看真实模型场景的执行结果。浏览器测试使用固定回复，单独检查桌面和手机界面的发送、取消、错误恢复和岗位卡。

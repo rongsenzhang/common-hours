@@ -53,6 +53,49 @@ async function verifyVenueScenario(page, shortlist, expectedA) {
   assert.deepEqual(await shortlist.allTextContents(), [facilitator]);
 }
 
+async function verifyCommunityCases(page) {
+  const {EXERCISE_CASE_TEXT} = await import("../site/exercise-engine.js");
+  await page.goto(new URL("#discover-case-b", base).href);
+  const list = page.locator("#community-case-results ol [data-detail]");
+  const listIds = () => list.evaluateAll(buttons => buttons.map(button => button.dataset.detail));
+  const caseAIds = ["email-practice-partner", "bus-app-coach", "video-call-coach"];
+  const caseBIds = ["bus-app-coach", "writing-partner", "patch-project-companion"];
+  await page.getByRole("heading", {name:"Case B community shortlist"}).waitFor();
+  assert.deepEqual(await listIds(), caseBIds);
+  await list.first().click();
+  assert.match(await page.locator("dialog").innerText(), /Thu evening/);
+  assert.match(await page.locator("dialog").innerText(), /2 miles/);
+  await page.keyboard.press("Escape");
+
+  await page.getByText("Change the volunteer’s conditions", {exact:true}).click();
+  await page.locator('#community-case-form [name=maxMiles]').fill("1");
+  await page.getByRole("button", {name:"Update shortlist"}).click();
+  assert.ok(!(await listIds()).includes("bus-app-coach"));
+  const search = page.locator("#pref-form [name=query]");
+  if (!(await search.isVisible())) await page.locator("[data-filter-toggle]").click();
+  async function enter(text) {
+    await search.fill(text);
+    await page.getByRole("button", {name:"Find roles"}).click();
+  }
+  await enter("Case B");
+  assert.deepEqual(await listIds(), caseBIds);
+  await enter(EXERCISE_CASE_TEXT.A);
+  await page.getByRole("heading", {name:"Case A community shortlist"}).waitFor();
+  assert.deepEqual(await listIds(), caseAIds);
+  await enter(EXERCISE_CASE_TEXT.B);
+  await page.getByRole("heading", {name:"Case B community shortlist"}).waitFor();
+  assert.deepEqual(await listIds(), caseBIds);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  await enter("walk dogs");
+  assert.equal(await page.locator("#community-case-results").count(), 0);
+  assert.ok(await page.locator("#results [data-detail='shelter-dog-walker']").count());
+  await page.getByRole("link", {name:"Case A", exact:true}).click();
+  await page.getByRole("heading", {name:"Case A community shortlist"}).waitFor();
+  await page.getByRole("link", {name:"Compare the seven interview roles"}).click();
+  await page.getByRole("heading", {name:"Matching exercise", exact:true}).waitFor();
+  assert.deepEqual(await page.locator("#ex-recommendations h3").allTextContents(), ["Digital access buddy", "Digital skills facilitator"]);
+}
+
 async function verify(browser, width) {
   const page = await browser.newPage({ viewport: { width, height: 900 } });
   const errors = [];
@@ -105,8 +148,9 @@ async function verify(browser, width) {
     await page.goBack();
     await page.getByRole("heading", { name: "Matching exercise", exact: true }).waitFor();
     assert.deepEqual(await shortlist.allTextContents(), expectedA);
+    await verifyCommunityCases(page);
     assert.deepEqual(errors, []);
-    console.log(width + "px passed: original cases, all three venue settings, immutable records, wording checks, ODI mapping, navigation and network isolation.");
+    console.log(width + "px passed: original cases, all three venue settings, immutable records, wording checks, ODI mapping, seven-role isolation, full-text Discover cases, profile changes and community role details.");
   } finally { await page.close(); }
 }
 

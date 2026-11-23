@@ -80,6 +80,10 @@ def main():
     parser.add_argument("--out", type=Path, default=ROOT / "site/data/semantic.json")
     args = parser.parse_args()
     catalog = json.loads((ROOT / "site/data/catalog.json").read_text(encoding="utf-8"))
+    benchmark_ids = set(json.loads((ROOT / "fixtures/history/v1.1-benchmark-roles.json").read_text()))
+    catalog["opportunities"] = [r for r in catalog["opportunities"] if r["id"] in benchmark_ids]
+    if len(catalog["opportunities"]) != len(benchmark_ids):
+        raise ValueError("A judged benchmark role is missing")
     cases = json.loads((ROOT / "fixtures/judgements.json").read_text(encoding="utf-8"))
     key = os.environ.get("OPENAI_API_KEY") if args.with_openai else None
     result = build(catalog, cases, key)

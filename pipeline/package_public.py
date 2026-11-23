@@ -11,11 +11,12 @@ SITE = ROOT / "site"
 PUBLIC_FILES = (
     "index.html", "app.js", "engine.js", "assistant.js", "assistant-topics.js",
     "chat-view.js", "live-chat.js", "html.js", "icons.js", "style.css", "chat.css",
+    "community-case.js", "community-case-view.js",
     "exercise-engine.js", "exercise-view.js", "exercise-chat.js", "exercise.css",
 )
 ROLE_FIELDS = (
     "id", "title", "organisation", "area", "theme", "summary", "time", "mode",
-    "stepFree", "contactNote", "interests", "tasks",
+    "stepFree", "contactNote", "interests", "tasks", "caseFacts",
 )
 
 

@@ -272,7 +272,7 @@ export const activityEvidence = {
   ],
   "seed library": [/\bseeds?\b/i],
   litter: [/\b(?:litter\w*|rubbish|trash)\b/i],
-  reading: [/\b(?:reading|literacy|read|pronunciation)\b/i],
+  reading: [/\b(?:reading (?:practice|partner|mentor)|practise (?:reading|pronunciation)|read (?:together|with learners))\b/i],
   groceries: [/\b(?:pantr\w*|grocer\w*|food parcels|food bank)\b/i],
   cooking: [/\b(?:cook\w*|kitchen|chop vegetables|prepare meals)\b/i],
   smartphones: [/\b(?:digital drop-in|devices?|smartphones?|email)\b/i],
@@ -282,6 +282,6 @@ export const activityEvidence = {
   posters: [/\b(?:posters?|artwork|graphic design)\b/i],
   welcome: [/\b(?:welcom\w*|greet\w*|reception)\b/i],
   testing: [/\b(?:test\w*|bug reports|usability)\b/i],
-  birds: [/\b(?:birds?|birdwatch\w*|wildlife)\b/i],
+  birds: [/\b(?:birds?|birdwatch\w*)\b/i],
   captions: [/\b(?:captions?|subtitles?)\b/i],
 };

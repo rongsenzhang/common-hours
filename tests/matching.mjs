@@ -89,7 +89,8 @@ test('a blank browse returns all fixtures while a nonempty query needs evidence'
 test('topic aliases and literal accent normalisation have inspectable evidence', () => {
   assert.equal(search('ornithology').matches[0].opportunity.id, 'wildlife-counter');
   assert.equal(search('ornithology', {}, 'baseline').matches.length, 0);
-  assert.ok(search('ornithology').matches[0].reasons.some(reason => reason.includes('“birds”') && reason.includes('title (“wildlife”)')));
+  assert.deepEqual(ids(search('ornithology').matches), ['wildlife-counter']);
+  assert.ok(search('ornithology').matches[0].reasons.some(reason => reason.includes('tasks (“birds”)')));
   assert.equal(search('cafe', {}, 'baseline').matches[0].opportunity.id, 'repair-cafe');
 });
 
@@ -116,10 +117,12 @@ test('each opportunity and condition object appears once and shows only the matc
   }
 });
 
-test('published benchmark top three matches the actual matcher for every case and both methods', () => {
+test('published benchmark top three matches the actual matcher on the judged catalogue for every case', () => {
+  const judged = data.opportunities.filter(role => evaluation.roleIds.includes(role.id));
+  assert.equal(judged.length, evaluation.catalogSize);
   for (const fixture of evaluation.cases) {
     for (const method of ['baseline','hybrid']) {
-      const actual = search(fixture.query, fixture.preferences, method);
+      const actual = search(fixture.query, fixture.preferences, method, judged);
       assert.deepEqual(ids(actual.matches).slice(0, 3), fixture[method].top3);
       assert.deepEqual(ids(actual.review), fixture[method].review);
       assert.deepEqual(ids(actual.excluded), fixture[method].excluded);

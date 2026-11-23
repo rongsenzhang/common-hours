@@ -35,6 +35,35 @@ class CatalogueTests(unittest.TestCase):
                 file, identifier = source.split(":")
                 self.assertIn(identifier, (self.fixtures / file).read_text())
 
+    def test_community_catalogue_size_and_unique_records(self):
+        data = self.generate()
+        rows = data["opportunities"]
+        self.assertEqual(len(rows), 100)
+        self.assertEqual(len({row["title"] for row in rows}), 100)
+        self.assertEqual(len({row["id"] for row in rows}), 100)
+        self.assertEqual(data["summary"]["hostCount"], len({row["organisation"] for row in rows}))
+
+    def test_case_facts_are_grounded_and_missing_facts_stay_unknown(self):
+        rows = {row["id"]: row for row in self.generate()["opportunities"]}
+        local = rows["bus-app-coach"]["caseFacts"]
+        self.assertEqual(local["slots"], [{"day": "Thu", "period": "evening"}])
+        self.assertEqual(local["distanceMiles"], 2)
+        self.assertIn(local["digitalEvidence"], rows["bus-app-coach"]["summary"])
+        self.assertIsNone(rows["photo-transfer-tutor"]["caseFacts"]["distanceMiles"])
+        self.assertEqual(rows["repair-cafe"]["caseFacts"]["slots"], [])
+        self.assertIsNone(rows["tablet-basics-host"]["caseFacts"]["individualEvidence"])
+        self.assertEqual(rows["junior-coding-mentor"]["caseFacts"]["clearance"], "required")
+
+    def test_case_fact_mismatch_fails_build(self):
+        self.revise("case-facts.csv", "bus-app-coach,Thu evening", "bus-app-coach,Sat evening")
+        with self.assertRaisesRegex(ValueError, "Case slots disagree"):
+            self.generate()
+
+    def test_ungrounded_case_evidence_fails_build(self):
+        self.revise("case-facts.csv", "teach journey planning on a travel app", "guaranteed one-to-one job")
+        with self.assertRaisesRegex(ValueError, "Case preference evidence"):
+            self.generate()
+
     def test_missing_value_remains_unknown(self):
         roles = {row["id"]: row for row in self.generate()["opportunities"]}
         self.assertEqual(roles["garden-buddy"]["stepFree"], "unknown")

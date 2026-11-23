@@ -21,7 +21,7 @@ const concepts = {
     "archive archives history historical heritage handwritten transcribe transcriber transcribing letters",
   litter: "litter cleanup litterpick recycling rubbish rubbishpicking",
   nature: "nature outdoors outdoor outside park parks riverside",
-  birds: "wildlife birds bird birdwatching birding sightings ornithology",
+  birds: "birds bird birdwatching birding ornithology",
   reading: "literacy reading pronunciation aloud english learner learners",
   design:
     "poster posters design designer designing graphic artwork graphics illustration",

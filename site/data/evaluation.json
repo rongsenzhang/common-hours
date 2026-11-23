@@ -1,8 +1,29 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "caseCount": 36,
   "catalogSize": 19,
-  "methodology": "Authored synthetic judgements on the current catalogue. Literal word coverage is compared with TF-IDF, a controlled vocabulary and activity/object checks. Both methods use the same schedule, access and participation checks. Archived B22 tests the original catalogue.",
+  "roleIds": [
+    "animal-supply-sorter",
+    "archive-transcriber",
+    "caption-editor",
+    "cycle-workshop",
+    "digital-helper",
+    "garden-buddy",
+    "meal-cook",
+    "neighbourhood-dog-walker",
+    "pantry-packer",
+    "phone-companion",
+    "poster-maker",
+    "reading-partner",
+    "repair-cafe",
+    "river-walk",
+    "seed-sorter",
+    "shelter-dog-walker",
+    "website-tester",
+    "welcome-desk",
+    "wildlife-counter"
+  ],
+  "methodology": "Frozen v1.1 role pool. Authored synthetic judgements on the current catalogue. Literal word coverage is compared with TF-IDF, a controlled vocabulary and activity/object checks. Both methods use the same schedule, access and participation checks. Archived B22 tests the original catalogue.",
   "methods": {
     "baseline": {
       "ndcgAt3": 0.6957,

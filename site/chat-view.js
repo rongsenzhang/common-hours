@@ -3,7 +3,6 @@ import { icon } from "./icons.js";
 
 const starters = [
   "Can I walk dogs at weekends?",
-  "I like gardening and need step-free access.",
   "What can I do from home?",
 ];
 
@@ -98,33 +97,33 @@ export function renderChat(
         `<article class="chat-turn"><p class="asked"><span class="sr">You asked: </span>${e(input)}</p>
       <div class="answered">${interview ? interviewReply(reply) : `<span class="chat-source">${reply.provider === "openai" ? "OpenAI · " + e(reply.model) : "On-device search"}</span><p class="chat-answer">${e(reply.text)}</p>
        ${recommendations(reply.matches, reply.details, byId, "Matching roles")}
-       ${recommendations(reply.toConfirm, reply.details, byId, "To confirm with the organiser")}`}
+       ${recommendations(reply.toConfirm, reply.details, byId, "To confirm with the organiser")}
+       ${["A", "B"].includes(reply.caseId) ? `<a href="#discover-case-${reply.caseId.toLowerCase()}">Adjust Case ${reply.caseId} in Discover</a>` : ""}`}
       </div></article>`,
     )
     .join("");
   const prompts = interview
     ? casePrompts()
-    : starters.map(prompt => promptButton(prompt)).join("");
+    : starters.map(prompt => promptButton(prompt)).join("")
+      + (live ? promptButton("I'd like to volunteer but I'm not sure what I'd be good at.", "Help me find my strengths") : "")
+      + casePrompts();
   const placeholder = interview
     ? (turns.length ? "e.g. My travel limit is 5 miles." : "Paste the volunteer case here…")
-    : "e.g. Can I help at weekends?";
-  const input = `<textarea id="chat-input" name="message" rows="${interview ? 3 : 1}" maxlength="${interview ? 1200 : 600}" required placeholder="${placeholder}" autocomplete="off" aria-describedby="chat-disclosure" ${pending ? "disabled" : ""}>${e(draft)}</textarea>`;
+    : "e.g. Case A, or tell me what you’re looking for…";
+  const input = `<textarea id="chat-input" name="message" rows="${interview ? 3 : 1}" maxlength="1200" required placeholder="${placeholder}" autocomplete="off" aria-describedby="chat-disclosure" ${pending ? "disabled" : ""}>${e(draft)}</textarea>`;
   return `<section class="chat-page"><header class="chat-header">
-    <div class="chat-mark">${icon("chat", 26)}</div><h1>Ask the role finder</h1>
-    <p>${interview ? "Paste the volunteer’s case or choose a supplied example. You can change one condition in a follow-up." : "Tell me what you’d like to do, when you’re free or what access you need."}</p></header>
-    <fieldset class="chat-sources"><legend>Which opportunities should I search?</legend>
-      <label><input type="radio" name="chat-source" value="community" ${interview ? "" : "checked"}>Community catalogue</label>
-      <label><input type="radio" name="chat-source" value="exercise" ${interview ? "checked" : ""}>Interview exercise · 7 roles</label>
-    </fieldset>
+    <div class="chat-mark">${icon("chat", 26)}</div><h1>${interview ? "Seven-role exercise chat" : "Ask the role finder"}</h1>
+    <p>${interview ? "Paste the volunteer’s case or choose a supplied example. You can change one condition in a follow-up." : `Search ${roles.length} fictional community roles. Describe what you’d like to do, paste a volunteer profile, or try Case A or Case B.`}</p></header>
     ${selector}
-    <p class="chat-disclosure" id="chat-disclosure">${e(disclosure)}${interview ? "" : " The supplied Case A and B prompts open the interview exercise on this device."}</p>
+    <p class="chat-disclosure" id="chat-disclosure">${e(disclosure)}</p>
     ${turns.length || pending ? '<div class="chat-tools"><button class="text-btn" data-restart-chat>Start a new chat</button></div>' : '<div class="chat-starters" aria-label="Example questions">' + prompts + "</div>"}
     <div class="chat-history">${messages}${pending ? `<article class="chat-turn"><p class="asked"><span class="sr">You asked: </span>${e(pending)}</p><div class="answered"><p role="status">Waiting for OpenAI…</p></div></article>` : ""}</div>
     ${interview && turns.length ? interviewFollowups(turns.at(-1).reply.state) : ""}
+    ${live && !pending && turns.at(-1)?.reply.matches?.length ? '<div class="chat-starters chat-followups" aria-label="Explore these recommendations">' + promptButton("Why do these roles suit me?") + "</div>" : ""}
     ${error ? `<p class="chat-error" role="alert">${e(error)}</p>` : ""}
     <form id="chat-form" class="chat-composer"><label for="chat-input">${turns.length ? "Ask a follow-up" : interview ? "Your volunteer case" : "Your question"}</label>
       <div>${input}
       ${pending ? '<button type="button" class="primary" data-cancel-chat>Cancel</button>' : `<button type="submit" class="primary">Ask ${icon("next", 16)}</button>`}</div>
       <small>Reloading clears the conversation from this tab.</small>
-    </form>${interview ? '<a class="chat-exercise-link" href="#exercise">Inspect the seven records and matching rules</a>' : ""}</section>`;
+    </form>${interview ? '<a class="chat-exercise-link" href="#exercise">Inspect the seven records and matching rules</a>' : '<a class="chat-exercise-link" href="#exercise">Compare with the seven-role matching exercise</a>'}</section>`;
 }

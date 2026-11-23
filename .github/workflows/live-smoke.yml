@@ -6,6 +6,11 @@ on:
     branches: [main]
     paths:
       - server/live.mjs
+      - server/community-chat.mjs
+      - site/community-case.js
+      - site/data/catalog.json
+      - site/exercise-engine.js
+      - site/exercise-chat.js
       - qa/openai-live-smoke.mjs
       - .github/workflows/live-smoke.yml
 
@@ -28,7 +33,7 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
-      - name: Verify five synthetic questions against the actual model
+      - name: Verify volunteer conversations against the actual model
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: node qa/openai-live-smoke.mjs
