@@ -322,7 +322,7 @@ function applyProfileChange(plan, {message, history}) {
   const previous = latestProfile(history);
   if (previousRoles(history).length && (onlyAskingWhy(message) || plan.intent === "explain")) {
     plan.intent = "explain";
-    plan.case_profile = previous;
+    if (previous) plan.case_profile = previous;
     return;
   }
   if (!previous || !plan.case_profile) return;
