@@ -1,6 +1,7 @@
 // This module is server-only. The catalogue is loaded by the host, never from the chat request.
 import { checkedEvidence, explainEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, validCommunityProfile, visitorExcerpts } from "./community-chat.mjs";
-import { EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
+import { suppliedExerciseCaseId } from "../site/exercise-chat.js";
+import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
 import { matchOpportunities } from "../site/engine.js";
 
 export const DEFAULT_MODEL = "gpt-5.4-mini-2026-03-17";
@@ -367,6 +368,45 @@ function applyProfileChange(plan, {message, history}) {
   plan.case_profile = profile;
 }
 
+// Keep a plainly stated availability window when the model produces a broader one.
+// More complex, alternative or negative statements stay with the language model.
+function groundAvailability(plan, message) {
+  if (plan.intent !== "case_search" || !plan.case_profile) return;
+  const sentences = message.toLowerCase().split(/[.!?。！？;；]/u);
+  const windows = new Set();
+  const modes = new Set();
+  for (const sentence of sentences) {
+    if (/\b(?:not|never|except|prefer|usually|or|sometimes|can't|cannot)\b|不|除了|或者|有时|通常|倾向/u.test(sentence)) continue;
+    const declaresAvailability = /\bi(?: can| am|'m) (?:only )?(?:volunteer|available|free)\b|我(?:只能|可以|有空)|^\s*(?:weekday|weekend) evenings? only\s*$/u.test(sentence);
+    if (!declaresAvailability) continue;
+    if (/\b(?:can only volunteer online|can volunteer online only)\b|我只能[^，。；]{0,14}(?:线上|远程)(?:参加|参与|做志愿)/u.test(sentence)) modes.add("online");
+    if (/\b(?:can only volunteer in person|can volunteer in person only)\b|我只能[^，。；]{0,14}(?:现场|线下)(?:参加|参与|做志愿)/u.test(sentence)) modes.add("in-person");
+    const weekdays = /\bweekday evenings?\b|工作日(?:的)?(?:晚上|晚间)/u.test(sentence);
+    const weekends = /\bweekend evenings?\b|周末(?:的)?(?:晚上|晚间)/u.test(sentence);
+    if (weekdays !== weekends) windows.add(weekdays ? "weekdays" : "weekends");
+  }
+  if (modes.size === 1) plan.case_profile.mode = [...modes][0];
+  if (windows.size === 1 && !(/(?:\bweekends?\b|周末)/iu.test(message) && /(?:\bweekdays?\b|工作日)/iu.test(message))) {
+    plan.case_profile.days = windows.has("weekdays") ? ["Mon","Tue","Wed","Thu","Fri"] : ["Sat","Sun"];
+    plan.case_profile.period = "evening";
+  }
+}
+
+function groundVolunteerProfile(plan, turn) {
+  const id = suppliedExerciseCaseId(turn.message);
+  if (id && plan.intent !== "clock_confirmation") {
+    const previous = latestProfile(turn.history);
+    const bFollowUp = id === "B" && previous && /same volunteer/iu.test(turn.message);
+    plan.intent = "case_search";
+    plan.case_profile = bFollowUp ? {...previous, mode: "in-person"}
+      : {...exerciseProfile(id), verifiedRoleId: null, stepFree: false};
+    plan.required_activity_ref = null;
+    return;
+  }
+  applyProfileChange(plan, turn);
+  groundAvailability(plan, turn.message);
+}
+
 function formatAnswer({ plan, model }, { message, history }, roles) {
   const zh = plan ? plan.language === "zh" : /[\u3400-\u9fff]/u.test(message);
   const say = (en, cn) => (zh ? cn : en);
@@ -387,7 +427,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
         "我可以帮你查找演示目录中的志愿活动。你想做什么？",
       ),
     );
-  applyProfileChange(plan, {message, history});
+  groundVolunteerProfile(plan, {message, history});
   if (plan.intent === "identity")
     return respond(
       say(

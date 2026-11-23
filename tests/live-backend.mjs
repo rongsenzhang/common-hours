@@ -393,3 +393,21 @@ test("a preset name isn't presented as personal evidence about the volunteer", a
   assert(evidence.sourceQuote && evidence.userQuote === null && evidence.reason === null);
   assert(!why.details["email-practice-partner"].includes("You mentioned"));
 });
+
+test("a clear weekday-evening request narrows broad AI availability in either language", async () => {
+  const proposed = {...profile("A"), days: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], period:"any", mode:"either"};
+  for (const text of [
+    "I like helping one person at a time learn to use a phone. I can only volunteer online on weekday evenings.",
+    "朋友经常叫我教他们用手机。我喜欢一次帮一个人，而且我只能在工作日晚上线上参加。",
+  ]) {
+    const answer = await run(text,{intent:"case_search", activity:"", case_profile:proposed});
+    assert.deepEqual(answer.caseProfile.days, profile("A").days);
+    assert.equal(answer.caseProfile.period, "evening");
+    assert.equal(answer.caseProfile.mode, "online");
+  }
+  const alternatives = await run("I can volunteer on weekday evenings or weekend mornings.",
+    {intent:"case_search",activity:"",case_profile:proposed});
+  assert.deepEqual(alternatives.caseProfile.days,proposed.days);
+  const named = await run("Case B",{intent:"case_search", activity:"", case_profile:proposed});
+  assert.deepEqual(named.caseProfile,profile("B"));
+});
