@@ -8,7 +8,7 @@ const modes = ["either", "in-person", "online"];
 const clearances = ["unknown", "none", "verified"];
 const choice = (values) => ({ type: "string", enum: values });
 
-export function communityProfileSchema() {
+export function communityProfileSchema(required = false) {
   const properties = {
     days: { type: "array", items: choice(days) },
     period: choice(periods),
@@ -20,10 +20,8 @@ export function communityProfileSchema() {
     digital: { type: "boolean" },
     stepFree: { type: "boolean" },
   };
-  return { anyOf: [
-    { type: "object", properties, required: Object.keys(properties), additionalProperties: false },
-    { type: "null" },
-  ] };
+  const profile = {type: "object", properties, required: Object.keys(properties), additionalProperties: false};
+  return required ? profile : {anyOf: [profile, {type:"null"}]};
 }
 
 export { validCommunityProfile } from "../site/community-case.js";

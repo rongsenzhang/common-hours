@@ -442,3 +442,17 @@ test("a why request asks the model for evidence for each displayed role without 
   assert.deepEqual(reply.matches,history[0].matches);
   for(const id of reply.matches) assert.equal(reply.evidence[id].userQuote,user);
 });
+
+test("a volunteer describing a session window gets a required profile from the real request schema", async () => {
+  for (const message of ["I enjoy helping someone with a phone. I can only volunteer online on weekday evenings.",
+    "朋友叫我教他们用手机。我只能在工作日晚上线上参加。"]) {
+    const reply = await run(message,{}, {fetchImpl:async (_url, request) => {
+      const schema=JSON.parse(request.body).text.format.schema;
+      assert.equal(schema.properties.case_profile.type, "object");
+      assert(!schema.properties.intent.enum.includes("search"));
+      return completed({...basePlan,activity:"", intent:"case_search",case_profile:{...profile("A"),maxMiles:null}});
+    }});
+    assert.equal(reply.caseProfile.mode,"online");
+    assert.deepEqual(reply.caseProfile.days,profile("A").days);
+  }
+});

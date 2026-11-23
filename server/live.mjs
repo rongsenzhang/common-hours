@@ -105,11 +105,11 @@ function enumString(values) {
   return { type: "string", enum: values };
 }
 
-function planSchema(roles) {
+function planSchema(roles, profileTurn = false) {
   const listingSources = ["summary", "individualEvidence", "digitalEvidence",
     ...Array.from({length: Math.max(...roles.map(role => role.tasks.length))}, (_, i) => `task_${i}`)];
   const fields = {
-    intent: enumString(INTENTS),
+    intent: enumString(profileTurn ? ["case_search", "unknown", "clarify"] : INTENTS),
     language: enumString(["en", "zh"]),
     activity: { type: "string" },
     time: enumString(TIMES),
@@ -119,7 +119,7 @@ function planSchema(roles) {
       type: "array",
       items: enumString(roles.map((role) => role.id)),
     },
-    case_profile: communityProfileSchema(),
+    case_profile: communityProfileSchema(profileTurn),
     required_activity_ref: {type:["integer","null"]},
     changed_fields: {type: ["array", "null"], items: enumString(PROFILE_FIELDS)},
     role_evidence: {
@@ -587,6 +587,12 @@ export async function answerLive({
     throw unavailable();
   const turn = validateTurn({ message, history }, roles);
   const clock = clockInTurn(turn.message);
+  // Concrete availability needs a full profile: the simple activity route
+  // cannot verify a weekday-evening slot or carry that constraint forward.
+  const describesAvailability = /\b(?:i can|i am|i’m|i'm|i am available)\b|我(?:只能|可以|有空)/iu.test(turn.message);
+  const hasSessionWindow = /\b(?:weekdays?|weekends?)\s+(?:mornings?|afternoons?|evenings?)\b|(?:工作日|周末)(?:的)?(?:晚上|晚间|白天|早上|下午)/iu.test(turn.message);
+  const profileTurn = Boolean(suppliedExerciseCaseId(turn.message) || (describesAvailability && hasSessionWindow)
+    || (latestProfile(turn.history) && /\b(?:miles?|travel radius)\b|英里/iu.test(turn.message)));
   const previousIds = previousRoles(turn.history);
   const explanation = !clock && previousIds.length && onlyAskingWhy(turn.message)
     ? prepareExplanation(turn, roles, previousIds, latestProfile(turn.history)) : null;
@@ -609,7 +615,7 @@ export async function answerLive({
         store: false,
         max_output_tokens: 2200,
         reasoning: { effort: "low" },
-        instructions: clock ? CLOCK_INSTRUCTIONS : explanation ? explanationInstructions : INSTRUCTIONS,
+        instructions: clock ? CLOCK_INSTRUCTIONS : explanation ? explanationInstructions : profileTurn ? INSTRUCTIONS + "\nThis message states a volunteer profile. Provide the complete case_profile, interpret skills and preferences from the conversation, and apply the recorded schedule and participation requirements." : INSTRUCTIONS,
         input: JSON.stringify(explanation ? explanation.input : clock ? {latest_message:turn.message, clock, active_profile:latestProfile(turn.history)} : {
           catalogue: inputCatalogue(roles),
           named_volunteer_examples: EXERCISE_CASE_TEXT,
@@ -624,7 +630,7 @@ export async function answerLive({
             type: "json_schema",
             name: clock ? "common_hours_host_time_question" : explanation ? "common_hours_explanation" : "common_hours_volunteer_turn",
             strict: true,
-            schema: clock ? CLOCK_SCHEMA : explanation ? explanation.schema : planSchema(roles),
+            schema: clock ? CLOCK_SCHEMA : explanation ? explanation.schema : planSchema(roles, profileTurn),
           },
         },
       }),
