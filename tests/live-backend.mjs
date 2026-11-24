@@ -565,6 +565,12 @@ test("source metadata distinguishes generic search quantity, counts, selected so
   const mixed = await packTurn("From the full catalogue switch to the seven exercise roles.",[],"records");
   assert.equal(mixed.source,"exercise");
   const saved = [{user:"Use the matching exercise", source:"exercise", text:"Your options.",matches:[],toConfirm:[],caseProfile:profile("B")}];
+  for (const message of ["Use all 100 roles and label the ones from the matching exercise.", "用一百个岗位，如果是原题的就标注一下。"]) {
+    const full = await run(message, {intent:"case_search", case_profile:profile("B"), activity:""}, {history:saved});
+    assert.equal(full.source,undefined);
+    assert.equal(full.caseProfile.mode,"in-person");
+    assert.ok(full.matches.length);
+  }
   const zh = await packTurn("这七个岗位里面为什么推荐这个？",saved,"detail",{language:"zh",role_id:"digital-skills-facilitator"});
   assert.match(zh.text,/招聘方原题/);
   assert.match(zh.text,/Digital skills facilitator/);

@@ -27,6 +27,9 @@ export function requestedSource({message, history}) {
   // A role's source can be discussed without changing the active search pool.
   const aboutChoice = /\b(?:why|reason|source|label|tag|provenance)\b|为什么|为何|理由|标注|来源/iu.test(message);
   const limitSearch = /\b(?:only|just|restrict|switch|limit|focus)\b|只看|仅看|切换/iu.test(message);
+  // A request to search the full pool can also ask for the original roles to be labelled.
+  const fullSearch = /(?:\b(?:use|search|switch to|return to|back to|look through|compare|consider)\s+(?:the\s+)?(?:full|whole|wider|community|all (?:100|one hundred)|100 roles)\b|(?:用|搜|看|回到|切换到|从)(?:全部|所有|这|那)?(?:一百|100|完整目录|社区目录))/iu.test(affirmative);
+  if (fullSearch && /\b(?:tag|label|mark|highlight|flag|indicate)\b|标注|标记|标明/iu.test(affirmative)) return 'community';
   if (aboutChoice && !limitSearch) return active;
   if (communityReference.test(affirmative) && packReference.test(affirmative)
       && /\b(?:including|include|alongside|tags?|labels?|mark)\b|包括|包含|标注|标记/iu.test(affirmative)
