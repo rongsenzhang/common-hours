@@ -144,7 +144,7 @@ function odiFields() {
 function layout() {
   return `<div class="ex-page">
     <header class="ex-header"><h1>Matching exercise</h1>
-      <p>Try both volunteer cases against seven fictional opportunities. Change a condition to see which roles the same rules recommend.</p>
+      <p>Try both volunteer cases against the seven fictional roles supplied in the recruitment task. Change a condition to see which roles the same rules recommend.</p>
     </header>
     <div class="ex-cases" role="group" aria-label="Load a case">
       <button type="button" data-ex-case="A"><strong>Case A</strong><span>Online or in person</span></button>
@@ -176,8 +176,8 @@ function layout() {
         </ol><div class="ex-links"><a href="${codeUrl}">Inspect the matching code ${icon("external", 14)}</a>
         <a href="https://github.com/rongsenzhang/common-hours/blob/main/docs/matching-exercise.md">Run the exercise locally ${icon("external", 14)}</a></div></div>
       </details>
-      <details class="ex-disclosure"><summary><span>Seven source records</span>${icon("down", 17)}</summary>
-        <div class="ex-detail-body"><p>“None listed” means the record lists no extra requirement. Derived interests show how the matcher interprets the activity text.</p><ul class="ex-records">${records()}</ul>
+      <details class="ex-disclosure" id="exercise-records"><summary><span>Seven recruitment-task records</span>${icon("down", 17)}</summary>
+        <div class="ex-detail-body"><p>The recruitment task supplies each role’s title, activity, time, location and requirements. “None listed” means the record gives no extra requirement. The matcher adds the derived interests.</p><ul class="ex-records">${records()}</ul>
         <h3 class="ex-source-heading">Original case inputs</h3>
         <dl class="ex-mapping"><div><dt>Case A · Online or in person</dt><dd>“${e(EXERCISE_CASE_TEXT.A)}”</dd></div>
         <div><dt>Case B · In person only</dt><dd>${e(EXERCISE_CASE_TEXT.B)}</dd></div></dl></div>

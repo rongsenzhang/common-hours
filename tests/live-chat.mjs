@@ -182,3 +182,20 @@ test("a live follow-up preserves checked volunteer constraints while keeping unr
   await assert.rejects(requestLiveReply({...base, fetchImpl: async () =>
     json({...reply, caseProfile: {...profile, maxMiles: -1}})}), {kind: "invalid"});
 });
+
+test("seven-role replies carry their source into follow-ups and cannot display community cards", async () => {
+  const pack = {...reply, source: "exercise", text: "Digital skills facilitator.", toConfirm: [], details: {}};
+  const checked = await requestLiveReply({...base, fetchImpl: async () => json(pack)});
+  assert.deepEqual(checked, pack);
+  const turns = [{input: "Use the seven roles", reply: checked}];
+  await requestLiveReply({...base, turns, fetchImpl: async (_url, opts) => {
+    assert.equal(JSON.parse(opts.body).history[0].source, "exercise");
+    return json(reply);
+  }});
+  const view = renderChat(turns, roles, {mode: "live", liveAvailable: true});
+  assert.match(view, /<a href="#exercise-records">Recruitment task · 7 supplied roles<\/a>/);
+  assert.match(view, /Use the community catalogue/);
+  assert.doesNotMatch(view, /data-detail=/);
+  await assert.rejects(requestLiveReply({...base, fetchImpl: async () =>
+    json({...pack, matches: ["garden"]})}), {kind: "invalid"});
+});

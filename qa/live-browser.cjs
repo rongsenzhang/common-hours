@@ -9,6 +9,8 @@ const config = new URL("data/chat-config.json", base).href;
 const api = new URL("qa-chat", base).href;
 const caseA = "I’d like to help people one to one, ideally using the digital support skills I already have. I can only volunteer on weekday evenings. Online is fine, but I can’t travel more than three miles. I don’t know if my safeguarding clearance is valid for a new role.";
 const caseBFollowUp = "The same volunteer can no longer volunteer online. Everything else stays the same.";
+const onlyExercise = "Use only the seven roles from the matching exercise.";
+const onlyCommunity = "Search the 100 community roles instead.";
 
 async function ask(page, question) {
   await page.locator("#chat-input").fill(question);
@@ -47,6 +49,21 @@ async function verifyInterviewChat(page, postBodies, replies) {
   assert.equal(postBodies.length, liveCalls + 2);
   assert.equal(postBodies.at(-1).history.at(-1).user, caseA);
   assert.equal(postBodies.at(-1).history.at(-1).caseProfile.maxMiles, 3);
+  await page.getByRole("button", {name: "Use the seven exercise roles"}).click();
+  const last = page.locator(".chat-turn").last();
+  await last.getByRole("link", {name: "Recruitment task · 7 supplied roles"}).waitFor();
+  assert.equal(await last.locator("[data-detail]").count(), 0);
+  assert.equal(postBodies.at(-1).message, onlyExercise);
+  await page.getByRole("button", {name: "Use the community catalogue"}).click();
+  await last.getByText("Community catalogue · 100 fictional roles", {exact: false}).waitFor();
+  assert.equal(postBodies.at(-1).message, onlyCommunity);
+  assert.equal(postBodies.at(-1).history.at(-1).source, "exercise");
+  await page.getByRole("link", {name: "seven roles supplied in the recruitment task", exact: true}).click();
+  const records = page.locator("details#exercise-records");
+  await records.locator("li h4").first().waitFor();
+  assert.equal(await records.locator("li h4").count(), 7);
+  assert.equal(await records.evaluate(el => el.open && el.querySelector("summary") === document.activeElement), true);
+  await page.goBack();
   await page.locator("[data-restart-chat]").click();
   await page.getByRole("button", {name: "Run Case B"}).click();
   await page.getByText("OpenAI · browser-test-model").waitFor();
@@ -125,13 +142,14 @@ async function verifyInterviewChat(page, postBodies, replies) {
           if (next === "fail")
             return route.fulfill({ status: 503, body: "offline" });
           const question = messages.at(-1).message;
-          const preset = [caseA, caseBFollowUp, "Case B"].includes(question);
+          const preset = [caseA, caseBFollowUp, "Case B", onlyCommunity].includes(question);
           return route.fulfill({
             json: {
               provider: "openai",
               model: "browser-test-model",
               text: "Confirmed by the demo catalogue.",
-              ...(preset ? replies[question === caseA ? "A" : "B"] : {matches: ["shelter-dog-walker"], toConfirm: []}),
+              ...(question === onlyExercise ? {source: "exercise", matches: [], toConfirm: [], caseProfile: replies.B.caseProfile}
+                : preset ? replies[question === caseA ? "A" : "B"] : {matches: ["shelter-dog-walker"], toConfirm: []}),
               details: {},
             },
           });

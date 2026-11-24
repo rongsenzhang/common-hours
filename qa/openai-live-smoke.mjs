@@ -44,7 +44,8 @@ async function checkTurn(label, message, history, expected) {
     requireResult(Array.isArray(answer.matches) && Array.isArray(answer.toConfirm));
     expected(answer);
     history.push({
-      user: message, text: answer.text, matches: answer.matches, toConfirm: answer.toConfirm,
+      user: message, text: answer.text.slice(0, 1200), matches: answer.matches, toConfirm: answer.toConfirm,
+      ...(answer.source === "exercise" && {source: "exercise"}),
       ...(answer.caseProfile && {caseProfile: answer.caseProfile}),
     });
     console.log("PASS", label);
@@ -129,6 +130,18 @@ async function checkSuppliedCases() {
   const cases = [];
   await checkTurn("Case A, submitted profile", EXERCISE_CASE_TEXT.A, cases, expectProfile(exerciseProfile("A")));
   await checkTurn("Case B as a change to the volunteer", EXERCISE_CASE_TEXT.B, cases, expectProfile(exerciseProfile("B")));
+  const exercise = [...cases];
+  await checkTurn("Case B in the seven recruitment-task records",
+    "Yes, just the seven roles in the matching exercise.", exercise, reply => {
+      noRoles(reply);
+      requireResult(reply.source === "exercise" && reply.text.includes("Digital skills facilitator"), "exercise_shortlist");
+      sameProfile(cases.at(-1).caseProfile, reply.caseProfile);
+    });
+  await checkTurn("return the same volunteer to the community catalogue",
+    "Now search all 100 community roles again for the same volunteer.", exercise, reply => {
+      requireResult(reply.source !== "exercise", "community_scope");
+      expectProfile(exerciseProfile("B"))(reply);
+    });
   await checkTurn("change the travel radius in natural language",
     "Keep the rest, but I could get to a venue five miles away now.", cases,
     expectProfile({...exerciseProfile("B"), maxMiles: 5}));
@@ -183,7 +196,7 @@ async function checkLiveResponses() {
     }
   }
   if (failures.length) throw new Error(failures.join("\n"));
-  console.log("Verified fifteen real OpenAI turns with", DEFAULT_MODEL);
+  console.log("Verified live OpenAI conversations with", DEFAULT_MODEL);
 }
 
 checkLiveResponses().catch((error) => {

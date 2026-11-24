@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
+import { exerciseProfile, exerciseRoles, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
 import { matchCommunityCase } from "../site/community-case.js";
 import { readFileSync } from "node:fs";
 import {
@@ -488,4 +488,95 @@ test("a volunteer describing a session window gets a required profile from the r
     assert.equal(reply.caseProfile.mode,"online");
     assert.deepEqual(reply.caseProfile.days,profile("A").days);
   }
+});
+
+
+const packTurn = (message, history, action, {language = "en", role_id = null} = {}) => run(message, {}, {
+  history, fetchImpl:async (_url, request) => {
+    const body = JSON.parse(request.body);
+    assert.equal(body.text.format.name, "common_hours_exercise_source");
+    const input = JSON.parse(body.input);
+    assert.deepEqual(input.records, exerciseRoles);
+    assert.equal(input.catalogue_sources.community.count, roles.length);
+    assert.ok(!input.catalogue);
+    return completed({action,language,role_id});
+  },
+});
+const historyItem = (user, {text,matches,toConfirm,caseProfile,source}) =>
+  ({user,text,matches,toConfirm,caseProfile,source});
+
+test("both supplied cases use the same seven records on request, keep pending reasons, and switch back to the wider catalogue", async () => {
+  const caseA = await run(EXERCISE_CASE_TEXT.A, {intent:"case_search",activity:"",case_profile:profile("A")});
+  const saved = [historyItem(EXERCISE_CASE_TEXT.A,caseA)];
+  for (const question of ["Just focus on seven role matching exercise?", "Use only the seven roles from the matching exercise.", "只看招聘方原题七个岗位"]) {
+    const a = await packTurn(question,saved,"shortlist");
+    assert.equal(a.source,"exercise");
+    assert.deepEqual(a.matches,[]);
+    assert.deepEqual(a.toConfirm,[]);
+    assert.deepEqual(a.caseProfile,profile("A"));
+    assert.match(a.text,/Shortlist:[\s\S]*Digital access buddy[\s\S]*Digital skills facilitator[\s\S]*To confirm:[\s\S]*Youth reading mentor[\s\S]*clearance[\s\S]*Form-filling volunteer[\s\S]*distance/i);
+  }
+  const question = "Switch to the seven original roles";
+  const a = await packTurn(question,saved,"shortlist");
+  saved.push(historyItem(question,a));
+  const b = await packTurn(EXERCISE_CASE_TEXT.B,saved,"shortlist");
+  assert.deepEqual(b.caseProfile,profile("B"));
+  assert.match(b.text,/Digital skills facilitator/);
+  assert.ok(!b.text.includes("Digital access buddy"));
+  saved.push(historyItem(EXERCISE_CASE_TEXT.B,b));
+  const list = await packTurn("Which roles did the recruiter give us?",saved,"records");
+  for (const row of exerciseRoles) assert.ok(list.text.includes(row.title));
+  const count = await packTurn("Okay, and how many roles in your data set?",saved,"count");
+  assert.equal(count.source,"exercise");
+  assert.match(count.text,/100 fictional roles/);
+  assert.match(count.text,/7 separate/);
+  saved.push(historyItem("How many roles?",count));
+  const detail = await packTurn("Why was Digital access buddy excluded?",saved,"detail",{role_id:"digital-access-buddy"});
+  assert.match(detail.text,/Excluded.*online/i);
+  const back = await run("Back to 100 instead of the seven", {intent:"case_search",activity:"",case_profile:profile("A")}, {history:saved});
+  assert.equal(back.source,undefined);
+  assert.deepEqual(back.caseProfile,profile("B"));
+  assert.ok(back.matches.length);
+  const edited = await run("Use all 100 again, now online only.",{
+    intent:"case_search",activity:"",case_profile:{...profile("B"),mode:"online"},changed_fields:["mode"]
+  },{history:saved});
+  assert.equal(edited.caseProfile.mode,"online");
+  const unknown = await run("Search the 100 community roles instead. I need a ceiling hoist.",
+    {intent:"unknown",reply:"Ask the host about a ceiling hoist.",case_profile:profile("B")},{history:saved});
+  assert.deepEqual(unknown.matches,[]);
+  assert.match(unknown.text,/ceiling hoist/);
+});
+
+test("source metadata distinguishes generic search quantity, counts, selected sources and the volunteer profile", async () => {
+  for (const question of ["Which are the original seven roles?",
+    "Which seven roles did the recruitment task supply? List their titles.",
+    "Which roles are in the candidate brief?", "exercise 里的七个岗位是哪些？"]) {
+    const fresh = await packTurn(question,[],"records");
+    assert.equal(fresh.caseProfile,undefined);
+    assert.match(fresh.text,/Case A or Case B/);
+    for (const row of exerciseRoles) assert.ok(fresh.text.includes(row.title));
+  }
+  const inventory = await packTurn("How many roles are in your data set?",[],"count");
+  assert.equal(inventory.source,undefined);
+  for (const msg of ["How many hours does this role need?", "How many of those roles fit Case B?", "Show me seven roles from the 100 community catalogue."]) {
+    const reply = await run(msg,{intent:"clarify",reply:"Which role do you mean?"});
+    assert.equal(reply.source,undefined);
+  }
+  const mixed = await packTurn("From the full catalogue switch to the seven exercise roles.",[],"records");
+  assert.equal(mixed.source,"exercise");
+  const saved = [{user:"Use the matching exercise", source:"exercise", text:"Your options.",matches:[],toConfirm:[],caseProfile:profile("B")}];
+  const zh = await packTurn("这七个岗位里面为什么推荐这个？",saved,"detail",{language:"zh",role_id:"digital-skills-facilitator"});
+  assert.match(zh.text,/招聘方原题/);
+  assert.match(zh.text,/Digital skills facilitator/);
+  assert.throws(()=>validateTurn({message:"next",history:[{...saved[0],matches:["bus-app-coach"]}]},roles),LiveError);
+  assert.throws(()=>validateTurn({message:"next",history:[{...saved[0],source:"invented"}]},roles),LiveError);
+  await assert.rejects(packTurn("Tell me about the first one",saved,"detail",{role_id:"bus-app-coach"}),{code:"invalid_reply"});
+});
+
+test("community clearance for a different role never clears the recruiter's reading mentor", async () => {
+  const current = {...profile("A"),clearance:"verified",verifiedRoleId:"junior-coding-mentor"};
+  const saved = [{user:"I have checked my clearance for the coding mentor.",text:"Recorded.",matches:[],toConfirm:[],caseProfile:current}];
+  const answer = await packTurn("Use the matching exercise.",saved,"shortlist");
+  assert.deepEqual(answer.caseProfile,current);
+  assert.match(answer.text,/To confirm:[\s\S]*Youth reading mentor.*clearance/);
 });

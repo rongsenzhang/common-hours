@@ -263,7 +263,8 @@ function render(scroll = false) {
   if (page === "ask" && h !== "ask") cancelRequest();
   leaveExercise?.();
   leaveExercise = undefined;
-  page = ["ask", "ask-exercise", "exercise"].includes(h) ? h : "discover";
+  const route = h === "exercise-records" ? "exercise" : h;
+  page = ["ask", "ask-exercise", "exercise"].includes(route) ? route : "discover";
   const titles = { discover: "Discover volunteer roles", exercise: "Matching exercise", ask: "Ask the role finder", "ask-exercise": "Interview cases · Ask the role finder" };
   document.title = titles[page] + " · Common Hours";
   for (const n of document.querySelectorAll("nav a")) {
@@ -272,6 +273,13 @@ function render(scroll = false) {
   }
   if (page === "exercise") {
     leaveExercise = mountExercise(main);
+    if (h === "exercise-records") {
+      const records = main.querySelector("#exercise-records");
+      records.open = true;
+      records.querySelector("summary").focus({preventScroll: true});
+      records.scrollIntoView({block: "start"});
+      return;
+    }
   } else if (page === "ask-exercise") {
     main.innerHTML = chatContents();
   } else if (catalog) {

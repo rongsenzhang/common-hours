@@ -44,6 +44,7 @@ function recentLiveHistory(turns) {
       text: reply.text.slice(0, 1200),
       matches: reply.matches,
       toConfirm: reply.toConfirm,
+      ...(reply.source === "exercise" ? {source: "exercise"} : {}),
       ...(reply.caseProfile ? {caseProfile: copyCommunityProfile(reply.caseProfile)} : {}),
     }));
 }
@@ -61,8 +62,10 @@ function checkedReply(data, roles) {
     throw new ChatRequestError("invalid");
   }
   const ids = [...data.matches, ...data.toConfirm];
+  const exercise = data.source === "exercise";
   const roleIds = new Set(roles.map((role) => role.id));
   if (
+    (exercise && ids.length !== 0) ||
     (data.caseProfile != null && !validCommunityProfile(data.caseProfile, roleIds)) ||
     data.matches.length > 3 || data.toConfirm.length > 3 ||
     (!data.caseProfile && ids.length > 3) ||
@@ -82,6 +85,7 @@ function checkedReply(data, roles) {
     matches: data.matches,
     toConfirm: data.toConfirm,
     details,
+    ...(exercise ? {source: "exercise"} : {}),
     ...(data.caseProfile ? {caseProfile: copyCommunityProfile(data.caseProfile)} : {}),
   };
 }

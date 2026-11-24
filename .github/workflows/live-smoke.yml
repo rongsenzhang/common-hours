@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - server/live.mjs
+      - server/exercise-source.mjs
       - server/explanation.mjs
       - server/community-chat.mjs
       - site/assistant.js

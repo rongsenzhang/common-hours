@@ -131,7 +131,7 @@ async function verify(browser, width) {
     assert.deepEqual(await shortlist.allTextContents(), ["Youth reading mentor", "Digital skills facilitator"]);
     await page.getByRole("button", { name: /Case A/ }).click();
     assert.deepEqual(await shortlist.allTextContents(), expectedA);
-    await page.getByText("Seven source records", { exact: true }).click();
+    await page.getByText("Seven recruitment-task records", { exact: true }).click();
     assert.equal(await page.locator(".ex-records h4").count(), 7);
     await page.locator("#ex-wording summary").click();
     assert.ok(await page.locator("#ex-wording li[data-check=pass]").count() >= 2);
