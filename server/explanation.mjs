@@ -1,6 +1,6 @@
 // For a direct "why?" turn the previous shortlist is already known. The model
 // chooses evidence for each of those roles without inferring a fresh profile.
-import { visitorExcerpts, isListExplanation, isSourceInstruction } from "./community-chat.mjs";
+import { visitorExcerpts, isListExplanation, isSourceInstruction, lastDisplayedTurn } from "./community-chat.mjs";
 import { matchCommunityCase } from "../site/community-case.js";
 
 const object = properties => ({type: "object", properties, required: Object.keys(properties), additionalProperties: false});
@@ -33,7 +33,7 @@ export function prepareExplanation(turn, roles, ids, profile) {
       reason: {type:"string"},
     });
   }
-  const previous = [...turn.history].reverse().find(item => item.matches.length || item.toConfirm.length);
+  const previous = lastDisplayedTurn(turn.history);
   let decisions = [];
   if (profile) {
     const checked = matchCommunityCase(ids.map(id => byId.get(id)), profile, {limit:Infinity});
@@ -41,7 +41,10 @@ export function prepareExplanation(turn, roles, ids, profile) {
       rows.map(({role, fit, reasons}) => [role.id, {id:role.id, status, fit, reasons}])));
     decisions = ids.map(id => byRole.get(id));
   } else if (previous) {
-    decisions = ids.map(id => ({id, status:previous.toConfirm.includes(id) ? "pending" : "recommendations"}));
+    decisions = ids.map(id => {
+      const {time, mode, stepFree, contactNote} = byId.get(id);
+      return {id, status:previous.toConfirm.includes(id) ? "pending" : "recommendations", time, mode, stepFree, contactNote};
+    });
   }
   return {ids, profile, input: {question:turn.message, volunteer_statements:statements, profile, roles:sources, checked_decisions:decisions,
     previous_reply:turn.history.at(-1)?.text},

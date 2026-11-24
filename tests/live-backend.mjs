@@ -649,3 +649,23 @@ test("clearance explicitly verified for the original youth role also applies in 
   const answer = await packTurn("Use the matching exercise.",saved,"shortlist");
   assert.match(answer.text.split("To confirm:")[0],/Youth reading mentor/);
 });
+
+test("why keeps a real unresolved access result pending without a volunteer case profile", async () => {
+  const question = "Garden work at weekends with a step-free route";
+  const found = await run(question, {activity:"garden", step_free:true, candidate_ids:["garden-buddy"]});
+  assert.deepEqual(found.matches,[]);
+  assert.deepEqual(found.toConfirm,["garden-buddy"]);
+  assert.equal(found.caseProfile,undefined);
+  const reply = await run("why this list? reason?",{}, {history:[historyItem(question,found)],fetchImpl:async (_url, request) => {
+    const input = JSON.parse(JSON.parse(request.body).input);
+    const [decision] = input.checked_decisions;
+    assert.equal(decision.id,"garden-buddy");
+    assert.equal(decision.status,"pending");
+    assert.equal(decision.stepFree,"unknown");
+    assert.match(decision.contactNote,/path/);
+    const explanations = {"garden-buddy":{listing_source:"summary",visitor_source:"0",reason:""}};
+    return completed({language:"en",comparison:"The garden listing needs the host to confirm the route.",explanations});
+  }});
+  assert.deepEqual(reply.matches,found.matches);
+  assert.deepEqual(reply.toConfirm,found.toConfirm);
+});

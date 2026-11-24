@@ -116,8 +116,12 @@ export function explainEvidence(evidence, zh) {
   return [reason, userQuote ? `You mentioned “${userQuote}”.` : "", `The listing says “${sourceQuote}”.`].filter(Boolean).join(" ");
 }
 
+export function lastDisplayedTurn(history) {
+  return history.findLast(item => item.matches.length || item.toConfirm.length);
+}
+
 export function previousRoles(history) {
-  const turn = [...history].reverse().find(item => item.matches.length || item.toConfirm.length);
+  const turn = lastDisplayedTurn(history);
   return turn ? [...turn.matches, ...turn.toConfirm] : [];
 }
 

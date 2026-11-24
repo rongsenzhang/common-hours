@@ -1,5 +1,5 @@
 // This module is server-only. The catalogue is loaded by the host, never from the chat request.
-import { checkedEvidence, explainEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, isListExplanation, validCommunityProfile, visitorExcerpts } from "./community-chat.mjs";
+import { checkedEvidence, explainEvidence, communityAnswer, communityProfileSchema, previousRoles, lastDisplayedTurn, suggestedQuestion, isListExplanation, validCommunityProfile, visitorExcerpts } from "./community-chat.mjs";
 import { catalogueSources, packReply, preparePack, requestedSource, validPackPlan } from "./exercise-source.mjs";
 import { prepareExplanation, explanationInstructions, validComparison } from "./explanation.mjs";
 import { suppliedExerciseCaseId } from "../site/exercise-chat.js";
@@ -539,8 +539,12 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
     mode: plan.mode,
     stepFree: plan.step_free || Boolean(pendingAccess),
   };
-  const ranked = matchOpportunities(candidates, prefs);
-  const rows = [
+  // A follow-up explains the decisions the volunteer saw. General searches
+  // have no saved case profile from which to reconstruct their access filters.
+  const last = plan.intent === "explain" ? lastDisplayedTurn(history) : null;
+  const ranked = last ? null : matchOpportunities(candidates, prefs);
+  const rows = last ? ["matches", "toConfirm"].flatMap(group =>
+    last[group].filter(id => wanted.includes(id)).map(id => ({opportunity: byId.get(id), group}))).slice(0, 3) : [
     ...ranked.matches.map((r) => ({ ...r, group: "matches" })),
     ...ranked.review.map((r) => ({ ...r, group: "toConfirm" })),
   ].slice(0, 3);
@@ -553,7 +557,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
       roleDescription(opportunity, zh, wantsDetails),
     ].filter(Boolean).join("\n");
   }
-  if (wantsDetails && !rows.length && ranked.excluded.length) {
+  if (wantsDetails && !rows.length && ranked?.excluded.length) {
     const role = ranked.excluded[0].opportunity;
     return respond(
       say(
