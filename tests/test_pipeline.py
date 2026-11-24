@@ -29,11 +29,13 @@ class CatalogueTests(unittest.TestCase):
         self.assertEqual(data, json.loads((ROOT / "site/data/catalog.json").read_text()))
         with sqlite3.connect(self.root / "test.sqlite") as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM roles").fetchone()[0], len(data["opportunities"]))
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM roles WHERE source='exercise'").fetchone()[0], 7)
         for row in data["opportunities"]:
             self.assertEqual(set(row["sources"]), set(row) - {"sources"})
             for source in row["sources"].values():
                 file, identifier = source.split(":")
-                self.assertIn(identifier, (self.fixtures / file).read_text())
+                base = ROOT if row.get("source") == "exercise" else self.fixtures
+                self.assertIn(identifier, (base / file).read_text())
 
     def test_community_catalogue_size_and_unique_records(self):
         data = self.generate()
@@ -41,7 +43,26 @@ class CatalogueTests(unittest.TestCase):
         self.assertEqual(len(rows), 100)
         self.assertEqual(len({row["title"] for row in rows}), 100)
         self.assertEqual(len({row["id"] for row in rows}), 100)
-        self.assertEqual(data["summary"]["hostCount"], len({row["organisation"] for row in rows}))
+        demo = [row for row in rows if row.get("source") != "exercise"]
+        self.assertEqual(len(demo), 93)
+        self.assertEqual(data["summary"]["hostCount"], len({row["organisation"] for row in demo}))
+
+    def test_recruitment_roles_appear_once_with_the_supplied_facts(self):
+        rows = {row["id"]: row for row in self.generate()["opportunities"] if row.get("source") == "exercise"}
+        self.assertEqual(set(rows), {"digital-access-buddy", "community-cafe-host", "youth-reading-mentor",
+                                     "food-parcel-packer", "conversation-partner", "form-filling-volunteer",
+                                     "digital-skills-facilitator"})
+        digital = rows["digital-access-buddy"]
+        self.assertEqual(digital["summary"], "Support adults individually to get online and use everyday services")
+        self.assertEqual(digital["caseFacts"], {
+            "slots": [{"day": "Wed", "period": "evening"}], "distanceMiles": None,
+            "clearance": "none-listed", "individualEvidence": "individually", "digitalEvidence": "get online",
+        })
+        self.assertEqual(digital["mode"], "remote")
+        forms = rows["form-filling-volunteer"]
+        self.assertEqual((forms["mode"], forms["caseFacts"]["distanceMiles"], forms["stepFree"]),
+                         ("onsite", None, "unknown"))
+        self.assertEqual(rows["youth-reading-mentor"]["caseFacts"]["clearance"], "required")
 
     def test_case_facts_are_grounded_and_missing_facts_stay_unknown(self):
         rows = {row["id"]: row for row in self.generate()["opportunities"]}

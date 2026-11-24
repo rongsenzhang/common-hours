@@ -17,6 +17,9 @@ class PublicChatPackageTests(unittest.TestCase):
                 config = json.loads((target / "data/chat-config.json").read_text())
                 self.assertEqual(config, {"endpoint": endpoint})
                 self.assertFalse((target / "server").exists())
+                rows = json.loads((target / "data/catalog.json").read_text())["opportunities"]
+                self.assertEqual(len(rows), 100)
+                self.assertEqual(sum(row.get("source") == "exercise" for row in rows), 7)
 
     def test_missing_or_invalid_explicit_endpoint_aborts_before_packaging(self):
         with tempfile.TemporaryDirectory() as scratch:

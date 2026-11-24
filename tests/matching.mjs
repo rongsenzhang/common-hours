@@ -91,7 +91,9 @@ test('topic aliases and literal accent normalisation have inspectable evidence',
   assert.equal(search('ornithology', {}, 'baseline').matches.length, 0);
   assert.deepEqual(ids(search('ornithology').matches), ['wildlife-counter']);
   assert.ok(search('ornithology').matches[0].reasons.some(reason => reason.includes('tasks (“birds”)')));
-  assert.equal(search('cafe', {}, 'baseline').matches[0].opportunity.id, 'repair-cafe');
+  const cafes = ids(search('cafe', {}, 'baseline').matches);
+  assert.deepEqual(cafes, ids(search('café', {}, 'baseline').matches));
+  assert.deepEqual(new Set(cafes), new Set(['community-cafe-host', 'repair-cafe']));
 });
 
 test('rankings are independent of source order; scores are relative and bounded', () => {

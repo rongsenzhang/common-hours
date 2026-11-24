@@ -1,4 +1,4 @@
-import { escapeText as e } from "./html.js";
+import { escapeText as e, roleByline } from "./html.js";
 import { communityRoleFacts, discoverCaseFromHash, profileFromCommunityForm, renderCommunityCases } from "./community-case-view.js";
 import { matchOpportunities } from "./engine.js";
 import { icon, mark } from "./icons.js";
@@ -189,8 +189,8 @@ function renderCard(row) {
     t = themes[r.theme] || themes.community,
     isSaved = saved.has(r.id);
   return `<article class="role-card"><div class="card-top"><div class="themelabel"><span class="tile ${e(r.theme)}">${icon(t[0], 22)}</span><span>${e(t[1])}</span></div><button class="save ${isSaved ? "selected" : ""}" aria-label="${isSaved ? "Unsave" : "Save"} ${e(r.title)}" aria-pressed="${isSaved}" data-save="${e(r.id)}">${icon("save", 19)}</button></div>
- <h3><button data-detail="${e(r.id)}">${e(r.title)}</button></h3><p class="org">${e(r.organisation)}</p><p class="card-desc">${e(r.summary)}</p>
- <div class="card-foot"><span>${icon("pin", 15)} ${e(r.mode === "remote" ? "From home" : r.area)}</span><span>${icon("clock", 15)} ${e(r.time === "unknown" ? "Time to confirm" : labels[r.time])}</span></div>
+ <h3><button data-detail="${e(r.id)}">${e(r.title)}</button></h3><p class="org">${roleByline(r, false)}</p><p class="card-desc">${e(r.summary)}</p>
+ <div class="card-foot"><span>${icon("pin", 15)} ${e(r.mode === "remote" ? "From home" : r.source === "exercise" ? labels[r.mode] : r.area)}</span><span>${icon("clock", 15)} ${e(r.time === "unknown" ? "Time to confirm" : labels[r.time])}</span></div>
  ${row.issues?.length ? '<div class="issue-line">' + icon("info", 15) + " " + e(row.issues[0].label) + "</div>" : ""}</article>`;
 }
 function showResults() {
@@ -306,8 +306,8 @@ function detail(id) {
   );
   const fields = ["time", "mode", "stepFree"];
   dialog.innerHTML = `<div class="modal-head"><span class="themelabel"><span class="tile ${e(r.theme)}">${icon(t[0], 22)}</span>${e(t[1])}</span><button autofocus class="close" aria-label="Close role details" data-close>${icon("close")}</button></div>
- <h2 id="dialog-title">${e(r.title)}</h2><p class="org">${e(r.organisation)} · ${e(r.area)}</p><p>${e(r.summary)}</p>
- <h3>What you would do</h3><ul>${r.tasks.map((x) => "<li>" + e(x) + "</li>").join("")}</ul>
+ <h2 id="dialog-title">${e(r.title)}</h2><p class="org">${roleByline(r)}</p><p>${e(r.summary)}</p>
+ ${r.tasks.length === 1 && r.tasks[0] === r.summary ? "" : "<h3>What you would do</h3><ul>" + r.tasks.map((x) => "<li>" + e(x) + "</li>").join("") + "</ul>"}
  <h3>Role details</h3><dl class="fact-grid">${fields.map((f) => "<div><dt>" + e(labels[f]) + "</dt><dd>" + e(f === "stepFree" && r.mode === "remote" ? "No venue visit" : labels[r[f]]) + "</dd></div>").join("")}${communityRoleFacts(r)}</dl>
  ${r.contactNote ? "<h3>Before you take part</h3><p>" + e(r.contactNote) + "</p>" : ""}
  ${qs.length ? `<div class="question"><h3>What to ask the organiser</h3>${qs.map((q) => "<p>" + e(q.question) + "</p>").join("")}</div>` : ""}

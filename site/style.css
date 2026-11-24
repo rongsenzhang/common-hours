@@ -606,6 +606,15 @@ main.frame {
   color: #526558;
   margin-top: 4px;
 }
+.exercise-credit {
+  display: inline-block;
+  color: var(--green);
+  border: 1px solid var(--border);
+  border-radius: .35rem;
+  padding: .1em .5em;
+  font-size: .8rem;
+  font-weight: 600;
+}
 .card-desc {
   margin: 12px 0 17px;
   color: #425646;

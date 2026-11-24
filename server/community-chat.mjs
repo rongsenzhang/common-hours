@@ -66,6 +66,27 @@ export function visitorExcerpts({history, message}) {
         .map(chunk => chunk.trim()).filter(Boolean)));
 }
 
+const listExplanationQuestions = [
+  /^why (?:this|that) (?:short)?list(?:[?.!\s]+reasons?)?$/iu,
+  /^(?:please )?(?:(?:tell|give|show) me (?:your |the )?|explain (?:your |the )?)?reason(?:s|ing)?(?: (?:for|behind) (?:this|the) (?:short)?list)?$/iu,
+  /^why(?: these| those| this| that)?(?: roles?| ones?)?(?: for me)?$|^why do these roles suit me$/iu,
+  /^why (?:did you (?:choose|pick|recommend|suggest)|are|would) (?:these|those|this|that)(?: roles?| ones?)?(?: (?:for me|a good fit|suit me|good for me))?$/iu,
+  /^(?:why|explain why)\b.{0,165}\b(?:exercise|recruitment)[ -](?:role|tag|label|task)/iu,
+  /^(?:请)?(?:说说|解释一下|讲讲|告诉我)(?:你的|推荐的|这个名单的)?(?:理由|原因)$|^为什么(?:这样|这么)推荐$/u,
+  /^(?:你为什么觉得这几个岗位适合我|为什么(?:是|推荐)?(?:这些|这几个|这个|它们)(?:岗位|机会)?(?:给我|适合我)?|(?:这些|这几个|这个)(?:岗位|机会)?为什么适合我|我说的哪些经验和这些岗位的工作有关)$/u,
+  /^(?:为什么|为何).{0,80}(?:原题|招聘方).{0,40}(?:入选|出现|推荐)/u,
+];
+
+export function isListExplanation(message) {
+  const text = message.trim().replace(/[?.!！？。]+$/u, "").trim();
+  return listExplanationQuestions.some(pattern => pattern.test(text));
+}
+
+// Scope switches and requests to explain a result are commands, not evidence of interests.
+export function isSourceInstruction(text) {
+  return /^(?:please )?(?:(?:switch|go|return) (?:back )?to|use|search|look (?:only )?at|(?:just )?focus on|back to|list|show)(?: (?:only|all|the|our|these|those|full|community|wider|original|supplied|matching|recruitment|exercise|seven|7|100|one hundred|roles?|records?|catalog(?:ue)?|pack|instead|again|from|in)){1,20}[.!?]*$|^(?:请)?(?:切换到?|只看|回到|改用|使用|列出).{0,24}(?:岗位|目录|原题|练习)[。！!？?]*$/iu.test(text.trim());
+}
+
 export function checkedEvidence(plan, role, excerpts) {
   const item = plan.role_evidence.find(row => row.role_id === role.id);
   if (!item || !plan.candidate_ids.includes(role.id)) return null;
@@ -74,8 +95,9 @@ export function checkedEvidence(plan, role, excerpts) {
   const quote = listingFields[item.listing_source];
   if (typeof quote !== "string" || !quote.trim()) return null;
   const userQuote = Number.isInteger(item.visitor_source) ? excerpts[item.visitor_source] : null;
-  const commandOnly = /^(?:(?:run|show|use|try|switch to)\s+)?case [ab]$|^案例\s*[ab]$|^(?:why(?: these| those| this| that)?|why did you (?:pick|choose|recommend|suggest) (?:these|those)(?: for me)?|为什么(?:是|推荐)?(?:这些|这个|这几个)(?:岗位)?(?:给我)?)$/iu;
+  const commandOnly = /^(?:(?:run|show|use|try|switch to)\s+)?case [ab]$|^案例\s*[ab]$/iu;
   const fromUser = typeof userQuote === "string" && userQuote.length > 1
+    && !isSourceInstruction(userQuote) && !isListExplanation(userQuote)
     && !commandOnly.test(userQuote.trim().replace(/[?!？。！.]+$/u, ""));
   // Model prose is allowed only as an explicitly subjective fit judgement.
   // Venue, clearance, numbers, availability and application facts come from
@@ -162,5 +184,5 @@ export function communityAnswer(plan, roles, result, {message, history}) {
     const {role, reasons} = ranked.excluded[0];
     outcome += " " + role.title + " — " + reasons[0];
   }
-  return {...result, caseProfile: profile, text: [intro, outcome, suggestedQuestion(plan)].filter(Boolean).join(" ")};
+  return {...result, caseProfile: profile, text: plan.comparison ?? [intro, outcome, suggestedQuestion(plan)].filter(Boolean).join(" ")};
 }

@@ -1,4 +1,4 @@
-import { escapeText as e } from "./html.js";
+import { escapeText as e, roleByline } from "./html.js";
 import { icon } from "./icons.js";
 
 const starters = [
@@ -13,7 +13,7 @@ function recommendations(ids, details, byId, heading) {
       const role = byId.get(id);
       if (!role) return "";
       return `<li><button class="role-link" data-detail="${e(id)}">${e(role.title)} ${icon("next", 15)}</button>
-      <span class="chat-host">${e(role.organisation)} · ${e(role.area)}</span>
+      <span class="chat-host">${roleByline(role)}</span>
       <p>${e(details?.[id] || role.summary)}</p></li>`;
     })
     .join("");
@@ -50,7 +50,7 @@ function catalogueReply(reply, byId) {
   const exercise = reply.source === "exercise";
   const source = exercise
     ? '<a href="#exercise-records">Recruitment task · 7 supplied roles</a>'
-    : `Community catalogue · ${byId.size} fictional roles`;
+    : `Full catalogue · ${byId.size} roles`;
   return `<div class="chat-source"><span>${model}</span> <span>· ${source}</span></div>
     <p class="chat-answer">${e(reply.text)}</p>
     ${recommendations(reply.matches, reply.details, byId, "Matching roles")}
@@ -121,9 +121,11 @@ export function renderChat(
   const whyPrompt = /[\u3400-\u9fff]/u.test(last?.input ?? "") ? "为什么这些岗位适合我？" : "Why do these roles suit me?";
   const followups = [];
   if (live && !pending && last) {
-    if (last.reply.matches.length) followups.push(promptButton(whyPrompt));
+    if (last.reply.matches.length || (last.reply.source === "exercise" && last.reply.caseProfile)) {
+      followups.push(promptButton(whyPrompt));
+    }
     if (last.reply.source === "exercise") {
-      followups.push(promptButton(`Search the ${roles.length} community roles instead.`, "Use the community catalogue"));
+      followups.push(promptButton(`Search all ${roles.length} roles again.`, `Use all ${roles.length} roles`));
     } else if (last.reply.caseProfile) {
       followups.push(promptButton("Use only the seven roles from the matching exercise.", "Use the seven exercise roles"));
     }
@@ -134,7 +136,7 @@ export function renderChat(
   const input = `<textarea id="chat-input" name="message" rows="${interview ? 3 : 1}" maxlength="1200" required placeholder="${placeholder}" autocomplete="off" aria-describedby="chat-disclosure" ${pending ? "disabled" : ""}>${e(draft)}</textarea>`;
   return `<section class="chat-page"><header class="chat-header">
     <div class="chat-mark">${icon("chat", 26)}</div><h1>${interview ? "Seven-role exercise chat" : "Ask the role finder"}</h1>
-    <p>${interview ? 'Try the two cases with the <a href="#exercise-records">seven roles supplied in the recruitment task</a>. You can change one condition in a follow-up.' : `Case A, Case B and your own questions use the catalogue of ${roles.length} fictional community roles by default. ${live ? 'To compare, ask for only the' : 'You can also view the'} <a href="#exercise-records">seven roles supplied in the recruitment task</a>.`}</p></header>
+    <p>${interview ? 'Try the two cases with the <a href="#exercise-records">seven roles supplied in the recruitment task</a>. You can change one condition in a follow-up.' : `Case A, Case B and your own questions search all ${roles.length} fictional roles, including the <a href="#exercise-records">seven roles supplied in the recruitment task</a>.`}</p></header>
     ${selector}
     <p class="chat-disclosure" id="chat-disclosure">${e(disclosure)}</p>
     ${turns.length || pending ? '<div class="chat-tools"><button class="text-btn" data-restart-chat>Start a new chat</button></div>' : '<div class="chat-starters" aria-label="Example questions">' + prompts + "</div>"}

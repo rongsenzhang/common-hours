@@ -10,7 +10,7 @@ const api = new URL("qa-chat", base).href;
 const caseA = "I’d like to help people one to one, ideally using the digital support skills I already have. I can only volunteer on weekday evenings. Online is fine, but I can’t travel more than three miles. I don’t know if my safeguarding clearance is valid for a new role.";
 const caseBFollowUp = "The same volunteer can no longer volunteer online. Everything else stays the same.";
 const onlyExercise = "Use only the seven roles from the matching exercise.";
-const onlyCommunity = "Search the 100 community roles instead.";
+const onlyCommunity = "Search all 100 roles again.";
 
 async function ask(page, question) {
   await page.locator("#chat-input").fill(question);
@@ -32,6 +32,8 @@ async function checkCaseAnswer(page, expectedRoles) {
 
 async function verifyInterviewChat(page, postBodies, replies) {
   const liveCalls = postBodies.length;
+  const {exerciseRoles} = await import("../site/exercise-engine.js");
+  const originals = new Set(exerciseRoles.map(role => role.id));
   assert.ok(await page.getByRole("radio", {name: "Live AI", exact: true}).isChecked());
   async function checkCommunityCase(question, mode) {
     await ask(page, question);
@@ -40,6 +42,9 @@ async function verifyInterviewChat(page, postBodies, replies) {
     const ids = await answer.locator("[data-detail]").evaluateAll(cards => cards.map(card => card.dataset.detail));
     const expected = replies[mode === "either" ? "A" : "B"];
     assert.deepEqual(ids, [...expected.matches, ...expected.toConfirm]);
+    const credited = await answer.locator(".chat-options li:has(.exercise-credit) [data-detail]")
+      .evaluateAll(buttons => buttons.map(button => button.dataset.detail));
+    assert.deepEqual(credited, ids.filter(id => originals.has(id)));
     assert.equal(new URL(page.url()).hash, "#ask");
     assert.equal(postBodies.at(-1).message, question);
     assert.equal(await answer.locator("[data-exercise-title]").count(), 0);
@@ -54,8 +59,9 @@ async function verifyInterviewChat(page, postBodies, replies) {
   await last.getByRole("link", {name: "Recruitment task · 7 supplied roles"}).waitFor();
   assert.equal(await last.locator("[data-detail]").count(), 0);
   assert.equal(postBodies.at(-1).message, onlyExercise);
-  await page.getByRole("button", {name: "Use the community catalogue"}).click();
-  await last.getByText("Community catalogue · 100 fictional roles", {exact: false}).waitFor();
+  await page.getByRole("button", {name: "Why do these roles suit me?"}).waitFor();
+  await page.getByRole("button", {name: "Use all 100 roles"}).click();
+  await last.getByText("Full catalogue · 100 roles", {exact: false}).waitFor();
   assert.equal(postBodies.at(-1).message, onlyCommunity);
   assert.equal(postBodies.at(-1).history.at(-1).source, "exercise");
   await page.getByRole("link", {name: "seven roles supplied in the recruitment task", exact: true}).click();

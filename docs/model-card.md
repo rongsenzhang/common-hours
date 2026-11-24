@@ -4,7 +4,7 @@ A volunteer describes an activity and selects practical requirements. The matche
 
 ## From fixtures to a searchable catalogue
 
-The community catalogue contains 100 fictional roles. Its original 19 are the fixed candidate pool for the 36-query benchmark. The additional listings support volunteer browsing and case-profile testing. The role file supplies listing text and interests, the host directory supplies organisation names and areas, and the session feed supplies timing, participation mode and venue access. A separate file contains three fictional host replies for a coordinator exercise.
+The catalogue contains 93 demo listings and the seven fictional roles supplied in the recruitment task. The latter carry an explicit exercise source label. Its original 19 are the fixed candidate pool for the 36-query benchmark. The additional listings support volunteer browsing and case-profile testing. The role file supplies listing text and interests, the host directory supplies organisation names and areas, and the session feed supplies timing, participation mode and venue access. A separate file contains three fictional host replies for a coordinator exercise.
 
 The Python pipeline checks for duplicate keys, broken references, missing session rows, unrecognised vocabulary and inconsistent remote/venue-access combinations. It joins the inputs in a local SQLite database, preserves missing values as unknown and writes a browser-readable catalogue. The full research catalogue maps each role field to a source file and stable identifier. The public package extracts visitor-facing role facts and omits those internal references. The database also contains the three optional follow-up facts. A first-time search always uses the original listing facts.
 

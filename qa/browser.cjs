@@ -49,7 +49,14 @@ async function verifyViewport(browser, width, height) {
         .getByRole("button", { name: "Find roles", exact: true })
         .click();
     }
+    await search("Digital access buddy");
+    const original = page.locator('.role-card').filter({has: page.locator('[data-detail="digital-access-buddy"]')});
+    await original.locator(".exercise-credit").waitFor();
+    await original.locator("[data-detail]").click();
+    await page.locator("dialog .exercise-credit").waitFor();
+    await page.keyboard.press("Escape");
     await search("walk dogs");
+    assert.equal(await page.locator("#results .exercise-credit").count(), 0);
     assert.deepEqual(
       (
         await page

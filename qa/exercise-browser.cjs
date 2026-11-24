@@ -58,10 +58,15 @@ async function verifyCommunityCases(page) {
   await page.goto(new URL("#discover-case-b", base).href);
   const list = page.locator("#community-case-results ol [data-detail]");
   const listIds = () => list.evaluateAll(buttons => buttons.map(button => button.dataset.detail));
-  const caseAIds = ["email-practice-partner", "bus-app-coach", "video-call-coach"];
-  const caseBIds = ["bus-app-coach", "writing-partner", "patch-project-companion"];
+  const caseAIds = ["digital-access-buddy", "email-practice-partner", "bus-app-coach"];
+  const caseBIds = ["bus-app-coach", "digital-skills-facilitator", "writing-partner"];
   await page.getByRole("heading", {name:"Case B community shortlist"}).waitFor();
   assert.deepEqual(await listIds(), caseBIds);
+  const rowFor = id => page.locator("#community-case-results li").filter({has: page.locator(`[data-detail="${id}"]`)});
+  assert.equal(await rowFor("bus-app-coach").locator(".exercise-credit").count(), 0);
+  for (const id of ["digital-skills-facilitator", "form-filling-volunteer", "youth-reading-mentor"]) {
+    assert.equal(await rowFor(id).locator(".exercise-credit").textContent(), "From the matching exercise");
+  }
   await list.first().click();
   assert.match(await page.locator("dialog").innerText(), /Thu evening/);
   assert.match(await page.locator("dialog").innerText(), /2 miles/);

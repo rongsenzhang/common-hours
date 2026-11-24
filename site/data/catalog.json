@@ -8,8 +8,8 @@
       "time": {
         "flexible": 6,
         "unknown": 1,
-        "weekday": 63,
-        "weekend": 30
+        "weekday": 66,
+        "weekend": 27
       },
       "mode": {
         "hybrid": 5,
@@ -20,17 +20,17 @@
       "stepFree": {
         "na": 25,
         "no": 4,
-        "unknown": 5,
-        "yes": 66
+        "unknown": 11,
+        "yes": 60
       },
       "theme": {
         "animals": 3,
         "arts": 22,
         "community": 18,
-        "digital": 11,
+        "digital": 12,
         "food": 8,
         "growing": 2,
-        "learning": 13,
+        "learning": 12,
         "nature": 11,
         "repair": 12
       }
@@ -714,99 +714,97 @@
       }
     },
     {
-      "id": "coffee-kit-sorter",
-      "title": "Coffee morning kit organiser",
-      "organisation": "Elm Table Collective",
-      "area": "Longsight",
+      "id": "community-cafe-host",
+      "title": "Community café host",
+      "organisation": "Host not supplied",
+      "area": "Area not supplied",
       "theme": "food",
-      "summary": "Pack clean cups and stirrers into labelled crates before community breakfasts.",
+      "summary": "Welcome visitors and serve refreshments",
       "time": "weekday",
       "mode": "onsite",
-      "stepFree": "yes",
-      "contactNote": "A staff member moves full crates.",
+      "stepFree": "unknown",
+      "contactNote": "",
       "interests": [
-        "hospitality",
-        "organising",
-        "equipment"
+        "food"
       ],
       "tasks": [
-        "Count cups per crate",
-        "Label the return boxes"
+        "Welcome visitors and serve refreshments"
       ],
       "caseFacts": {
         "slots": [
           {
-            "day": "Wed",
+            "day": "Tue",
             "period": "daytime"
           }
         ],
-        "distanceMiles": 4.2,
+        "distanceMiles": 1.0,
         "clearance": "none-listed",
         "individualEvidence": null,
         "digitalEvidence": null
       },
+      "source": "exercise",
       "sources": {
-        "id": "roles.csv:coffee-kit-sorter",
-        "title": "roles.csv:coffee-kit-sorter",
-        "theme": "roles.csv:coffee-kit-sorter",
-        "summary": "roles.csv:coffee-kit-sorter",
-        "interests": "roles.csv:coffee-kit-sorter",
-        "tasks": "roles.csv:coffee-kit-sorter",
-        "organisation": "hosts.json:table",
-        "area": "hosts.json:table",
-        "time": "sessions.csv:S69",
-        "mode": "sessions.csv:S69",
-        "stepFree": "sessions.csv:S69",
-        "contactNote": "sessions.csv:S69",
-        "caseFacts": "case-facts.csv:coffee-kit-sorter"
+        "id": "site/exercise-engine.js:community-cafe-host",
+        "title": "site/exercise-engine.js:community-cafe-host",
+        "organisation": "site/exercise-engine.js:community-cafe-host",
+        "area": "site/exercise-engine.js:community-cafe-host",
+        "theme": "pipeline/exercise-records.mjs:community-cafe-host",
+        "summary": "site/exercise-engine.js:community-cafe-host",
+        "time": "site/exercise-engine.js:community-cafe-host",
+        "mode": "site/exercise-engine.js:community-cafe-host",
+        "stepFree": "site/exercise-engine.js:community-cafe-host",
+        "contactNote": "site/exercise-engine.js:community-cafe-host",
+        "interests": "pipeline/exercise-records.mjs:community-cafe-host",
+        "tasks": "site/exercise-engine.js:community-cafe-host",
+        "caseFacts": "site/exercise-engine.js:community-cafe-host",
+        "source": "site/exercise-engine.js:community-cafe-host"
       }
     },
     {
-      "id": "community-tea-steward",
-      "title": "Community tea station steward",
-      "organisation": "Elm Table Collective",
-      "area": "Longsight",
-      "theme": "food",
-      "summary": "Lay out cups and refill the tea flasks at a neighbourhood lunch.",
-      "time": "weekend",
+      "id": "conversation-partner",
+      "title": "Conversation partner",
+      "organisation": "Host not supplied",
+      "area": "Area not supplied",
+      "theme": "learning",
+      "summary": "Help adults practise English individually",
+      "time": "weekday",
       "mode": "onsite",
-      "stepFree": "yes",
-      "contactNote": "The lunch lead manages food preparation.",
+      "stepFree": "unknown",
+      "contactNote": "",
       "interests": [
-        "drinks",
-        "hospitality",
-        "organising"
+        "learning"
       ],
       "tasks": [
-        "Set out sugar and milk",
-        "Wash the empty flasks"
+        "Help adults practise English individually"
       ],
       "caseFacts": {
         "slots": [
           {
-            "day": "Sun",
-            "period": "daytime"
+            "day": "Mon",
+            "period": "evening"
           }
         ],
-        "distanceMiles": 4.2,
+        "distanceMiles": 5.0,
         "clearance": "none-listed",
-        "individualEvidence": null,
+        "individualEvidence": "individually",
         "digitalEvidence": null
       },
+      "source": "exercise",
       "sources": {
-        "id": "roles.csv:community-tea-steward",
-        "title": "roles.csv:community-tea-steward",
-        "theme": "roles.csv:community-tea-steward",
-        "summary": "roles.csv:community-tea-steward",
-        "interests": "roles.csv:community-tea-steward",
-        "tasks": "roles.csv:community-tea-steward",
-        "organisation": "hosts.json:table",
-        "area": "hosts.json:table",
-        "time": "sessions.csv:S65",
-        "mode": "sessions.csv:S65",
-        "stepFree": "sessions.csv:S65",
-        "contactNote": "sessions.csv:S65",
-        "caseFacts": "case-facts.csv:community-tea-steward"
+        "id": "site/exercise-engine.js:conversation-partner",
+        "title": "site/exercise-engine.js:conversation-partner",
+        "organisation": "site/exercise-engine.js:conversation-partner",
+        "area": "site/exercise-engine.js:conversation-partner",
+        "theme": "pipeline/exercise-records.mjs:conversation-partner",
+        "summary": "site/exercise-engine.js:conversation-partner",
+        "time": "site/exercise-engine.js:conversation-partner",
+        "mode": "site/exercise-engine.js:conversation-partner",
+        "stepFree": "site/exercise-engine.js:conversation-partner",
+        "contactNote": "site/exercise-engine.js:conversation-partner",
+        "interests": "pipeline/exercise-records.mjs:conversation-partner",
+        "tasks": "site/exercise-engine.js:conversation-partner",
+        "caseFacts": "site/exercise-engine.js:conversation-partner",
+        "source": "site/exercise-engine.js:conversation-partner"
       }
     },
     {
@@ -1001,6 +999,53 @@
       }
     },
     {
+      "id": "digital-access-buddy",
+      "title": "Digital access buddy",
+      "organisation": "Host not supplied",
+      "area": "Area not supplied",
+      "theme": "digital",
+      "summary": "Support adults individually to get online and use everyday services",
+      "time": "weekday",
+      "mode": "remote",
+      "stepFree": "na",
+      "contactNote": "",
+      "interests": [
+        "digital"
+      ],
+      "tasks": [
+        "Support adults individually to get online and use everyday services"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Wed",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": "individually",
+        "digitalEvidence": "get online"
+      },
+      "source": "exercise",
+      "sources": {
+        "id": "site/exercise-engine.js:digital-access-buddy",
+        "title": "site/exercise-engine.js:digital-access-buddy",
+        "organisation": "site/exercise-engine.js:digital-access-buddy",
+        "area": "site/exercise-engine.js:digital-access-buddy",
+        "theme": "pipeline/exercise-records.mjs:digital-access-buddy",
+        "summary": "site/exercise-engine.js:digital-access-buddy",
+        "time": "site/exercise-engine.js:digital-access-buddy",
+        "mode": "site/exercise-engine.js:digital-access-buddy",
+        "stepFree": "site/exercise-engine.js:digital-access-buddy",
+        "contactNote": "site/exercise-engine.js:digital-access-buddy",
+        "interests": "pipeline/exercise-records.mjs:digital-access-buddy",
+        "tasks": "site/exercise-engine.js:digital-access-buddy",
+        "caseFacts": "site/exercise-engine.js:digital-access-buddy",
+        "source": "site/exercise-engine.js:digital-access-buddy"
+      }
+    },
+    {
       "id": "digital-helper",
       "title": "Digital drop-in helper",
       "organisation": "Little Lantern Library",
@@ -1045,6 +1090,53 @@
         "stepFree": "sessions.csv:S03",
         "contactNote": "sessions.csv:S03",
         "caseFacts": "case-facts.csv:digital-helper"
+      }
+    },
+    {
+      "id": "digital-skills-facilitator",
+      "title": "Digital skills facilitator",
+      "organisation": "Host not supplied",
+      "area": "Area not supplied",
+      "theme": "digital",
+      "summary": "Lead a group session on smartphone basics",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "",
+      "interests": [
+        "digital"
+      ],
+      "tasks": [
+        "Lead a group session on smartphone basics"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Fri",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 1.0,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": "smartphone basics"
+      },
+      "source": "exercise",
+      "sources": {
+        "id": "site/exercise-engine.js:digital-skills-facilitator",
+        "title": "site/exercise-engine.js:digital-skills-facilitator",
+        "organisation": "site/exercise-engine.js:digital-skills-facilitator",
+        "area": "site/exercise-engine.js:digital-skills-facilitator",
+        "theme": "pipeline/exercise-records.mjs:digital-skills-facilitator",
+        "summary": "site/exercise-engine.js:digital-skills-facilitator",
+        "time": "site/exercise-engine.js:digital-skills-facilitator",
+        "mode": "site/exercise-engine.js:digital-skills-facilitator",
+        "stepFree": "site/exercise-engine.js:digital-skills-facilitator",
+        "contactNote": "site/exercise-engine.js:digital-skills-facilitator",
+        "interests": "pipeline/exercise-records.mjs:digital-skills-facilitator",
+        "tasks": "site/exercise-engine.js:digital-skills-facilitator",
+        "caseFacts": "site/exercise-engine.js:digital-skills-facilitator",
+        "source": "site/exercise-engine.js:digital-skills-facilitator"
       }
     },
     {
@@ -1432,6 +1524,100 @@
         "stepFree": "sessions.csv:S42",
         "contactNote": "sessions.csv:S42",
         "caseFacts": "case-facts.csv:folk-song-indexer"
+      }
+    },
+    {
+      "id": "food-parcel-packer",
+      "title": "Food parcel packer",
+      "organisation": "Host not supplied",
+      "area": "Area not supplied",
+      "theme": "food",
+      "summary": "Pack parcels alongside a small team",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "",
+      "interests": [
+        "food"
+      ],
+      "tasks": [
+        "Pack parcels alongside a small team"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Tue",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.0,
+        "clearance": "none-listed",
+        "individualEvidence": null,
+        "digitalEvidence": null
+      },
+      "source": "exercise",
+      "sources": {
+        "id": "site/exercise-engine.js:food-parcel-packer",
+        "title": "site/exercise-engine.js:food-parcel-packer",
+        "organisation": "site/exercise-engine.js:food-parcel-packer",
+        "area": "site/exercise-engine.js:food-parcel-packer",
+        "theme": "pipeline/exercise-records.mjs:food-parcel-packer",
+        "summary": "site/exercise-engine.js:food-parcel-packer",
+        "time": "site/exercise-engine.js:food-parcel-packer",
+        "mode": "site/exercise-engine.js:food-parcel-packer",
+        "stepFree": "site/exercise-engine.js:food-parcel-packer",
+        "contactNote": "site/exercise-engine.js:food-parcel-packer",
+        "interests": "pipeline/exercise-records.mjs:food-parcel-packer",
+        "tasks": "site/exercise-engine.js:food-parcel-packer",
+        "caseFacts": "site/exercise-engine.js:food-parcel-packer",
+        "source": "site/exercise-engine.js:food-parcel-packer"
+      }
+    },
+    {
+      "id": "form-filling-volunteer",
+      "title": "Form-filling volunteer",
+      "organisation": "Host not supplied",
+      "area": "Area not supplied",
+      "theme": "digital",
+      "summary": "Help people individually with online forms",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "",
+      "interests": [
+        "digital"
+      ],
+      "tasks": [
+        "Help people individually with online forms"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": null,
+        "clearance": "none-listed",
+        "individualEvidence": "individually",
+        "digitalEvidence": "online forms"
+      },
+      "source": "exercise",
+      "sources": {
+        "id": "site/exercise-engine.js:form-filling-volunteer",
+        "title": "site/exercise-engine.js:form-filling-volunteer",
+        "organisation": "site/exercise-engine.js:form-filling-volunteer",
+        "area": "site/exercise-engine.js:form-filling-volunteer",
+        "theme": "pipeline/exercise-records.mjs:form-filling-volunteer",
+        "summary": "site/exercise-engine.js:form-filling-volunteer",
+        "time": "site/exercise-engine.js:form-filling-volunteer",
+        "mode": "site/exercise-engine.js:form-filling-volunteer",
+        "stepFree": "site/exercise-engine.js:form-filling-volunteer",
+        "contactNote": "site/exercise-engine.js:form-filling-volunteer",
+        "interests": "pipeline/exercise-records.mjs:form-filling-volunteer",
+        "tasks": "site/exercise-engine.js:form-filling-volunteer",
+        "caseFacts": "site/exercise-engine.js:form-filling-volunteer",
+        "source": "site/exercise-engine.js:form-filling-volunteer"
       }
     },
     {
@@ -1959,54 +2145,6 @@
         "stepFree": "sessions.csv:S73",
         "contactNote": "sessions.csv:S73",
         "caseFacts": "case-facts.csv:landmark-card-maker"
-      }
-    },
-    {
-      "id": "language-table-setter",
-      "title": "Language table steward",
-      "organisation": "Two Tables Language Club",
-      "area": "Rusholme",
-      "theme": "learning",
-      "summary": "Set up themed conversation stations and welcome learners to their chosen table.",
-      "time": "weekend",
-      "mode": "onsite",
-      "stepFree": "yes",
-      "contactNote": "A tutor runs each conversation station.",
-      "interests": [
-        "languages",
-        "welcome",
-        "organising"
-      ],
-      "tasks": [
-        "Lay out topic cards",
-        "Introduce the session theme"
-      ],
-      "caseFacts": {
-        "slots": [
-          {
-            "day": "Sat",
-            "period": "daytime"
-          }
-        ],
-        "distanceMiles": 2.3,
-        "clearance": "none-listed",
-        "individualEvidence": null,
-        "digitalEvidence": null
-      },
-      "sources": {
-        "id": "roles.csv:language-table-setter",
-        "title": "roles.csv:language-table-setter",
-        "theme": "roles.csv:language-table-setter",
-        "summary": "roles.csv:language-table-setter",
-        "interests": "roles.csv:language-table-setter",
-        "tasks": "roles.csv:language-table-setter",
-        "organisation": "hosts.json:lang",
-        "area": "hosts.json:lang",
-        "time": "sessions.csv:S31",
-        "mode": "sessions.csv:S31",
-        "stepFree": "sessions.csv:S31",
-        "contactNote": "sessions.csv:S31",
-        "caseFacts": "case-facts.csv:language-table-setter"
       }
     },
     {
@@ -3166,54 +3304,6 @@
       }
     },
     {
-      "id": "practice-account-helper",
-      "title": "Practice account guide",
-      "organisation": "Copper Link Room",
-      "area": "Salford",
-      "theme": "digital",
-      "summary": "Work individually with an adult to practise signing in to a demo account during a daytime workshop.",
-      "time": "weekday",
-      "mode": "onsite",
-      "stepFree": "yes",
-      "contactNote": "Only training accounts are used in the workshop.",
-      "interests": [
-        "digital",
-        "teaching",
-        "adult learning"
-      ],
-      "tasks": [
-        "Review the demo sign-in steps",
-        "Reset the practice password"
-      ],
-      "caseFacts": {
-        "slots": [
-          {
-            "day": "Thu",
-            "period": "daytime"
-          }
-        ],
-        "distanceMiles": 2.0,
-        "clearance": "none-listed",
-        "individualEvidence": "individually with an adult",
-        "digitalEvidence": "practise signing in to a demo account"
-      },
-      "sources": {
-        "id": "roles.csv:practice-account-helper",
-        "title": "roles.csv:practice-account-helper",
-        "theme": "roles.csv:practice-account-helper",
-        "summary": "roles.csv:practice-account-helper",
-        "interests": "roles.csv:practice-account-helper",
-        "tasks": "roles.csv:practice-account-helper",
-        "organisation": "hosts.json:link-room",
-        "area": "hosts.json:link-room",
-        "time": "sessions.csv:S27",
-        "mode": "sessions.csv:S27",
-        "stepFree": "sessions.csv:S27",
-        "contactNote": "sessions.csv:S27",
-        "caseFacts": "case-facts.csv:practice-account-helper"
-      }
-    },
-    {
       "id": "programme-proofreader",
       "title": "Theatre programme proofreader",
       "organisation": "Curtain Yard Players",
@@ -3259,54 +3349,6 @@
         "stepFree": "sessions.csv:S89",
         "contactNote": "sessions.csv:S89",
         "caseFacts": "case-facts.csv:programme-proofreader"
-      }
-    },
-    {
-      "id": "pronunciation-cards",
-      "title": "Pronunciation card maker",
-      "organisation": "Two Tables Language Club",
-      "area": "Rusholme",
-      "theme": "learning",
-      "summary": "Prepare illustrated word cards for facilitators to use in a beginners' English class.",
-      "time": "weekday",
-      "mode": "remote",
-      "stepFree": "na",
-      "contactNote": "Use the club's approved word list.",
-      "interests": [
-        "literacy",
-        "design",
-        "languages"
-      ],
-      "tasks": [
-        "Choose a picture for each word",
-        "Check the spelling list"
-      ],
-      "caseFacts": {
-        "slots": [
-          {
-            "day": "Wed",
-            "period": "evening"
-          }
-        ],
-        "distanceMiles": null,
-        "clearance": "none-listed",
-        "individualEvidence": null,
-        "digitalEvidence": null
-      },
-      "sources": {
-        "id": "roles.csv:pronunciation-cards",
-        "title": "roles.csv:pronunciation-cards",
-        "theme": "roles.csv:pronunciation-cards",
-        "summary": "roles.csv:pronunciation-cards",
-        "interests": "roles.csv:pronunciation-cards",
-        "tasks": "roles.csv:pronunciation-cards",
-        "organisation": "hosts.json:lang",
-        "area": "hosts.json:lang",
-        "time": "sessions.csv:S29",
-        "mode": "sessions.csv:S29",
-        "stepFree": "sessions.csv:S29",
-        "contactNote": "sessions.csv:S29",
-        "caseFacts": "case-facts.csv:pronunciation-cards"
       }
     },
     {
@@ -3686,54 +3728,6 @@
       }
     },
     {
-      "id": "screen-reader-study",
-      "title": "Screen reader study partner",
-      "organisation": "Copper Link Room",
-      "area": "Salford",
-      "theme": "digital",
-      "summary": "Work one to one to practise screen reader shortcuts with a learner using a demonstration laptop.",
-      "time": "weekday",
-      "mode": "onsite",
-      "stepFree": "yes",
-      "contactNote": "Loan laptops have headphones and the software installed.",
-      "interests": [
-        "digital",
-        "accessibility",
-        "teaching"
-      ],
-      "tasks": [
-        "Navigate a sample heading list",
-        "Compare two keyboard commands"
-      ],
-      "caseFacts": {
-        "slots": [
-          {
-            "day": "Mon",
-            "period": "evening"
-          }
-        ],
-        "distanceMiles": 5.2,
-        "clearance": "none-listed",
-        "individualEvidence": "one to one",
-        "digitalEvidence": "practise screen reader shortcuts"
-      },
-      "sources": {
-        "id": "roles.csv:screen-reader-study",
-        "title": "roles.csv:screen-reader-study",
-        "theme": "roles.csv:screen-reader-study",
-        "summary": "roles.csv:screen-reader-study",
-        "interests": "roles.csv:screen-reader-study",
-        "tasks": "roles.csv:screen-reader-study",
-        "organisation": "hosts.json:link-room",
-        "area": "hosts.json:link-room",
-        "time": "sessions.csv:S24",
-        "mode": "sessions.csv:S24",
-        "stepFree": "sessions.csv:S24",
-        "contactNote": "sessions.csv:S24",
-        "caseFacts": "case-facts.csv:screen-reader-study"
-      }
-    },
-    {
       "id": "seasonal-calendar-maker",
       "title": "Seasonal calendar maker",
       "organisation": "Brookbend Water Club",
@@ -4022,54 +4016,6 @@
         "stepFree": "sessions.csv:S99",
         "contactNote": "sessions.csv:S99",
         "caseFacts": "case-facts.csv:story-bag-steward"
-      }
-    },
-    {
-      "id": "story-sequence-helper",
-      "title": "Picture sequence workshop helper",
-      "organisation": "Two Tables Language Club",
-      "area": "Rusholme",
-      "theme": "learning",
-      "summary": "Help families arrange picture cards into a story and retell the sequence aloud.",
-      "time": "weekend",
-      "mode": "onsite",
-      "stepFree": "yes",
-      "contactNote": "The family programme checks safeguarding clearance.",
-      "interests": [
-        "families",
-        "storytelling",
-        "teaching"
-      ],
-      "tasks": [
-        "Lay out story cards",
-        "Encourage turn-taking"
-      ],
-      "caseFacts": {
-        "slots": [
-          {
-            "day": "Sun",
-            "period": "daytime"
-          }
-        ],
-        "distanceMiles": 2.3,
-        "clearance": "required",
-        "individualEvidence": null,
-        "digitalEvidence": null
-      },
-      "sources": {
-        "id": "roles.csv:story-sequence-helper",
-        "title": "roles.csv:story-sequence-helper",
-        "theme": "roles.csv:story-sequence-helper",
-        "summary": "roles.csv:story-sequence-helper",
-        "interests": "roles.csv:story-sequence-helper",
-        "tasks": "roles.csv:story-sequence-helper",
-        "organisation": "hosts.json:lang",
-        "area": "hosts.json:lang",
-        "time": "sessions.csv:S35",
-        "mode": "sessions.csv:S35",
-        "stepFree": "sessions.csv:S35",
-        "contactNote": "sessions.csv:S35",
-        "caseFacts": "case-facts.csv:story-sequence-helper"
       }
     },
     {
@@ -4787,6 +4733,53 @@
         "stepFree": "sessions.csv:S48",
         "contactNote": "sessions.csv:S48",
         "caseFacts": "case-facts.csv:yarn-swatch-filer"
+      }
+    },
+    {
+      "id": "youth-reading-mentor",
+      "title": "Youth reading mentor",
+      "organisation": "Host not supplied",
+      "area": "Area not supplied",
+      "theme": "learning",
+      "summary": "Support young readers, one to one",
+      "time": "weekday",
+      "mode": "onsite",
+      "stepFree": "unknown",
+      "contactNote": "",
+      "interests": [
+        "learning"
+      ],
+      "tasks": [
+        "Support young readers, one to one"
+      ],
+      "caseFacts": {
+        "slots": [
+          {
+            "day": "Thu",
+            "period": "evening"
+          }
+        ],
+        "distanceMiles": 2.0,
+        "clearance": "required",
+        "individualEvidence": "one to one",
+        "digitalEvidence": null
+      },
+      "source": "exercise",
+      "sources": {
+        "id": "site/exercise-engine.js:youth-reading-mentor",
+        "title": "site/exercise-engine.js:youth-reading-mentor",
+        "organisation": "site/exercise-engine.js:youth-reading-mentor",
+        "area": "site/exercise-engine.js:youth-reading-mentor",
+        "theme": "pipeline/exercise-records.mjs:youth-reading-mentor",
+        "summary": "site/exercise-engine.js:youth-reading-mentor",
+        "time": "site/exercise-engine.js:youth-reading-mentor",
+        "mode": "site/exercise-engine.js:youth-reading-mentor",
+        "stepFree": "site/exercise-engine.js:youth-reading-mentor",
+        "contactNote": "site/exercise-engine.js:youth-reading-mentor",
+        "interests": "pipeline/exercise-records.mjs:youth-reading-mentor",
+        "tasks": "site/exercise-engine.js:youth-reading-mentor",
+        "caseFacts": "site/exercise-engine.js:youth-reading-mentor",
+        "source": "site/exercise-engine.js:youth-reading-mentor"
       }
     },
     {

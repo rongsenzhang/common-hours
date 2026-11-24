@@ -50,7 +50,9 @@ def make_site(output, chat_endpoint=None):
         public = {
             "version": catalog["version"],
             "summary": {"hostCount": catalog["summary"]["hostCount"]},
-            "opportunities": [{key: r[key] for key in ROLE_FIELDS} for r in catalog["opportunities"]],
+            "opportunities": [{**{key: r[key] for key in ROLE_FIELDS},
+                               **({"source": r["source"]} if "source" in r else {})}
+                              for r in catalog["opportunities"]],
         }
         host_questions = [{key: q[key] for key in ("roleId", "field", "question")}
                           for q in questions["questions"]]

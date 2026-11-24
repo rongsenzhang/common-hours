@@ -65,7 +65,7 @@ function run(message, extras = {}, input = {}) {
           return [id, {listing_source: selected?.listing_source || "summary",
             visitor_source: visitor ? String(visitor.index) : null, reason: selected?.reason || ""}];
         }));
-        return completed({language:extras.language ?? "en", explanations});
+        return completed({language:extras.language ?? "en", comparison:"The activities described below draw on the interests you shared.", explanations});
       }
       if (body.text.format.name === "common_hours_host_time_question") {
         return completed({language:extras.language ?? "en",host_question:"Could you confirm the exact time?"});
@@ -467,7 +467,7 @@ test("a why request asks the model for evidence for each displayed role without 
     const input=JSON.parse(body.input);
     assert.deepEqual(input.volunteer_statements,[{index:0,text:user}]);
     assert.deepEqual(Object.keys(input.roles),history[0].matches);
-    return completed({language:"en",explanations:Object.fromEntries(schema.required.map(id=>[id,{
+    return completed({language:"en",comparison:"Video call practice companion involves the same individual practice you enjoy.",explanations:Object.fromEntries(schema.required.map(id=>[id,{
       listing_source:"digitalEvidence",visitor_source:"0",reason:"This could suit you because you enjoy helping a learner practise."
     }]))});
   }});
@@ -491,7 +491,7 @@ test("a volunteer describing a session window gets a required profile from the r
 });
 
 
-const packTurn = (message, history, action, {language = "en", role_id = null} = {}) => run(message, {}, {
+const packTurn = (message, history, action, {language = "en", role_id = null, comparison = ""} = {}) => run(message, {}, {
   history, fetchImpl:async (_url, request) => {
     const body = JSON.parse(request.body);
     assert.equal(body.text.format.name, "common_hours_exercise_source");
@@ -499,7 +499,7 @@ const packTurn = (message, history, action, {language = "en", role_id = null} = 
     assert.deepEqual(input.records, exerciseRoles);
     assert.equal(input.catalogue_sources.community.count, roles.length);
     assert.ok(!input.catalogue);
-    return completed({action,language,role_id});
+    return completed({action,language,role_id,comparison});
   },
 });
 const historyItem = (user, {text,matches,toConfirm,caseProfile,source}) =>
@@ -529,7 +529,7 @@ test("both supplied cases use the same seven records on request, keep pending re
   const count = await packTurn("Okay, and how many roles in your data set?",saved,"count");
   assert.equal(count.source,"exercise");
   assert.match(count.text,/100 fictional roles/);
-  assert.match(count.text,/7 separate/);
+  assert.match(count.text,/including the 7 roles/);
   saved.push(historyItem("How many roles?",count));
   const detail = await packTurn("Why was Digital access buddy excluded?",saved,"detail",{role_id:"digital-access-buddy"});
   assert.match(detail.text,/Excluded.*online/i);
@@ -579,4 +579,73 @@ test("community clearance for a different role never clears the recruiter's read
   const answer = await packTurn("Use the matching exercise.",saved,"shortlist");
   assert.deepEqual(answer.caseProfile,current);
   assert.match(answer.text,/To confirm:[\s\S]*Youth reading mentor.*clearance/);
+});
+
+test("the full model context includes seven attributed records and ranks both sources on their evidence", async () => {
+  const ids = ["email-practice-partner", "digital-access-buddy", "bus-app-coach"];
+  const answer = await run(EXERCISE_CASE_TEXT.A, {}, {fetchImpl:async (_url, request) => {
+    const input = JSON.parse(JSON.parse(request.body).input);
+    assert.equal(input.catalogue.length,100);
+    const supplied = input.catalogue.filter(role => role.source === "exercise");
+    assert.deepEqual(supplied.map(role => role.id).sort(), exerciseRoles.map(role => role.id).sort());
+    assert.equal(input.catalogue_sources.recruitment_pack.included_in_catalogue,true);
+    return completed({...basePlan, intent:"case_search", case_profile:profile("A"), candidate_ids:ids});
+  }});
+  assert.deepEqual(answer.matches,ids);
+  const b = await run(EXERCISE_CASE_TEXT.B, {intent:"case_search",case_profile:profile("B"),candidate_ids:ids});
+  assert.ok(!b.matches.includes("digital-access-buddy"));
+  assert.ok(!b.matches.includes("form-filling-volunteer"));
+});
+
+test("seven-only why explains actual checked trade-offs without repeating the previous answer", async () => {
+  const saved = [{user:"Use only the seven roles from the matching exercise.", source:"exercise", text:"Original shortlist.", matches:[],toConfirm:[],caseProfile:profile("A")}];
+  for (const [message, language, comparison] of [
+    ["why this list? reason?", "en", "Digital access buddy fits your wish to work with one person using digital skills. Digital skills facilitator uses those skills in a group, while the form-filling venue still needs a distance check."],
+    ["tell me your reason", "en", "Digital access buddy offers individual practice and the session is online, so travel is unnecessary. Digital skills facilitator is feasible if you enjoy teaching a group."],
+    ["请解释一下推荐的理由", "zh", "Digital access buddy 同时用到数字技能和一对一辅导，因此排在小组课前面。"],
+  ]) {
+    const answer = await run(message,{}, {history:saved,fetchImpl:async (_url, request) => {
+      const req = JSON.parse(request.body);
+      const input = JSON.parse(req.input);
+      assert.deepEqual(req.text.format.schema.properties.action.enum,["explain"]);
+      assert.deepEqual(input.checked_decisions.recommendations.map(row => row.fit), ["Strong fit","Partial fit"]);
+      assert.deepEqual(input.checked_decisions.pending.map(row => row.id), ["youth-reading-mentor","form-filling-volunteer"]);
+      assert.deepEqual(input.previous_reply,saved.at(-1).text);
+      return completed({action:"explain",language,role_id:null,comparison});
+    }});
+    assert.equal(answer.source,"exercise");
+    assert.equal(answer.text,comparison);
+    assert.deepEqual(answer.matches,[]);
+    saved.push(historyItem(message,answer));
+  }
+  await assert.rejects(packTurn("tell me your reason",saved,"shortlist"),{code:"invalid_reply"});
+});
+
+test("why a marked role was chosen in the full catalogue preserves the displayed order and the source", async () => {
+  const ids = ["video-call-coach","digital-access-buddy"];
+  const saved = [{user:"Case A",text:"",matches:[],toConfirm:[],caseProfile:profile("A")}];
+  saved[0].text = "Case A in the full catalogue.";
+  for (const user of ["Use only the seven roles from the matching exercise.", "tell me your reason","Search all 100 roles again."]) {
+    saved.push({user,text:"Current results.",matches:ids,toConfirm:[],caseProfile:profile("A")});
+  }
+  const answer = await run("Why was an exercise role recommended from the 100?",{}, {history:saved,fetchImpl:async (_url, request) => {
+    const body = JSON.parse(request.body);
+    assert.equal(body.text.format.name,"common_hours_explanation");
+    const input = JSON.parse(body.input);
+    assert.deepEqual(input.volunteer_statements,[]);
+    assert.deepEqual(input.checked_decisions.map(row => row.id),ids);
+    assert.equal(input.roles["digital-access-buddy"].source,"exercise");
+    return completed({language:"en",comparison:"Digital access buddy matches the case priorities, with individual support for everyday digital services.",
+      explanations:Object.fromEntries(ids.map(id=>[id,{listing_source:"summary",visitor_source:null,reason:""}]))});
+  }});
+  assert.equal(answer.source,undefined);
+  assert.match(answer.text,/case priorities/);
+  assert.deepEqual(answer.matches,ids);
+});
+
+test("clearance explicitly verified for the original youth role also applies in its seven-role view", async () => {
+  const current = {...profile("A"),clearance:"verified",verifiedRoleId:"youth-reading-mentor"};
+  const saved = [{user:"My clearance is verified for Youth reading mentor.",text:"Recorded.",matches:[],toConfirm:[],caseProfile:current}];
+  const answer = await packTurn("Use the matching exercise.",saved,"shortlist");
+  assert.match(answer.text.split("To confirm:")[0],/Youth reading mentor/);
 });

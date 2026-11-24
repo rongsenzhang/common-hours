@@ -11,9 +11,39 @@
       "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
     },
     {
+      "roleId": "community-cafe-host",
+      "field": "stepFree",
+      "source": "site/exercise-engine.js:community-cafe-host",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
+      "roleId": "conversation-partner",
+      "field": "stepFree",
+      "source": "site/exercise-engine.js:conversation-partner",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
       "roleId": "crossing-survey-counter",
       "field": "stepFree",
       "source": "sessions.csv:S77",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
+      "roleId": "digital-skills-facilitator",
+      "field": "stepFree",
+      "source": "site/exercise-engine.js:digital-skills-facilitator",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
+      "roleId": "food-parcel-packer",
+      "field": "stepFree",
+      "source": "site/exercise-engine.js:food-parcel-packer",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
+      "roleId": "form-filling-volunteer",
+      "field": "stepFree",
+      "source": "site/exercise-engine.js:form-filling-volunteer",
       "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
     },
     {
@@ -44,6 +74,12 @@
       "roleId": "wildlife-counter",
       "field": "stepFree",
       "source": "sessions.csv:S13",
+      "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
+    },
+    {
+      "roleId": "youth-reading-mentor",
+      "field": "stepFree",
+      "source": "site/exercise-engine.js:youth-reading-mentor",
       "question": "Could you tell me whether there is a step-free route from arrival to the activity area?"
     }
   ]

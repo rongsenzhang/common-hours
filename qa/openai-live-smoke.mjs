@@ -131,12 +131,17 @@ async function checkSuppliedCases() {
   await checkTurn("Case A, submitted profile", EXERCISE_CASE_TEXT.A, cases, expectProfile(exerciseProfile("A")));
   await checkTurn("Case B as a change to the volunteer", EXERCISE_CASE_TEXT.B, cases, expectProfile(exerciseProfile("B")));
   const exercise = [...cases];
-  await checkTurn("Case B in the seven recruitment-task records",
+  const pack = await checkTurn("Case B in the seven recruitment-task records",
     "Yes, just the seven roles in the matching exercise.", exercise, reply => {
       noRoles(reply);
       requireResult(reply.source === "exercise" && reply.text.includes("Digital skills facilitator"), "exercise_shortlist");
       sameProfile(cases.at(-1).caseProfile, reply.caseProfile);
     });
+  await checkTurn("explain the actual seven-role shortlist", "why this list? reason?", exercise, reply => {
+    requireResult(reply.source === "exercise" && reply.text !== pack.text, "repeated_exercise_shortlist");
+    requireResult(/digital skills facilitator/i.test(reply.text), "missing_explained_role");
+    sameProfile(pack.caseProfile, reply.caseProfile);
+  });
   await checkTurn("return the same volunteer to the community catalogue",
     "Now search all 100 community roles again for the same volunteer.", exercise, reply => {
       requireResult(reply.source !== "exercise", "community_scope");

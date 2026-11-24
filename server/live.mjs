@@ -1,7 +1,7 @@
 // This module is server-only. The catalogue is loaded by the host, never from the chat request.
-import { checkedEvidence, explainEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, validCommunityProfile, visitorExcerpts } from "./community-chat.mjs";
+import { checkedEvidence, explainEvidence, communityAnswer, communityProfileSchema, previousRoles, suggestedQuestion, isListExplanation, validCommunityProfile, visitorExcerpts } from "./community-chat.mjs";
 import { catalogueSources, packReply, preparePack, requestedSource, validPackPlan } from "./exercise-source.mjs";
-import { prepareExplanation, explanationInstructions } from "./explanation.mjs";
+import { prepareExplanation, explanationInstructions, validComparison } from "./explanation.mjs";
 import { suppliedExerciseCaseId } from "../site/exercise-chat.js";
 import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
 import { matchOpportunities } from "../site/engine.js";
@@ -159,7 +159,7 @@ Choose one intent:
 - unknown: a requested requirement cannot be checked in these records, e.g. exact start time, age eligibility, wheelchair needs beyond step-free routes, pay or live vacancies. Carry such requirements forward until the visitor explicitly changes them. Ask the host to confirm. Never reduce an exact clock time or calendar date to a general day or period.
 - application: real booking, contact or applying.
 - search: actual requests to find an activity, including a follow-up modifying a preference. Read the preceding visitor messages and displayed role IDs. Carry forward the active activity and requirements across social, identity and off-topic exchanges. Only replace a preference the visitor changes. Preserve exclusions. Use an empty activity only when the user genuinely wants to browse broadly. Use concise English search terms grounded in the activity, translating natural language as needed (e.g. "walk dogs", "allotment" or "reading"). Never drop the distinguishing object in a request, such as "horses" in "walk horses".
-- case_search: interpret a volunteer profile, a specific weekly day, day/evening period, travel radius, interest in one-to-one/digital support, safeguarding requirements, a named Case A/B, or follow-up that changes any active profile constraint. Use case_search even for a pasted interview case. Search the community catalogue supplied in this request. The two named case statements are example volunteer inputs. A separately sourced Matching exercise contains seven original recruitment-pack roles. catalogue_sources gives their exact titles and the count of each collection. Never claim the seven are an identifiable subset of the community catalogue or ask visitors to paste the seven titles. "Case B" alone refers to A with online participation removed. "The same volunteer can no longer volunteer online" retains the last profile, or A if there is no earlier one. Preserve unchanged constraints even after small talk. If a different literal case profile is pasted in full, interpret its actual wording. Mark unsupported mandatory conditions unknown and explain what to ask. Examples: exact clock times, "mornings only" (daytime is too broad), a specific street address or actual distance from the visitor's own home, or a hard prohibition on any group activity when the record only describes some individual support. For contradictions clarify.
+- case_search: interpret a volunteer profile, a specific weekly day, day/evening period, travel radius, interest in one-to-one/digital support, safeguarding requirements, a named Case A/B, or follow-up that changes any active profile constraint. Use case_search even for a pasted interview case. Search the community catalogue supplied in this request. The two named case statements are example volunteer inputs. The seven original recruitment-task roles are part of the full catalogue and carry source=exercise. Consider them alongside every other role using only the volunteer's preferences, practical conditions and activity evidence. Source is informational and never a ranking factor. catalogue_sources gives their titles. When explaining a source label, explain that the role was supplied in the recruitment exercise. The original seven can also be searched on their own. "Case B" alone refers to A with online participation removed. "The same volunteer can no longer volunteer online" retains the last profile, or A if there is no earlier one. Preserve unchanged constraints even after small talk. If a different literal case profile is pasted in full, interpret its actual wording. Mark unsupported mandatory conditions unknown and explain what to ask. Examples: exact clock times, "mornings only" (daytime is too broad), a specific street address or actual distance from the visitor's own home, or a hard prohibition on any group activity when the record only describes some individual support. For contradictions clarify.
 - more: the next page of an existing search. Keep the previous criteria.
 - detail: explicit question about an identifiable role, several named roles, the first/second previously shown option, or its tasks, location, accessibility or schedule. Select only the referenced ID(s). If an asked-for detail isn't in the catalogue use unknown.
 
@@ -187,6 +187,7 @@ function inputCatalogue(roles) {
       mode,
       stepFree,
       contactNote,
+      source,
       caseFacts,
     }) => ({
       id,
@@ -199,6 +200,7 @@ function inputCatalogue(roles) {
       mode,
       stepFree,
       contactNote,
+      ...(source === "exercise" && {source}),
       caseFacts,
     }),
   );
@@ -271,7 +273,7 @@ function readOutput(body, known, clock, explanation, requestedModel, pack) {
     throw invalidReply();
   }
   if (pack) {
-    if (!validPackPlan(answer)) throw invalidReply();
+    if (!validPackPlan(answer, pack)) throw invalidReply();
     return {model: body.model, plan: answer};
   }
   if (clock) {
@@ -279,7 +281,7 @@ function readOutput(body, known, clock, explanation, requestedModel, pack) {
     return {model: body.model, plan: {intent: "clock_confirmation", language: answer.language, hostQuestion: answer.host_question}};
   }
   if (explanation) {
-    if (!answer?.explanations || !["en","zh"].includes(answer.language)) throw invalidReply();
+    if (!answer?.explanations || !validComparison(answer.comparison) || !["en","zh"].includes(answer.language)) throw invalidReply();
     const role_evidence = explanation.ids.map(id => {
       const item = answer.explanations[id];
       if (!item || !Object.hasOwn(explanation.input.roles[id].fields, item.listing_source)
@@ -289,7 +291,7 @@ function readOutput(body, known, clock, explanation, requestedModel, pack) {
     });
     answer = {intent:"explain", language:answer.language, activity:"", time:"any", mode:"any", step_free:false,
       candidate_ids:explanation.ids, case_profile:explanation.profile, changed_fields:[], required_activity_ref:null,
-      role_evidence, follow_up:"", reply:""};
+      role_evidence, follow_up:"", reply:"", comparison:answer.comparison.trim()};
   }
   return { model: body.model, plan: validatePlan(answer, known) };
 }
@@ -377,14 +379,9 @@ function latestProfile(history) {
   return recent?.caseProfile ?? null;
 }
 
-function onlyAskingWhy(message) {
-  const text = message.trim().toLowerCase().replace(/[?.!！？。]+$/u, "").trim();
-  return /^(?:why do these roles suit me|你为什么觉得这几个岗位适合我|why(?: these| those| this| that)?(?: roles?| ones?)?(?: for me)?|why (?:did you (?:choose|pick|recommend|suggest)|are|would) (?:these|those|this|that)(?: roles?| ones?)?(?: (?:for me|a good fit|suit me|good for me))?|为什么(?:是|推荐)?(?:这些|这几个|这个|它们)(?:岗位|机会)?(?:给我|适合我)?|(?:这些|这几个|这个)(?:岗位|机会)?为什么适合我|我说的哪些经验和这些岗位的工作有关)$/iu.test(text);
-}
-
 function applyProfileChange(plan, {message, history}) {
   const previous = latestProfile(history);
-  if (previousRoles(history).length && (onlyAskingWhy(message) || plan.intent === "explain")) {
+  if (previousRoles(history).length && (isListExplanation(message) || plan.intent === "explain")) {
     plan.intent = "explain";
     if (previous) plan.case_profile = previous;
     return;
@@ -578,7 +575,7 @@ function formatAnswer({ plan, model }, { message, history }, roles) {
           ),
     );
   }
-  if (plan.intent === "explain") return respond(say(
+  if (plan.intent === "explain") return respond(plan.comparison ?? say(
     "Here is how the work in each listing relates to what you told me.",
     "下面是各岗位的实际任务与你所述需求之间的联系。",
   ));
@@ -626,7 +623,7 @@ export async function answerLive({
   const turn = validateTurn({ message, history }, roles);
   const source = requestedSource(turn);
   const profile = latestProfile(turn.history);
-  const pack = source === "community" ? null : preparePack(turn, profile, roles.length, source);
+  const pack = source === "community" ? null : preparePack(turn, profile, roles.length, source, activeClock(turn));
   const resumeCommunity = !pack && turn.history.at(-1)?.source === "exercise";
   const clock = clockInTurn(turn.message);
   // Concrete availability needs a full profile: the simple activity route
@@ -636,7 +633,7 @@ export async function answerLive({
   const profileTurn = Boolean((resumeCommunity && profile) || suppliedExerciseCaseId(turn.message) || (describesAvailability && hasSessionWindow)
     || (latestProfile(turn.history) && /\b(?:miles?|travel radius)\b|英里/iu.test(turn.message)));
   const previousIds = previousRoles(turn.history);
-  const explanation = !pack && !resumeCommunity && !clock && previousIds.length && onlyAskingWhy(turn.message)
+  const explanation = !pack && !resumeCommunity && !clock && previousIds.length && isListExplanation(turn.message)
     ? prepareExplanation(turn, roles, previousIds, latestProfile(turn.history)) : null;
   const controller = new AbortController();
   const abort = () => controller.abort();
@@ -662,7 +659,7 @@ export async function answerLive({
           named_volunteer_examples: EXERCISE_CASE_TEXT,
           active_profile: profile,
           returning_from_exercise: resumeCommunity,
-          explain_previous_choices: Boolean(previousRoles(turn.history).length && onlyAskingWhy(turn.message)),
+          explain_previous_choices: Boolean(previousRoles(turn.history).length && isListExplanation(turn.message)),
           visitor_excerpts: visitorExcerpts(turn).map((text,index) => ({index,text})),
           recent_turns: turn.history,
           latest_message: turn.message,

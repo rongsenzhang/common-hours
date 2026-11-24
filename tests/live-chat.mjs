@@ -194,8 +194,21 @@ test("seven-role replies carry their source into follow-ups and cannot display c
   }});
   const view = renderChat(turns, roles, {mode: "live", liveAvailable: true});
   assert.match(view, /<a href="#exercise-records">Recruitment task · 7 supplied roles<\/a>/);
-  assert.match(view, /Use the community catalogue/);
+  assert.match(view, /Search all/);
   assert.doesNotMatch(view, /data-detail=/);
   await assert.rejects(requestLiveReply({...base, fetchImpl: async () =>
     json({...pack, matches: ["garden"]})}), {kind: "invalid"});
+});
+
+test("full-catalogue chat credits each supplied record whether shortlisted or awaiting confirmation", () => {
+  const catalog = [
+    {...roles[0], id: "buddy", title: "Digital access buddy", source: "exercise"},
+    {...roles[0], id: "forms", title: "Form-filling volunteer", source: "exercise"},
+    roles[0],
+  ];
+  const answer = {...reply, matches: ["buddy", "garden"], toConfirm: ["forms"]};
+  const view = renderChat([{input: "Case A", reply: answer}], catalog, {mode: "live"});
+  const cards = [...view.matchAll(/<li><button class="role-link" data-detail="([^"]+)"[\s\S]*?<\/li>/gu)];
+  assert.deepEqual(cards.map(row => [row[1], row[0].includes('class="exercise-credit"')]),
+    [["buddy", true], ["garden", false], ["forms", true]]);
 });

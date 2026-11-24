@@ -1,6 +1,6 @@
 # Common Hours
 
-Find volunteering opportunities around Greater Manchester and ask follow-up questions about the activities, timing and access. The independent NTU–TeamKinetic application demo uses 100 fictional community opportunities. All volunteers can use it without an account.
+Find volunteering opportunities around Greater Manchester and ask follow-up questions about the activities, timing and access. The independent NTU–TeamKinetic application demo uses 100 fictional opportunities, including the seven supplied in the recruitment exercise. All volunteers can use it without an account.
 
 [Find a role](https://rongsenzhang.github.io/common-hours/) · [Matching exercise](https://rongsenzhang.github.io/common-hours/#exercise) · [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask) · [实时问答测试指南](docs/testing-live.md) · [Finder and on-device tests](docs/testing-v1.1.md)
 
@@ -10,7 +10,7 @@ Open **Matching exercise** beside Discover. Run either supplied case, then try a
 
 ## Try the same volunteer in a larger catalogue
 
-Open [Discover with Case A](https://rongsenzhang.github.io/common-hours/#discover-case-a) or [Discover with Case B](https://rongsenzhang.github.io/common-hours/#discover-case-b), or type either label or the supplied case wording in Discover. Inspect the evidence behind each community recommendation and try changing a condition. Venue distances use a fictional starting point. Remote participation, travel, listed sessions and safeguarding requirements are checked against the selected volunteer profile.
+Open [Discover with Case A](https://rongsenzhang.github.io/common-hours/#discover-case-a) or [Discover with Case B](https://rongsenzhang.github.io/common-hours/#discover-case-b), or type either label or the supplied case wording in Discover. Original exercise listings carry a source label wherever they appear in the recommendations. Inspect the evidence behind a recommendation and try changing a condition. Venue distances use a fictional starting point. Remote participation, travel, listed sessions and safeguarding requirements are checked against the selected volunteer profile.
 
 In [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask), select **Live AI** and send the same profile. OpenAI interprets the conversation and proposes roles from the community catalogue. You can start with “I'm not sure what I'd be good at”, describe something people ask you to help with, and then ask “Why do these roles suit me?”. The service checks the proposed roles against their records and distinguishes confirmed opportunities from questions for the organiser.
 

@@ -47,7 +47,8 @@ def find_gaps(catalog):
             if key in gaps or not re.fullmatch(r"[a-z0-9-]{1,70}", role["id"]):
                 raise ValueError("Invalid or duplicate catalogue identifier")
             source = role["sources"][field]
-            if not re.fullmatch(r"sessions\.csv:[A-Za-z0-9_-]+", source):
+            exercise_record = role.get("source") == "exercise" and source == f"site/exercise-engine.js:{role['id']}"
+            if not exercise_record and not re.fullmatch(r"sessions\.csv:[A-Za-z0-9_-]+", source):
                 raise ValueError("Unknown session evidence reference")
             focus = "accessIfVisiting" if field == "stepFree" and role["mode"] == "unknown" else field
             gaps[key] = {

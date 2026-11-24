@@ -1,4 +1,4 @@
-import { escapeText as e } from "./html.js";
+import { escapeText as e, roleByline } from "./html.js";
 import { exerciseProfile } from "./exercise-engine.js";
 import { matchCommunityCase } from "./community-case.js";
 
@@ -9,7 +9,7 @@ export function discoverCaseFromHash(hash) {
 function roleRow({role, fit, reasons}) {
   return '<li><div class="community-case-role"><button type="button" data-detail="' + e(role.id)
     + '">' + e(role.title) + '</button><span>' + e(fit) + '</span></div><p>'
-    + e(role.organisation) + ' · ' + e(role.area) + '</p><ul>'
+    + roleByline(role) + '</p><ul>'
     + reasons.map(reason => '<li>' + e(reason) + '</li>').join('') + '</ul></li>';
 }
 
@@ -62,7 +62,7 @@ export function renderCommunityCases(roles, caseId, profile = null) {
   }
   return '<section id="community-cases" aria-labelledby="community-case-heading"><div class="community-case-head"><div>'
     + '<h2 tabindex="-1" id="community-case-heading">Try a volunteer case</h2><p>Run the interview conditions against '
-    + roles.length + ' fictional community roles.</p></div><div class="community-case-links">' + links + '</div></div>' + content + '</section>';
+    + roles.length + ' fictional roles, including the <a href="#exercise-records">seven supplied in the matching exercise</a>.</p></div><div class="community-case-links">' + links + '</div></div>' + content + '</section>';
 }
 
 export function communityRoleFacts(role) {

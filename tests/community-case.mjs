@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import {communityCaseId, matchCommunityCase} from "../site/community-case.js";
-import {exerciseProfile, EXERCISE_CASE_TEXT} from "../site/exercise-engine.js";
+import {exerciseProfile, exerciseRoles, matchExercise, EXERCISE_CASE_TEXT} from "../site/exercise-engine.js";
 
 const {opportunities} = JSON.parse(readFileSync(new URL("../site/data/catalog.json", import.meta.url)));
 const ids = rows => rows.map(row => row.role.id);
@@ -26,12 +26,13 @@ test("short labels and either complete original case resolve independently of pr
   assert.equal(communityCaseId("walking dogs"), null);
 });
 
-test("different datasets naturally produce different shortlists; switching off remote changes only the mode", () => {
+test("supplied and demo roles compete in the same pool; switching off remote changes only the mode", () => {
   assert.equal(opportunities.length, 100);
   const a = matchCommunityCase(opportunities, exerciseProfile("A"));
   const b = matchCommunityCase(opportunities, exerciseProfile("B"));
-  assert.deepEqual(ids(a.recommendations), ["email-practice-partner","bus-app-coach","video-call-coach"]);
-  assert.deepEqual(ids(b.recommendations), ["bus-app-coach","writing-partner","patch-project-companion"]);
+  assert.deepEqual(ids(a.recommendations), ["digital-access-buddy","email-practice-partner","bus-app-coach"]);
+  assert.deepEqual(ids(b.recommendations), ["bus-app-coach","digital-skills-facilitator","writing-partner"]);
+  assert.ok(ids(b.excluded).includes("digital-access-buddy"));
   assert.ok(b.pending.find(({role}) => role.id === "photo-transfer-tutor"));
   for (const set of [a,b]) {
     const allIds = Object.values(set).flatMap(ids);
@@ -41,6 +42,21 @@ test("different datasets naturally produce different shortlists; switching off r
   const uncapped = matchCommunityCase(opportunities, exerciseProfile("B"), {limit: Infinity});
   assert.ok(uncapped.recommendations.length > 3);
   assert.deepEqual(ids(b.recommendations), ids(uncapped.recommendations.slice(0,3)));
+});
+
+test("all seven original records carry their provenance and both cases retain the panel's eligibility decisions", () => {
+  const originals = opportunities.filter(role => role.source === "exercise");
+  assert.deepEqual(originals.map(role => role.id).sort(), exerciseRoles.map(role => role.id).sort());
+  for (const caseId of ["A", "B"]) {
+    const profile = exerciseProfile(caseId);
+    const panel = matchExercise(profile);
+    const subset = matchCommunityCase(originals, profile, {limit: Infinity});
+    for (const key of ["recommendations", "pending", "excluded", "other"]) {
+      assert.deepEqual(ids(subset[key]).sort(), ids(panel[key]).sort(), caseId + " " + key);
+    }
+    const ranked = roles => ids(matchCommunityCase(roles, profile).recommendations);
+    assert.deepEqual(ranked(opportunities.map(role => ({...role, source: undefined}))), ranked(opportunities));
+  }
 });
 
 test("distance is inclusive, missing distance requires confirmation and remote needs no venue", () => {

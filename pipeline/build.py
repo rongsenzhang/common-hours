@@ -6,6 +6,7 @@ import math
 import os
 from pathlib import Path
 import sqlite3
+import subprocess
 import tempfile
 from collections import Counter
 
@@ -17,8 +18,9 @@ ACCESS = {"yes": "yes", "no": "no", "n/a": "na", "": "unknown"}
 SCHEMA = """
 PRAGMA foreign_keys=ON;
 CREATE TABLE hosts (id TEXT PRIMARY KEY, name TEXT NOT NULL, area TEXT NOT NULL);
-CREATE TABLE roles (id TEXT PRIMARY KEY, host_id TEXT NOT NULL REFERENCES hosts(id),
-    title TEXT NOT NULL, theme TEXT NOT NULL, summary TEXT NOT NULL, interests TEXT NOT NULL, tasks TEXT NOT NULL);
+CREATE TABLE roles (id TEXT PRIMARY KEY, host_id TEXT REFERENCES hosts(id),
+    title TEXT NOT NULL, theme TEXT NOT NULL, summary TEXT NOT NULL, interests TEXT NOT NULL, tasks TEXT NOT NULL,
+    source TEXT NOT NULL CHECK (source IN ('demo','exercise')), CHECK (host_id IS NOT NULL OR source='exercise'));
 CREATE TABLE sessions (role_id TEXT PRIMARY KEY REFERENCES roles(id), session_id TEXT UNIQUE NOT NULL,
     time TEXT NOT NULL, mode TEXT NOT NULL, stepFree TEXT NOT NULL, contactNote TEXT NOT NULL);
 CREATE TABLE case_facts (role_id TEXT PRIMARY KEY REFERENCES roles(id), slots TEXT NOT NULL,
@@ -75,10 +77,15 @@ def build(fixtures, db_path):
         hosts = json.loads((fixtures / "hosts.json").read_text())
         for host in hosts:
             db.execute("INSERT INTO hosts VALUES(?,?,?)", [clean(host[k]) for k in ("id", "name", "area")])
+        retired = set(json.loads((fixtures / "history/retired-demo-roles.json").read_text()))
         for row in read_csv(fixtures / "roles.csv"):
+            if row["id"] in retired:
+                continue
             fields = ("id", "host_id", "title", "theme", "summary", "interests", "tasks")
-            db.execute("INSERT INTO roles VALUES(?,?,?,?,?,?,?)", [clean(row[k]) for k in fields])
+            db.execute("INSERT INTO roles VALUES(?,?,?,?,?,?,?,'demo')", [clean(row[k]) for k in fields])
         for row in read_csv(fixtures / "sessions.csv"):
+            if row["role_id"] in retired:
+                continue
             time = enum_value(row["schedule"], TIME)
             mode = enum_value(row["delivery"], MODE)
             access = enum_value(row["step_free"], ACCESS)
@@ -90,6 +97,8 @@ def build(fixtures, db_path):
         if missing:
             raise ValueError(f"Missing session records: {[row['id'] for row in missing]}")
         for row in read_csv(fixtures / "case-facts.csv"):
+            if row["role_id"] in retired:
+                continue
             distance = float(row["distance_miles"]) if row["distance_miles"] else None
             if distance is not None and (not math.isfinite(distance) or distance < 0):
                 raise ValueError(f"Invalid reference distance for {row['role_id']}")
@@ -101,19 +110,30 @@ def build(fixtures, db_path):
         missing_facts = db.execute("SELECT id FROM roles LEFT JOIN case_facts ON roles.id=case_facts.role_id WHERE case_facts.role_id IS NULL").fetchall()
         if missing_facts:
             raise ValueError(f"Missing community case facts: {[row['id'] for row in missing_facts]}")
+        supplied = json.loads(subprocess.check_output(
+            ["node", str(ROOT / "pipeline/exercise-records.mjs")], text=True))
+        for role in supplied:
+            role_id = role["id"]
+            activity = role["activity"]
+            db.execute("INSERT INTO roles VALUES(?,?,?,?,?,?,?,'exercise')",
+                       (role_id, None, role["title"], role["theme"], activity, role["theme"], activity))
+            db.execute("INSERT INTO sessions VALUES(?,?,?,?,?,?)",
+                       (role_id, role_id, role["time"], role["mode"],
+                        "na" if role["mode"] == "remote" else "unknown", ""))
+            db.execute("INSERT INTO case_facts VALUES(?,?,?,?,?,?)",
+                       (role_id, role["slot"], role["distanceMiles"], role["clearance"],
+                        role["individualEvidence"], role["digitalEvidence"]))
         linked = db.execute("""
-            SELECT roles.*,hosts.name AS organisation,hosts.area,sessions.session_id,sessions.time,
+            SELECT roles.*,coalesce(hosts.name,'Host not supplied') AS organisation,
+                   coalesce(hosts.area,'Area not supplied') AS area,sessions.session_id,sessions.time,
                    sessions.mode,sessions.stepFree,sessions.contactNote,
                    case_facts.slots,case_facts.distance_miles,case_facts.clearance,case_facts.individual_evidence,case_facts.digital_evidence
-            FROM roles JOIN hosts ON roles.host_id=hosts.id JOIN sessions ON roles.id=sessions.role_id
+            FROM roles LEFT JOIN hosts ON roles.host_id=hosts.id JOIN sessions ON roles.id=sessions.role_id
                        JOIN case_facts ON roles.id=case_facts.role_id
             ORDER BY roles.id
         """)
         opportunities = []
         for row in linked:
-            role_ref = f"roles.csv:{row['id']}"
-            host_ref = f"hosts.json:{row['host_id']}"
-            session_ref = f"sessions.csv:{row['session_id']}"
             entry = {k: row[k] for k in ("id", "title", "organisation", "area", "theme", "summary",
                                           "time", "mode", "stepFree", "contactNote")}
             entry["interests"] = grouped(row["interests"])
@@ -128,10 +148,18 @@ def build(fixtures, db_path):
                 "clearance": row["clearance"], "individualEvidence": row["individual_evidence"],
                 "digitalEvidence": row["digital_evidence"],
             }
-            entry["sources"] = dict.fromkeys(("id", "title", "theme", "summary", "interests", "tasks"), role_ref)
-            entry["sources"].update(dict.fromkeys(("organisation", "area"), host_ref))
-            entry["sources"].update(dict.fromkeys(("time", "mode", "stepFree", "contactNote"), session_ref))
-            entry["sources"]["caseFacts"] = f"case-facts.csv:{row['id']}"
+            if row["source"] == "exercise":
+                entry["source"] = "exercise"
+                entry["sources"] = dict.fromkeys(entry, f"site/exercise-engine.js:{row['id']}")
+                entry["sources"]["theme"] = entry["sources"]["interests"] = f"pipeline/exercise-records.mjs:{row['id']}"
+            else:
+                role_ref = f"roles.csv:{row['id']}"
+                host_ref = f"hosts.json:{row['host_id']}"
+                session_ref = f"sessions.csv:{row['session_id']}"
+                entry["sources"] = dict.fromkeys(("id", "title", "theme", "summary", "interests", "tasks"), role_ref)
+                entry["sources"].update(dict.fromkeys(("organisation", "area"), host_ref))
+                entry["sources"].update(dict.fromkeys(("time", "mode", "stepFree", "contactNote"), session_ref))
+                entry["sources"]["caseFacts"] = f"case-facts.csv:{row['id']}"
             opportunities.append(entry)
         follow_ups = json.loads((fixtures / "follow-ups.json").read_text())
         by_id = {row["id"]: row for row in opportunities}
@@ -144,8 +172,9 @@ def build(fixtures, db_path):
             db.execute("INSERT INTO follow_ups VALUES(?,?,?,?,?)", [clean(update[k]) for k in ("id","field","value","note","source")])
         counts = {field: dict(sorted(Counter(row[field] for row in opportunities).items()))
                   for field in ("time","mode","stepFree","theme")}
+        named_hosts = db.execute("SELECT COUNT(DISTINCT host_id) FROM roles").fetchone()[0]
         return {"version":"1.2.0","provenance":"All organisations, opportunities, timings and follow-ups are fictional. Venue distances are illustrative distances from the case volunteer's fictional starting point.",
-                "summary":{"roleCount":len(opportunities),"hostCount":len(hosts),"counts":counts},
+                "summary":{"roleCount":len(opportunities),"hostCount":named_hosts,"counts":counts},
                 "opportunities":opportunities,"followUps":follow_ups}
 
 

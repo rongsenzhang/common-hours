@@ -2,12 +2,12 @@
 
 用手机或电脑打开 [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask)，选择 **Live AI**。每条成功的回复旁会显示 OpenAI 和模型名称。示例使用虚构的志愿者岗位。测试时只需输入示例内容。
 
-**同一位志愿者，两组岗位。** 在 [评委练习](https://rongsenzhang.github.io/common-hours/#exercise) 中先运行 Case A 和 B，查看附件原有的 7 条记录。再打开 [Discover A](https://rongsenzhang.github.io/common-hours/#discover-case-a) 或 [Discover B](https://rongsenzhang.github.io/common-hours/#discover-case-b)，比较同一条件在 100 个虚构岗位中的结果。里程从虚构起点计算。
+**同一位志愿者，两个搜索范围。** 在 [评委练习](https://rongsenzhang.github.io/common-hours/#exercise) 中先运行 Case A 和 B，查看附件原有的 7 条记录。再打开 [Discover A](https://rongsenzhang.github.io/common-hours/#discover-case-a) 或 [Discover B](https://rongsenzhang.github.io/common-hours/#discover-case-b)，比较同一条件在全部 100 个岗位中的结果。100 岗包含原题七岗和另外 93 个演示岗位，查看推荐卡和待确认卡上的来源标记。里程从虚构起点计算。
 
 **在 Live AI 试三种问法。**
 
 1. 输入 `Case A` 或粘贴原文。查看晚间、三英里、一对一及数字支持的解释。接着输入 Case B 原文，检查新推荐中是否还有纯远程岗位。
-2. 输入 `Why do these roles suit me?`。检查理由能否对应你说过的偏好，以及这份岗位写明的任务或参加条件。
+2. 输入 `Why do these roles suit me?`，对照你的偏好和岗位记录核对理由。若想复现七岗对照，选择 **Use the seven exercise roles** 再问 `Why this list? Reason?`。核对助手能否解释个别辅导与小组教学的区别，以及哪些条件需要向主办方确认。
 3. 新开一段对话，输入 `I’d like to volunteer but I’m not sure what I’d be good at.`。回答助手的问题，例如 `People often ask me to help them use their phones. I’m usually free after work.`。再补充 `In person only, within two miles.`，看看哪些岗位还适合，哪些信息需要确认。
 
 也可以全程用中文。先说“我想做志愿者，但不知道自己擅长什么”，再说“朋友常找我教他们用手机。我喜欢一次帮一个人，只能在工作日晚上线上参加”。检查岗位是否支持线上、是否有工作日晚间场次，再问“你为什么觉得这几个岗位适合我？”。教朋友用手机是经验，可以支持相近任务；只能线上参加是限制，纯现场岗位不应进入推荐。如果再要求“必须晚上 6:35 准时开始”，现有记录只有时段，助手应提示向主办方确认。
