@@ -6,44 +6,22 @@ import {
 } from "./assistant-topics.js";
 
 const blank = { query: "", time: "any", mode: "any", stepFree: false };
-const chinese = /[\u3400-\u9fff]/;
-const vocabulary = [
-  [/遛狗|遛犬|带狗散步/g, " walk dogs "],
-  [/宠物用品|动物用品/g, " animal supplies "],
-  [/自行车维修|修自行车/g, " cycle repair "],
-  [/园艺|种菜|种花|打理花园/g, " garden "],
-  [/分拣种子|种子/g, " seed library "],
-  [/捡垃圾|清理垃圾/g, " litter "],
-  [/教阅读|陪读|阅读/g, " reading "],
-  [/做饭|烹饪/g, " cooking "],
-  [/食品包|食品银行/g, " groceries "],
-  [/观鸟|数鸟/g, " birds "],
-  [/字幕/g, " captions "],
-  [/海报/g, " posters "],
-  [/档案/g, " archive "],
-  [/线上|远程|居家|在家/g, " remote "],
-  [/现场|线下/g, " onsite "],
-  [/工作日|平日/g, " weekdays "],
-  [/周末|週末/g, " weekends "],
-  [/无台阶(?:的)?(?:通道|路线|入口)?|免爬楼梯/g, " step-free access "],
-  [/无障碍(?:的)?(?:通道|路线|入口)?/g, " accessibility "],
-];
 const units = {
   time: {
-    weekday: ["Weekdays", "工作日"],
-    weekend: ["Weekends", "周末"],
-    flexible: ["Weekdays or weekends", "工作日或周末"],
+    weekday: "Weekdays",
+    weekend: "Weekends",
+    flexible: "Weekdays or weekends",
   },
   mode: {
-    onsite: ["At the venue", "现场"],
-    remote: ["From home", "可在家参与"],
-    hybrid: ["At the venue or from home", "现场或远程"],
+    onsite: "At the venue",
+    remote: "From home",
+    hybrid: "At the venue or from home",
   },
 };
 const fieldName = {
-  time: ["the schedule", "时间"],
-  mode: ["where you can take part", "参与地点"],
-  stepFree: ["the step-free route", "无台阶通道"],
+  time: "the schedule",
+  mode: "where you can take part",
+  stepFree: "the step-free route",
 };
 
 function parseQuestion(question) {
@@ -52,14 +30,6 @@ function parseQuestion(question) {
     .replace(/[’‘]/g, "'")
     .replace(/i'd/g, "i would")
     .replace(/i'm/g, "i am");
-  for (const [pattern, replacement] of vocabulary)
-    rest = rest.replace(pattern, replacement);
-  // Leave a detectable marker for unsupported Chinese activities and conditions.
-  // Removing unknown text would silently turn a constrained request into a broad browse.
-  rest = rest.replace(
-    /第[一二三]个|最后一个|介绍|更多|其他|哪些|选项|选择|请问|麻烦|谢谢|你好|有没有|或者|请推荐|有推荐吗|能不能|可以|给我|帮我|我想|我需要|想要|需要|志愿者|志愿|活动|岗位|机会|推荐|哪些|什么|一下|工作|怎么样|比较|更好|要|我|在|有|能|吗|呢|的|只|和|做|找|想/g,
-    " ",
-  );
   const changes = {};
   const take = (pattern, key, value) => {
     if (!pattern.test(rest)) return false;
@@ -114,7 +84,9 @@ function parseQuestion(question) {
       true,
     );
   }
-  const translatedUnknown = chinese.test(rest);
+  // On-device matching uses an English vocabulary. Unknown words in other scripts
+  // must not disappear when the rest of a question is parsed for search filters.
+  const unsupportedScript = /(?!\p{Script=Latin})\p{Letter}/u.test(rest);
   // Catalogue records cover broad weekday/weekend windows, mode and step-free access.
   // Other explicit restrictions need the host's input before recommendations are safe.
   const unverified =
@@ -124,39 +96,33 @@ function parseQuestion(question) {
   const negative =
     /\b(?:not|no|never|without|avoid|hate|cannot|can't|don't|cannot|except|dislike|allergic)\b/.test(
       rest,
-    ) || /不|别|不要|不能/.test(rest);
+    );
   return {
     changes,
     tokens: topicTokens(rest),
-    translatedUnknown,
+    unsupportedScript,
     unverified,
     negative,
   };
 }
 
-function roleDescription(role, issues, zh) {
-  const position = zh ? 1 : 0;
-  const facts = [
-    units.time[role.time]?.[position],
-    units.mode[role.mode]?.[position],
-  ].filter(Boolean);
+function roleDescription(role, issues) {
+  const facts = [units.time[role.time], units.mode[role.mode]].filter(Boolean);
   if (role.time === "unknown")
-    facts.push(zh ? "活动时间待确认" : "Schedule unconfirmed");
+    facts.push("Schedule unconfirmed");
   if (role.mode === "unknown")
-    facts.push(zh ? "参与地点待确认" : "Participation mode unconfirmed");
+    facts.push("Participation mode unconfirmed");
   if (role.mode !== "remote" && role.stepFree === "unknown")
-    facts.push(zh ? "无台阶通道待确认" : "Step-free route unconfirmed");
+    facts.push("Step-free route unconfirmed");
   if (role.mode !== "remote" && role.stepFree === "no")
-    facts.push(zh ? "路线有台阶" : "Steps on the venue route");
+    facts.push("Steps on the venue route");
   if (role.mode !== "remote" && role.stepFree === "yes")
-    facts.push(zh ? "无台阶通道已确认" : "Step-free venue route");
+    facts.push("Step-free venue route");
   const unknown = issues
-    .map((i) => fieldName[i.field]?.[position])
+    .map((i) => fieldName[i.field])
     .filter(Boolean)
-    .join(zh ? "、" : " and ");
-  const note =
-    unknown &&
-    (zh ? `请向主办方确认${unknown}。` : `Ask the host to confirm ${unknown}.`);
+    .join(" and ");
+  const note = unknown && `Ask the host to confirm ${unknown}.`;
   return [role.summary, facts.length ? facts.join(" · ") + "." : "", note]
     .filter(Boolean)
     .join(" ");
@@ -166,8 +132,6 @@ function roleDescription(role, issues, zh) {
  * The caller owns per-session state. No searches or conversations leave the browser. */
 export function answerVolunteerQuestion(message, roles, previousState = null) {
   const question = String(message ?? "").trim();
-  const zh = chinese.test(question);
-  const say = (en, cn) => (zh ? cn : en);
   const previous = { ...blank, ...previousState?.preferences };
   const state = {
     preferences: { ...previous },
@@ -179,25 +143,16 @@ export function answerVolunteerQuestion(message, roles, previousState = null) {
   function reply(text, matches = [], toConfirm = [], details = {}) {
     return { text, matches, toConfirm, details, state };
   }
-  const prompt = say(
-    "What would you like to do? Tell me an activity, or a preference such as weekends, working from home or step-free access.",
-    "你想做什么活动？可以告诉我感兴趣的活动、时间、参与地点，或者是否需要无台阶通道。",
-  );
+  const prompt = "What would you like to do? Tell me an activity, or a preference such as weekends, working from home or step-free access.";
   if (!question || question.length > 600)
     return reply(
       question
-        ? say(
-            "Please ask one short volunteering question at a time (up to 600 characters).",
-            "请每次提一个不超过 600 字符的志愿活动问题。",
-          )
+        ? "Please ask one short volunteering question at a time (up to 600 characters)."
         : prompt,
     );
-  const blockedMessage = say(
-    "I can check the activity, weekday or weekend availability, participation mode and step-free access. I cannot verify that whole request from this catalogue. To search under different requirements, type “start over”.",
-    "此目录能核对活动类型、工作日或周末、参与地点和无台阶通道。刚才的要求无法全部核实。如需按另一组条件搜索，请输入“重新开始”。",
-  );
+  const blockedMessage = "I can check the activity, weekday or weekend availability, participation mode and step-free access. I cannot verify that whole request from this catalogue. To search under different requirements, type “start over”.";
   if (
-    /^(?:reset|start (?:again|over)|new search|重新开始|重置)[.!？。]?$/i.test(
+    /^(?:reset|start (?:again|over)|new search)[.!?]?$/i.test(
       question,
     )
   ) {
@@ -208,36 +163,33 @@ export function answerVolunteerQuestion(message, roles, previousState = null) {
   }
   if (state.blocked) return reply(blockedMessage);
   if (
-    /\b(?:apply|enrol|sign up|book me|reserve a place)\b|(?:怎么|如何|帮我)报名/i.test(
+    /\b(?:apply|enrol|sign up|book me|reserve a place)\b/i.test(
       question,
     )
   )
     return reply(
-      say(
-        "These are fictional opportunities for exploring the demo. You can open or save a role here. Real applications would need to go through its host.",
-        "这些是演示用的虚构岗位。你可以查看、收藏岗位；实际报名需要联系真实机构。",
-      ),
+      "These are fictional opportunities for exploring the demo. You can open or save a role here. Real applications would need to go through its host.",
     );
   const parsed = parseQuestion(question);
-  if (parsed.negative || parsed.translatedUnknown || parsed.unverified) {
+  if (parsed.negative || parsed.unsupportedScript || parsed.unverified) {
     // A later short follow-up must never silently remove an unresolved hard condition.
     state.blocked = true;
     return reply(blockedMessage);
   }
-  const ordinal = /\b(first|second|third|last)\b|第[一二三]个|最后一个/i.test(
+  const ordinal = /\b(first|second|third|last)\b/i.test(
     question,
   );
   const refersToRole =
     ordinal ||
-    /\b(?:that|this|the) (?:one|role|listing)\b|\bit\b|这个岗位|那个岗位/i.test(
+    /\b(?:that|this|the) (?:one|role|listing)\b|\bit\b/i.test(
       question,
     );
   const asksDetail =
-    /\b(?:what would i do|tell me more|tasks|details)\b|详细|介绍|具体做什么/i.test(
+    /\b(?:what would i do|tell me more|tasks|details)\b/i.test(
       question,
     );
   const asksFact =
-    /\b(?:first|second|third|last|what|where|when|tell|show|details|step[- ]free|access|weekends?|weekdays?|remote|in person|venue)\b|时间|地点|无台阶|介绍|周末|工作日|现场|远程/i.test(
+    /\b(?:first|second|third|last|what|where|when|tell|show|details|step[- ]free|access|weekends?|weekdays?|remote|in person|venue)\b/i.test(
       question,
     );
   const directFact =
@@ -256,26 +208,20 @@ export function answerVolunteerQuestion(message, roles, previousState = null) {
     const shown = previousState?.shown ?? [];
     if (!shown.length)
       return reply(
-        say(
-          "Which activity would you like me to look for first?",
-          "请先说想寻找哪种活动。",
-        ),
+        "Which activity would you like me to look for first?",
       );
     if (!ordinal && shown.length > 1) {
       state.shown = shown;
       state.offset = previousState.offset;
       return reply(
-        say(
-          "Which option would you like to hear about? Say “the first role” or “the second role”.",
-          "你想了解哪个选项？可以说“第一个”或“第二个”。",
-        ),
+        "Which option would you like to hear about? Say “the first role” or “the second role”.",
       );
     }
-    const index = /\bthird\b|第三个/i.test(question)
+    const index = /\bthird\b/i.test(question)
       ? 2
-      : /\bsecond\b|第二个/i.test(question)
+      : /\bsecond\b/i.test(question)
         ? 1
-        : /\blast\b|最后一个/i.test(question)
+        : /\blast\b/i.test(question)
           ? shown.length - 1
           : 0;
     const role = roles.find((item) => item.id === shown[index]);
@@ -283,34 +229,24 @@ export function answerVolunteerQuestion(message, roles, previousState = null) {
     state.offset = previousState.offset;
     if (!role)
       return reply(
-        say(
-          "That option is not among the listings I just showed.",
-          "上一次的结果中没有这个选项。",
-        ),
+        "That option is not among the listings I just showed.",
       );
     const result = matchOpportunities([role], { ...previous, query: "" });
     const entry = result.matches[0] || result.review[0];
     if (!entry)
       return reply(
-        say(
-          "This listing no longer meets the current requirements. Ask me to search again.",
-          "此岗位目前不符合已设置的条件，请重新搜索。",
-        ),
+        "This listing no longer meets the current requirements. Ask me to search again.",
       );
     const confirmed = result.matches.length > 0;
     return reply(
-      say("The listed tasks for ", "该岗位的工作内容（") +
-        role.title +
-        say(" are ", "）为：") +
-        role.tasks.join(", ") +
-        ".",
+      `The listed tasks for ${role.title} are ${role.tasks.join(", ")}.`,
       confirmed ? [role.id] : [],
       confirmed ? [] : [role.id],
-      { [role.id]: roleDescription(role, entry.issues, zh) },
+      { [role.id]: roleDescription(role, entry.issues) },
     );
   }
   const next =
-    /^(?:(?:please |can (?:i (?:see|have)|you (?:show|suggest) (?:me )?) |show (?:me )?|give me )?(?:any |some )?(?:other|more|next|alternative|alternatives)(?: (?:roles|options|projects|matches|suggestions|opportunities))?|还有别的吗|还有其他的吗|更多(?:选择|活动|岗位)?)[?!.？。]*$/i.test(
+    /^(?:(?:please |can (?:i (?:see|have)|you (?:show|suggest) (?:me )?) |show (?:me )?|give me )?(?:any |some )?(?:other|more|next|alternative|alternatives)(?: (?:roles|options|projects|matches|suggestions|opportunities))?)[?!.]*$/i.test(
       question,
     );
   if (next && !previousState?.shown?.length) return reply(prompt);
@@ -324,7 +260,7 @@ export function answerVolunteerQuestion(message, roles, previousState = null) {
       state.preferences.query = state.inferred || tokens.join(" ");
     } else if (
       !Object.keys(changes).length &&
-      !/\b(?:browse|anything|all roles|recommend|suggest|volunteer)\b|推荐|志愿/i.test(
+      !/\b(?:browse|anything|all roles|recommend|suggest|volunteer)\b/i.test(
         question,
       )
     )
@@ -366,14 +302,8 @@ export function answerVolunteerQuestion(message, roles, previousState = null) {
   if (!page.length)
     return reply(
       next
-        ? say(
-            "That was the last listed option for this search. Try a different activity or change a preference.",
-            "这些是本次搜索的所有选项。可以更换活动或调整条件。",
-          )
-        : say(
-            "I could not find a listed role for that request with the current preferences. Try another activity or change one of your filters.",
-            "目录中没有找到符合该请求和当前条件的岗位。可以换一种活动或调整条件。",
-          ),
+        ? "That was the last listed option for this search. Try a different activity or change a preference."
+        : "I could not find a listed role for that request with the current preferences. Try another activity or change one of your filters.",
     );
   const matches = [],
     toConfirm = [],
@@ -382,28 +312,13 @@ export function answerVolunteerQuestion(message, roles, previousState = null) {
     const role = entry.opportunity;
     (review ? toConfirm : matches).push(role.id);
     state.shown.push(role.id);
-    details[role.id] = roleDescription(role, entry.issues, zh);
+    details[role.id] = roleDescription(role, entry.issues);
   }
-  const line =
-    (matches.length
-      ? say(
-          "These roles fit the preferences I could check.",
-          "这些岗位符合目录中可核实的搜索条件。",
-        )
-      : "") +
-    (toConfirm.length
-      ? (matches.length ? " " : "") +
-        say(
-          "The options marked “To confirm” need an answer from their host.",
-          "“待确认”的岗位需要主办方核实相关信息。",
-        )
-      : "");
-  const more =
-    combined.length > state.offset + page.length
-      ? say(
-          " Ask for more options to see the next listings.",
-          " 你还可以继续查看其他选项。",
-        )
-      : "";
-  return reply(line + more, matches, toConfirm, details);
+  const lines = [];
+  if (matches.length) lines.push("These roles fit the preferences I could check.");
+  if (toConfirm.length)
+    lines.push("The options marked “To confirm” need an answer from their host.");
+  if (combined.length > state.offset + page.length)
+    lines.push("Ask for more options to see the next listings.");
+  return reply(lines.join(" "), matches, toConfirm, details);
 }

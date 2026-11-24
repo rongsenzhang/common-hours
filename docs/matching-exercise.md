@@ -32,6 +32,8 @@ The ODI field notes relate the supplied activity text to `Role.description`, rem
 
 The [records and matching function](../site/exercise-engine.js) hold the seven original descriptions, the case presets, the small phrase mapping, the checks and the ranking. The [page](../site/exercise-view.js) uses the output of that function for both cases. The [exercise tests](../tests/exercise.mjs) cover case changes and the treatment of missing information.
 
+The exercise reuses the Common Hours navigation, HTML escaping and icons. The matching rules, editable case controls and comparison with a simple filter were developed for the recruitment task. The matcher uses plain JavaScript. ChatGPT and Codex assisted with implementation, tests and the written note. The automated checks use the Node.js test runner for the rules and Playwright to operate the controls in a browser.
+
 To edit, [download the public source](https://github.com/rongsenzhang/common-hours/archive/refs/heads/main.zip), unzip it, and run the following from the folder that contains `site/`. Use a local web server so the browser can load JavaScript modules.
 
 ```sh

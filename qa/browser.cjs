@@ -108,7 +108,7 @@ async function verifyViewport(browser, width, height) {
       });
     }
     await page.getByRole("button", { name: "Start a new chat" }).click();
-    await page.locator("#chat-input").fill("我想周末遛狗");
+    await page.locator("#chat-input").fill("Can I take a dog for a walk on weekends?");
     await page.locator("#chat-input").press("Enter");
     await page
       .locator('.chat-turn:last-child [data-detail="shelter-dog-walker"]')

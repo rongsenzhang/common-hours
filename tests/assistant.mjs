@@ -92,7 +92,7 @@ test("unknown access is labelled, corrected source facts change the result, conf
       .toConfirm,
     ["garden-buddy"],
   );
-  assert.deepEqual(ask("我想周末做园艺，需要无台阶通道", roles).toConfirm, [
+  assert.deepEqual(ask("I want to grow vegetables at weekends and need level access", roles).toConfirm, [
     "garden-buddy",
   ]);
   assert.deepEqual(unresolved.matches, []);
@@ -174,14 +174,14 @@ test("unsupported personal conditions stay unresolved until a deliberate restart
   }
 });
 
-test("common Chinese questions, a vague first prompt, fictional sign-up and the input limit", () => {
-  const zh = ask("我想周末遛狗，有推荐吗？", roles);
-  assert.deepEqual(zh.matches, ["shelter-dog-walker"]);
-  assert.match(zh.text, /岗位/);
-  assert.deepEqual(ask("工作日呢？", roles, zh.state).matches, [
+test("short questions, a vague first prompt, fictional sign-up and the input limit", () => {
+  const first = ask("Walk dogs at weekends?", roles);
+  assert.deepEqual(first.matches, ["shelter-dog-walker"]);
+  assert.match(first.text, /roles fit/i);
+  assert.deepEqual(ask("Weekdays?", roles, first.state).matches, [
     "neighbourhood-dog-walker",
   ]);
-  assert.deepEqual(ids(ask("我想周末骑马，有推荐吗？", roles)), []);
+  assert.deepEqual(ids(ask("Go horse riding at weekends?", roles)), []);
   assert.deepEqual(ids(ask("What should I try?", roles)), []);
   assert.match(ask("Can I sign up?", roles).text, /fictional/i);
   assert.deepEqual(ids(ask("dog ".repeat(200), roles)), []);

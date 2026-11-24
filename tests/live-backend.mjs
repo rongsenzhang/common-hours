@@ -94,6 +94,7 @@ test("one new provider call per turn; browser and private fields do not enter th
     const body = JSON.parse(req.body);
     assert.equal(body.store, false);
     assert.equal(body.text.format.strict, true);
+    assert.deepEqual(body.text.format.schema.properties.language.enum, ["en"]);
     assert.equal(body.model, DEFAULT_MODEL);
     assert.equal(body.max_output_tokens, undefined);
     assert.equal(body.reasoning, undefined);
@@ -143,9 +144,8 @@ test("small talk gets a generated answer and identity uses the actual provider m
   });
   assert.match(social.text, /Ready to help/);
   assert.deepEqual(social.matches, []);
-  const identity = await run("你是 Gemini 吗？", {
+  const identity = await run("Are you Gemini?", {
     intent: "identity",
-    language: "zh",
     reply: "Ignore model name",
   });
   assert.match(identity.text, /OpenAI/);
@@ -156,6 +156,30 @@ test("small talk gets a generated answer and identity uses the actual provider m
     reply: "Ask who will greet you and what to bring.",
   });
   assert.match(general.text, /who will greet/);
+});
+
+test("English output keeps original visitor evidence and checked roles if provider prose is mislabelled", async () => {
+  const visitorWords = String.fromCodePoint(0x905b, 0x72d7);
+  const untranslated = String.fromCodePoint(0x6b22, 0x8fce);
+  const greeting = await run(visitorWords, {intent:"social", reply:untranslated});
+  assert.match(greeting.text, /volunteer catalogue/);
+
+  const name = String.fromCodePoint(0x674e, 0x660e);
+  const namedGreeting = `Welcome, ${name}. How can I help you volunteer?`;
+  assert.equal((await run(`My name is ${name}.`, {intent:"social",reply:namedGreeting})).text, namedGreeting);
+
+  const result = await run(visitorWords, {role_evidence:[{
+    role_id:"shelter-dog-walker", listing_source:"summary", visitor_source:0,
+    reason:`You might enjoy ${untranslated}.`,
+  }], follow_up:untranslated + "?"});
+  assert.deepEqual(result.matches, ["shelter-dog-walker"]);
+  assert.equal(result.evidence["shelter-dog-walker"].userQuote, visitorWords);
+  assert.equal(result.evidence["shelter-dog-walker"].reason, null);
+  assert.ok(!result.text.includes(untranslated));
+
+  const saved = [{user:"Case A", source:"exercise", text:"Original shortlist.", matches:[], toConfirm:[], caseProfile:profile("A")}];
+  const explanation = await packTurn("Why this list?", saved, "explain", {comparison:untranslated});
+  assert.match(explanation.text, /Shortlist:[\s\S]+Digital access buddy[\s\S]+To confirm:/);
 });
 
 test("accepts a dated snapshot of the requested model and rejects a different model", async () => {
@@ -193,9 +217,9 @@ test("specific time or missing information never appears as a confirmed match", 
   const nine = await run("Can I walk dogs on Saturday at 9am?");
   assert(!nine.matches.length && !nine.toConfirm.length);
   assert.match(nine.text, /exact day or time/);
-  const zh = await run("我周日上午九点想遛狗。", { language: "zh" });
-  assert.deepEqual(zh.matches, []);
-  assert.match(zh.text, /具体日期/);
+  const spoken = await run("Can I walk dogs on Sunday at half past nine?");
+  assert.deepEqual(spoken.matches, []);
+  assert.match(spoken.text, /half past nine/i);
   const unknown = await run("Is there a toilet with wheelchair access?", {
     intent: "unknown",
     reply:
@@ -379,18 +403,18 @@ test("OpenAI chooses which preferences change; the other profile fields survive 
   await assert.rejects(run("Five miles", {intent:"case_search",case_profile:proposed,changed_fields:["invented"]}),{code:"invalid_reply"});
 });
 
-test("bilingual volunteered strengths rank across the catalogue; a required extra activity must cite the visitor and record", async () => {
-  const user = "我喜欢用手机帮助别人，而且我只能在工作日晚上线上参加。";
+test("volunteered strengths rank across the catalogue; a required extra activity must cite the visitor and record", async () => {
+  const user = "I like teaching people to use their phones. I can only volunteer online on weekday evenings.";
   const state = {...profile("A"),mode:"online",maxMiles:null};
-  const skill = {intent:"case_search", activity:"手机指导",language:"zh",case_profile:state,
+  const skill = {intent:"case_search", activity:"phone skills",case_profile:state,
     candidate_ids:["video-call-coach"], role_evidence:[{role_id:"video-call-coach",listing_source:"digitalEvidence",
-      visitor_source:0,reason:"你可能会喜欢陪初学者练习如何开始一次视频通话。"}]};
+      visitor_source:0,reason:"You might enjoy helping a beginner practise starting a video call."}]};
   const matches = await run(user,skill);
   assert(matches.matches.includes("video-call-coach") && matches.matches.includes("email-practice-partner"));
   assert(matches.details["video-call-coach"].includes(skill.role_evidence[0].reason));
-  const visitor = "我只想帮人练习视频通话";
+  const visitor = "I only want to help people practise video calls.";
   const must = await run(visitor,{...skill,required_activity_ref:0,candidate_ids:["video-call-coach","email-practice-partner"],
-    role_evidence:[{...skill.role_evidence[0],visitor_source:0,reason:"你可能会获得时薪 100 英镑。"}]});
+    role_evidence:[{...skill.role_evidence[0],visitor_source:0,reason:"You might earn £100 an hour."}]});
   assert.deepEqual(must.matches,["video-call-coach"]);
   assert.equal(must.evidence["video-call-coach"].reason,null);
   const fabricated = await run(user,{...skill,role_evidence:[{
@@ -398,10 +422,10 @@ test("bilingual volunteered strengths rank across the catalogue; a required extr
   assert.equal(fabricated.evidence["video-call-coach"],undefined);
 });
 
-test("bare why in either language is read-only even when the provider guessed a new search", async () => {
+test("a follow-up asking why is read-only even when the provider guessed a new search", async () => {
   const initial = profile("B");
   const history=[{user:EXERCISE_CASE_TEXT.A,text:"Here are the roles.",caseProfile:initial,matches:["bus-app-coach"],toConfirm:[]}];
-  for (const question of ["Why these?", "为什么推荐这些岗位？"]) {
+  for (const question of ["Why these?", "Why do these roles suit me?"]) {
     const reply=await run(question,{intent:"case_search",case_profile:{...profile("A"),days:["Sat"]},changed_fields:["days","mode"],
       candidate_ids:["bus-app-coach","video-call-coach"],activity:""}, {history});
     assert.deepEqual(reply.caseProfile,initial);
@@ -416,6 +440,7 @@ test("a precise time gets a real upstream question and remains unresolved on ref
     requests++;
     const body=JSON.parse(req.body);
     assert.equal(body.text.format.name,"common_hours_host_time_question");
+    assert.deepEqual(body.text.format.schema.properties.language.enum, ["en"]);
     assert.equal(JSON.parse(body.input).clock,"6:35pm");
     return completed({language:"en",host_question:"Could I start at 6:35pm?"});
   }});
@@ -444,11 +469,11 @@ test("a preset name isn't presented as personal evidence about the volunteer", a
   assert(!why.details["email-practice-partner"].includes("You mentioned"));
 });
 
-test("a clear weekday-evening request narrows broad AI availability in either language", async () => {
+test("a clear weekday-evening request narrows broad AI availability", async () => {
   const proposed = {...profile("A"), days: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], period:"any", mode:"either"};
   for (const text of [
     "I like helping one person at a time learn to use a phone. I can only volunteer online on weekday evenings.",
-    "朋友经常叫我教他们用手机。我喜欢一次帮一个人，而且我只能在工作日晚上线上参加。",
+    "Friends ask me to show them how to use their phones. I can volunteer online only on weekday evenings.",
   ]) {
     const answer = await run(text,{intent:"case_search", activity:"", case_profile:proposed});
     assert.deepEqual(answer.caseProfile.days, profile("A").days);
@@ -468,6 +493,7 @@ test("a why request asks the model for evidence for each displayed role without 
   const reply = await run("Why did you choose these for me?",{}, {history,fetchImpl:async (_url, request) => {
     const body=JSON.parse(request.body);
     assert.equal(body.text.format.name,"common_hours_explanation");
+    assert.deepEqual(body.text.format.schema.properties.language.enum, ["en"]);
     const schema=body.text.format.schema.properties.explanations;
     assert.deepEqual(schema.required,history[0].matches);
     const input=JSON.parse(body.input);
@@ -484,7 +510,7 @@ test("a why request asks the model for evidence for each displayed role without 
 
 test("a volunteer describing a session window gets a required profile from the real request schema", async () => {
   for (const message of ["I enjoy helping someone with a phone. I can only volunteer online on weekday evenings.",
-    "朋友叫我教他们用手机。我只能在工作日晚上线上参加。"]) {
+    "My friends ask me for help with phones. I can volunteer online only on weekday evenings."]) {
     const reply = await run(message,{}, {fetchImpl:async (_url, request) => {
       const schema=JSON.parse(request.body).text.format.schema;
       assert.equal(schema.properties.case_profile.type, "object");
@@ -497,15 +523,16 @@ test("a volunteer describing a session window gets a required profile from the r
 });
 
 
-const packTurn = (message, history, action, {language = "en", role_id = null, comparison = ""} = {}) => run(message, {}, {
+const packTurn = (message, history, action, {role_id = null, comparison = ""} = {}) => run(message, {}, {
   history, fetchImpl:async (_url, request) => {
     const body = JSON.parse(request.body);
     assert.equal(body.text.format.name, "common_hours_exercise_source");
+    assert.deepEqual(body.text.format.schema.properties.language.enum, ["en"]);
     const input = JSON.parse(body.input);
     assert.deepEqual(input.records, exerciseRoles);
     assert.equal(input.catalogue_sources.community.count, roles.length);
     assert.ok(!input.catalogue);
-    return completed({action,language,role_id,comparison});
+    return completed({action,language:"en",role_id,comparison});
   },
 });
 const historyItem = (user, {text,matches,toConfirm,caseProfile,source}) =>
@@ -514,7 +541,7 @@ const historyItem = (user, {text,matches,toConfirm,caseProfile,source}) =>
 test("both supplied cases use the same seven records on request, keep pending reasons, and switch back to the wider catalogue", async () => {
   const caseA = await run(EXERCISE_CASE_TEXT.A, {intent:"case_search",activity:"",case_profile:profile("A")});
   const saved = [historyItem(EXERCISE_CASE_TEXT.A,caseA)];
-  for (const question of ["Just focus on seven role matching exercise?", "Use only the seven roles from the matching exercise.", "只看招聘方原题七个岗位"]) {
+  for (const question of ["Just focus on seven role matching exercise?", "Use only the seven roles from the matching exercise."]) {
     const a = await packTurn(question,saved,"shortlist");
     assert.equal(a.source,"exercise");
     assert.deepEqual(a.matches,[]);
@@ -556,7 +583,7 @@ test("both supplied cases use the same seven records on request, keep pending re
 test("source metadata distinguishes generic search quantity, counts, selected sources and the volunteer profile", async () => {
   for (const question of ["Which are the original seven roles?",
     "Which seven roles did the recruitment task supply? List their titles.",
-    "Which roles are in the candidate brief?", "exercise 里的七个岗位是哪些？"]) {
+    "Which roles are in the candidate brief?"]) {
     const fresh = await packTurn(question,[],"records");
     assert.equal(fresh.caseProfile,undefined);
     assert.match(fresh.text,/Case A or Case B/);
@@ -571,15 +598,15 @@ test("source metadata distinguishes generic search quantity, counts, selected so
   const mixed = await packTurn("From the full catalogue switch to the seven exercise roles.",[],"records");
   assert.equal(mixed.source,"exercise");
   const saved = [{user:"Use the matching exercise", source:"exercise", text:"Your options.",matches:[],toConfirm:[],caseProfile:profile("B")}];
-  for (const message of ["Use all 100 roles and label the ones from the matching exercise.", "用一百个岗位，如果是原题的就标注一下。"]) {
+  for (const message of ["Use all 100 roles and label the ones from the matching exercise.", "Search the full catalogue and mark the original seven."]) {
     const full = await run(message, {intent:"case_search", case_profile:profile("B"), activity:""}, {history:saved});
     assert.equal(full.source,undefined);
     assert.equal(full.caseProfile.mode,"in-person");
     assert.ok(full.matches.length);
   }
-  const zh = await packTurn("这七个岗位里面为什么推荐这个？",saved,"detail",{language:"zh",role_id:"digital-skills-facilitator"});
-  assert.match(zh.text,/招聘方原题/);
-  assert.match(zh.text,/Digital skills facilitator/);
+  const detail = await packTurn("Why does the digital skills role fit?",saved,"detail",{role_id:"digital-skills-facilitator"});
+  assert.match(detail.text,/Original recruitment pack/);
+  assert.match(detail.text,/Digital skills facilitator/);
   assert.throws(()=>validateTurn({message:"next",history:[{...saved[0],matches:["bus-app-coach"]}]},roles),LiveError);
   assert.throws(()=>validateTurn({message:"next",history:[{...saved[0],source:"invented"}]},roles),LiveError);
   await assert.rejects(packTurn("Tell me about the first one",saved,"detail",{role_id:"bus-app-coach"}),{code:"invalid_reply"});
@@ -611,10 +638,9 @@ test("the full model context includes seven attributed records and ranks both so
 
 test("seven-only why explains actual checked trade-offs without repeating the previous answer", async () => {
   const saved = [{user:"Use only the seven roles from the matching exercise.", source:"exercise", text:"Original shortlist.", matches:[],toConfirm:[],caseProfile:profile("A")}];
-  for (const [message, language, comparison] of [
-    ["why this list? reason?", "en", "Digital access buddy fits your wish to work with one person using digital skills. Digital skills facilitator uses those skills in a group, while the form-filling venue still needs a distance check."],
-    ["tell me your reason", "en", "Digital access buddy offers individual practice and the session is online, so travel is unnecessary. Digital skills facilitator is feasible if you enjoy teaching a group."],
-    ["请解释一下推荐的理由", "zh", "Digital access buddy 同时用到数字技能和一对一辅导，因此排在小组课前面。"],
+  for (const [message, comparison] of [
+    ["why this list? reason?", "Digital access buddy fits your wish to work with one person using digital skills. Digital skills facilitator uses those skills in a group, while the form-filling venue still needs a distance check."],
+    ["tell me your reason", "Digital access buddy offers individual practice and the session is online, so travel is unnecessary. Digital skills facilitator is feasible if you enjoy teaching a group."],
   ]) {
     const answer = await run(message,{}, {history:saved,fetchImpl:async (_url, request) => {
       const req = JSON.parse(request.body);
@@ -623,7 +649,7 @@ test("seven-only why explains actual checked trade-offs without repeating the pr
       assert.deepEqual(input.checked_decisions.recommendations.map(row => row.fit), ["Strong fit","Partial fit"]);
       assert.deepEqual(input.checked_decisions.pending.map(row => row.id), ["youth-reading-mentor","form-filling-volunteer"]);
       assert.deepEqual(input.previous_reply,saved.at(-1).text);
-      return completed({action:"explain",language,role_id:null,comparison});
+      return completed({action:"explain",language:"en",role_id:null,comparison});
     }});
     assert.equal(answer.source,"exercise");
     assert.equal(answer.text,comparison);

@@ -1,26 +1,23 @@
-# Common Hours v1.1 测试指南
+# Test the catalogue and on-device role finder
 
-公开入口可以直接用手机或电脑打开。此页测试本地模式。使用问答时请先选 **On-device search**。若要测试实时模型，请打开[实时问答测试指南](testing-live.md)。以下案例可直接复制，组与组之间点 **Start a new chat**，同组的追问请留在同一个对话里。
+Open [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask) on a phone or computer and select **On-device search**. Start a new chat between scenarios, but keep follow-up questions in the same conversation. For the model-backed assistant, use the [Live AI testing guide](testing-live.md).
 
-[打开问答](https://rongsenzhang.github.io/common-hours/#ask) · [打开目录](https://rongsenzhang.github.io/common-hours/)
-
-| 场景 | 操作 | 预期结果 |
+| Scenario | Action | Expected result |
 | --- | --- | --- |
-| 新目录里有遛狗岗位 | 在问答里输入 `Can I walk dogs?`。 | 出现 **Shelter dog walking buddy** 和 **Neighbourhood dog walker**。点开可以查看具体任务、时间和路线。河岸捡垃圾不会出现在结果里。 |
-| 同一兴趣，修改时间 | 继续输入 `Only weekends`，再输入 `What about weekdays?`。 | 周末只留下收容所遛狗，换成工作日后只留下社区遛狗。两个岗位分别标明平坦路线和有台阶的路线。 |
-| 时间合适但地点冲突 | 在上一组后继续输入 `Can I do it from home?`。 | 两个遛狗岗位均需到场，因此没有符合当前条件的岗位。 |
-| 中文查询 | 新开对话，输入 `我想周末遛狗`。 | 只出现周末的 **Shelter dog walking buddy**。 |
-| 多个备选 | 新开对话，输入 `What can I do from home?`，然后追问 `Show more options`。 | 每次最多三个，下一页是不同岗位。参与方式尚待核实的岗位标为 **To confirm**。点岗位名可查看，点 **Save role** 后回 Discover → Saved 可再次打开。 |
-| 缺少无障碍信息 | 在 Discover 的 **Your preferences**（窄屏先点 **Edit**）输入 `allotment`，选择 **Weekends**、**At the venue**，勾选 **Step-free access required** 并点 **Find roles**。 | **Community garden buddy** 出现在 **To confirm**。该岗位的无台阶通道仍待主办方确认。 |
-| 排除看似相近的活动 | 在 Discover 重置筛选，分别搜索 `walk horses` 和 `litter walk`。 | 前者没有匹配；后者找到 **Riverside litter walk**。详情说明路线有台阶且地面不平。 |
-| 公开和私有边界 | 普通访客打开公开网站；再用未登录 GitHub 的无痕窗口打开私有仓库。 | 网站只显示志愿者目录和问答。私有仓库在未授权窗口无法读取。 |
+| Find the two dog walks | Ask `Can I walk dogs?` | **Shelter dog walking buddy** and **Neighbourhood dog walker** appear. Open the cards to check the work, timing and route. Riverside litter collection is a different activity. |
+| Change availability | Follow up with `Only weekends`, then `What about weekdays?` | The weekend search returns the shelter walk on a level route. Weekdays return the neighbourhood walk, whose route includes steps. |
+| Request an incompatible setting | Continue with `Can I do it from home?` | Both walks require attendance, so the shortlist is empty. |
+| Request alternatives | In a new chat ask `What can I do from home?`, then `Show more options`. | Each reply offers up to three roles. The next reply shows different listings. Check **To confirm** for participation details and **Save role** to revisit a listing under **Discover → Saved**. |
+| Check an access requirement | In [Discover](https://rongsenzhang.github.io/common-hours/), enter `allotment` under **Your preferences**, select **Weekends** and **At the venue**, then select **Step-free access required** and **Find roles**. On a narrow screen, open **Edit** first. | **Community garden buddy** appears under **To confirm** because the route to the beds still needs checking. |
+| Distinguish similar activities | Reset the Discover filters and search separately for `walk horses` and `litter walk`. | The first search returns no match. The second finds **Riverside litter walk**, with steps and uneven ground noted in its details. |
+| Check staff access | Open the public site, then open the private staff repository in a signed-out browser window. | Volunteers can access discovery, matching and chat. Staff records require an authorised GitHub account. |
 
-## 面试演示旧问题
+## Reproduce the original search error
 
-1. 打开 [v1.0 原始发布记录](https://github.com/rongsenzhang/common-hours/releases/tag/v1.0.0)，指出当时目录没有遛狗岗位，而 *walk dogs* 误推了 *Riverside litter walk*。
-2. 打开 [冻结的 B22 案例](../fixtures/history/v1.0-B22.json)。当前回归测试对同一份旧目录要求返回空。仓库根目录运行 `node --test tests/matching.mjs` 可以复现。
-3. 返回当前公开页面，演示新增遛狗岗位的正例，再用 *walk horses* 作反例。两次比较检验不同能力：系统能在有记录时找到它，也能在缺乏依据时留空。
+1. In the [v1.0 release](https://github.com/rongsenzhang/common-hours/releases/tag/v1.0.0), the catalogue had no dog-walking role. A search for *walk dogs* suggested *Riverside litter walk*.
+2. Inspect the [frozen B22 example](../fixtures/history/v1.0-B22.json). Run `node --test tests/matching.mjs` from the repository root. The regression test expects an empty result when searching the original catalogue.
+3. Repeat the search in the current catalogue, which includes dog walking. Then try *walk horses* to check that the finder can withhold an unsupported suggestion.
 
-## 查看技术后台
+## Inspect the staff view
 
-使用有权限的 GitHub 账号打开[私有后台](https://github.com/rongsenzhang/common-hours-admin)。在查询索引中按 A–Z 找到 **walk dogs · B29**，比较各方法的结果。若要操作下拉列表和协调员核实/撤销流程，按[交互后台说明](admin.md)打开控制台。审核结果用于本次演示，不会修改所有访客看到的原始目录。
+With an authorised GitHub account, open the [staff repository](https://github.com/rongsenzhang/common-hours-admin). Find **walk dogs · B29** in the alphabetical query index and compare the methods. The [staff instructions](admin.md) cover the interactive dashboard and how to record or undo a coordinator check. Changes made in the simulation apply to that review session.

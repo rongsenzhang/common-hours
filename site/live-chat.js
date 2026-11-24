@@ -141,21 +141,12 @@ export async function requestLiveReply({
   }
 }
 
-export function liveFailureMessage(kind, message = "") {
-  const chinese = /[\u3400-\u9fff]/u.test(message);
+export function liveFailureMessage(kind) {
   if (kind === "cancelled")
-    return chinese
-      ? "已取消，你可以修改问题再发送。"
-      : "Cancelled. You can edit your question and send it again.";
+    return "Cancelled. You can edit your question and send it again.";
   if (kind === "busy")
-    return chinese
-      ? "OpenAI 暂时无法处理这次请求。请稍后重试，或使用本地搜索。"
-      : "OpenAI cannot take this request right now. Try again later or use on-device search.";
+    return "OpenAI cannot take this request right now. Try again later or use on-device search.";
   if (kind === "timeout")
-    return chinese
-      ? "实时 AI 响应超时。请重试或使用本地搜索。"
-      : "Live AI took too long to respond. Try again or use on-device search.";
-  return chinese
-    ? "实时 AI 暂时无法回复。请重试或使用本地搜索。"
-    : "Live AI could not reply. Try again or use on-device search.";
+    return "Live AI took too long to respond. Try again or use on-device search.";
+  return "Live AI could not reply. Try again or use on-device search.";
 }

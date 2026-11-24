@@ -2,7 +2,7 @@
 
 Find volunteering opportunities around Greater Manchester and ask follow-up questions about the activities, timing and access. The independent NTU–TeamKinetic application demo uses 100 fictional opportunities, including the seven supplied in the recruitment exercise. All volunteers can use it without an account.
 
-[Find a role](https://rongsenzhang.github.io/common-hours/) · [Matching exercise](https://rongsenzhang.github.io/common-hours/#exercise) · [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask) · [实时问答测试指南](docs/testing-live.md) · [Finder and on-device tests](docs/testing-v1.1.md)
+[Find a role](https://rongsenzhang.github.io/common-hours/) · [Matching exercise](https://rongsenzhang.github.io/common-hours/#exercise) · [Ask the role finder](https://rongsenzhang.github.io/common-hours/#ask) · [Live AI testing guide](docs/testing-live.md) · [Finder and on-device tests](docs/testing-v1.1.md)
 
 ## Panel matching exercise
 

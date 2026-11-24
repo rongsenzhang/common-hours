@@ -74,7 +74,7 @@ function cancelRequest(restoreDraft = true) {
   controller.abort();
   if (restoreDraft) {
     chats.live.draft = input;
-    chatError = liveFailureMessage("cancelled", input);
+    chatError = liveFailureMessage("cancelled");
   }
 }
 const labels = {
@@ -347,7 +347,7 @@ async function ask(message) {
       if (liveRequest !== request) return;
       liveRequest = null;
       chat.draft = input;
-      chatError = liveFailureMessage(error.kind, input);
+      chatError = liveFailureMessage(error.kind);
       updateChat(true);
       return;
     }

@@ -118,11 +118,10 @@ export function renderChat(
       + (live ? promptButton("I'd like to volunteer but I'm not sure what I'd be good at.", "Help me find my strengths") : "")
       + casePrompts();
   const last = turns.at(-1);
-  const whyPrompt = /[\u3400-\u9fff]/u.test(last?.input ?? "") ? "为什么这些岗位适合我？" : "Why do these roles suit me?";
   const followups = [];
   if (live && !pending && last) {
     if (last.reply.matches.length || (last.reply.source === "exercise" && last.reply.caseProfile)) {
-      followups.push(promptButton(whyPrompt));
+      followups.push(promptButton("Why do these roles suit me?"));
     }
     if (last.reply.source === "exercise") {
       followups.push(promptButton(`Search all ${roles.length} roles again.`, `Use all ${roles.length} roles`));

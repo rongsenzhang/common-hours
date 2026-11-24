@@ -152,11 +152,11 @@ async function checkSuppliedCases() {
     expectProfile({...exerciseProfile("B"), maxMiles: 5}));
 }
 
-async function checkEnglishCoaching() {
+async function checkGuidedDiscovery() {
   const coaching = [];
   await checkTurn("an undecided volunteer gets a discovery question",
     "I'd like to help out, but I have no idea what I'd be good at. Could you help me work that out?", coaching,
-    (reply) => { noRoles(reply); requireResult(/[?？]/u.test(reply.text)); });
+    (reply) => { noRoles(reply); requireResult(reply.text.includes("?")); });
   const found = await checkTurn("skills and constraints lead to actionable roles",
     "I like helping one person at a time learn to use a phone. I can only volunteer online on weekday evenings.", coaching,
     reply => {
@@ -177,15 +177,13 @@ async function checkEnglishCoaching() {
     });
 }
 
-async function checkChineseCoaching() {
-  const chinese = [];
-  await checkTurn("Chinese guided discovery", "我想尝试做志愿者，但不知道自己能做什么。", chinese,
-    reply => { noRoles(reply); requireResult(/[?？]/u.test(reply.text)); });
-  const chineseFound = await checkTurn("Chinese volunteer skills stay soft while logistics remain hard",
-    "朋友经常叫我教他们用手机。我喜欢一次帮一个人，而且我只能在工作日晚上线上参加。", chinese,
+async function checkVolunteeredExperience() {
+  const conversation = [];
+  const found = await checkTurn("informal experience and availability guide the first search",
+    "Friends often ask me to show them how to use their phones. I enjoy helping one person at a time. I can only volunteer online on weekday evenings.", conversation,
     reply => expectProfile({...exerciseProfile("A"), mode:"online", maxMiles:null}, {openEnded:true})(reply));
-  await checkTurn("Chinese personalised recommendation explanation", "我说的哪些经验和这些岗位的工作有关？", chinese,
-    reply => expectPersonalExplanation(chineseFound, reply));
+  await checkTurn("the suggested roles draw on the volunteer's experience", "Why do these roles suit me?", conversation,
+    reply => expectPersonalExplanation(found, reply));
 }
 
 async function checkLiveResponses() {
@@ -195,7 +193,7 @@ async function checkLiveResponses() {
     return;
   }
   const failures = [];
-  for (const scenario of [checkDogWalkConversation, checkGardenAccess, checkSuppliedCases, checkEnglishCoaching, checkChineseCoaching]) {
+  for (const scenario of [checkDogWalkConversation, checkGardenAccess, checkSuppliedCases, checkGuidedDiscovery, checkVolunteeredExperience]) {
     try {
       await scenario();
     } catch (error) {
