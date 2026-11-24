@@ -420,6 +420,12 @@ test("a precise time gets a real upstream question and remains unresolved on ref
     return completed({language:"en",host_question:"Could I start at 6:35pm?"});
   }});
   assert.equal(requests,1); assert.deepEqual(first.matches,[]); assert.match(first.text,/6:35pm/);
+  const dotted = await run(message, {}, {fetchImpl:async()=>completed({
+    language:"en", host_question:"Could you confirm whether this role’s shift starts at exactly 6:35 p.m.?",
+  })});
+  assert.match(dotted.text,/ask the host.*6:35 p\.m\.\?/i);
+  assert.deepEqual(dotted.matches,[]);
+  assert.deepEqual(dotted.toConfirm,[]);
   const history=[{user:message,text:first.text,matches:[],toConfirm:[]}];
   const next=await run("Any home-based options?",{intent:"unknown",case_profile:profile("A"),reply:""}, {history});
   assert.deepEqual(next.matches,[]); assert.match(next.text,/6:35pm/);

@@ -171,7 +171,9 @@ async function checkEnglishCoaching() {
     reply => expectPersonalExplanation(found, reply));
   await checkTurn("an unsupported exact time needs confirmation",
     "One more thing, I can only start at exactly 6:35pm. Which role guarantees that start time?", coaching, reply => {
-      noRoles(reply); requireResult(/6[:.]35\s*pm/iu.test(reply.text) && /host/iu.test(reply.text));
+      noRoles(reply);
+      requireResult(/\b6[:.]35\s*p\.?\s*m\b/iu.test(reply.text), "missing_requested_clock");
+      requireResult(/\bhost\b/iu.test(reply.text), "missing_host_handoff");
     });
 }
 
