@@ -33,10 +33,10 @@ const basePlan = {
   reply: "",
 };
 const sentinel = "unit-test-only-token";
-function completed(plan) {
+function completed(plan, model = DEFAULT_MODEL) {
   return new Response(
     JSON.stringify({
-      model: DEFAULT_MODEL,
+      model,
       status: "completed",
       output: [
         { type: "reasoning" },
@@ -95,6 +95,8 @@ test("one new provider call per turn; browser and private fields do not enter th
     assert.equal(body.store, false);
     assert.equal(body.text.format.strict, true);
     assert.equal(body.model, DEFAULT_MODEL);
+    assert.equal(body.max_output_tokens, undefined);
+    assert.equal(body.reasoning, undefined);
     assert(!req.body.includes(sentinel));
     assert(!req.body.includes("NOT_PUBLIC"));
     assert(!req.body.includes("sessions.csv"));
@@ -154,6 +156,18 @@ test("small talk gets a generated answer and identity uses the actual provider m
     reply: "Ask who will greet you and what to bring.",
   });
   assert.match(general.text, /who will greet/);
+});
+
+test("accepts a dated snapshot of the requested model and rejects a different model", async () => {
+  const actualSnapshot = DEFAULT_MODEL + "-2026-11-17";
+  const identityPlan = { ...basePlan, intent: "identity", candidate_ids: [] };
+  const identityFrom = (model) => run("Which model are you?", {}, {
+    fetchImpl: async () => completed(identityPlan, model),
+  });
+  const reply = await identityFrom(actualSnapshot);
+  assert.equal(reply.model, actualSnapshot);
+  assert.ok(reply.text.includes(actualSnapshot));
+  await assert.rejects(identityFrom("gpt-6.2-sol"), {code: "invalid_reply"});
 });
 
 test("a known activity with unconfirmed access stays visible without promising the route", async () => {

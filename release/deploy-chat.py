@@ -16,7 +16,7 @@ API = "https://api.cloudflare.com/client/v4"
 REPOSITORY = "rongsenzhang/common-hours"
 ORIGIN = "https://rongsenzhang.github.io"
 WORKER = "common-hours-volunteer-chat"
-MODEL = "gpt-5.4-mini-2026-03-17"
+MODEL = "gpt-6.2-astra"
 WRANGLER_VERSION = "4.165.0"
 
 
@@ -185,6 +185,16 @@ def deploy(binary, account, api_token, openai_key):
         raise DeploymentError("Wrangler could not deploy the Worker" + suffix + ". Check the token scope and configuration.")
 
 
+def verify_model_access(api_key):
+    # Exercise the same catalogue, request schema and result checks as the Worker before replacing it.
+    env = {"PATH": os.environ.get("PATH", os.defpath), "OPENAI_API_KEY": api_key}
+    result = subprocess.run(
+        ["node", "qa/openai-live-smoke.mjs", "--preflight"], cwd=ROOT, env=env, timeout=120,
+    )
+    if result.returncode:
+        raise DeploymentError(f"OpenAI preflight for {MODEL} failed before Worker deployment.")
+
+
 def verify_worker(base, send=request, sleep=time.sleep):
     origin_header = {"Origin": ORIGIN}
     for attempt in range(9):
@@ -207,10 +217,11 @@ def verify_worker(base, send=request, sleep=time.sleep):
             or "POST" not in headers.get("Access-Control-Allow-Methods", "").upper()
             or "content-type" not in headers.get("Access-Control-Allow-Headers", "").lower()):
         raise DeploymentError("The volunteer site's CORS preflight did not pass.")
-    status, headers, reply = send(endpoint, method="POST", headers=origin_header, timeout=55,
+    status, headers, reply = send(endpoint, method="POST", headers=origin_header, timeout=115,
                                   data={"message": "Are you Gemini?", "history": []})
     if not (status == 200 and headers.get("Access-Control-Allow-Origin") == ORIGIN
-            and isinstance(reply, dict) and reply.get("provider") == "openai" and reply.get("model") == MODEL
+            and isinstance(reply, dict) and reply.get("provider") == "openai" and isinstance(reply.get("model"), str)
+            and re.fullmatch(re.escape(MODEL) + r"(?:-\d{4}-\d{2}-\d{2})?", reply["model"])
             and isinstance(reply.get("text"), str) and "openai" in reply["text"].lower()
             and reply.get("matches") == [] and reply.get("toConfirm") == [] and reply.get("details") == {}):
         raise DeploymentError(f"Public live-model smoke failed (HTTP {status}); the Pages endpoint was not selected.")
@@ -233,6 +244,8 @@ def main():
     account = verified_account(call, kind, os.environ.get("CLOUDFLARE_ACCOUNT_ID"))
     print("Checking ownership of the target Worker.", flush=True)
     check_worker_owner(call, account)
+    print(f"Checking {MODEL} access and a real structured volunteer-chat response before deployment.", flush=True)
+    verify_model_access(os.environ["OPENAI_API_KEY"])
     print("Checking the public workers.dev hostname.", flush=True)
     subdomain = workers_subdomain(call, account)
     print("Deploying the Worker with its encrypted runtime secret.", flush=True)

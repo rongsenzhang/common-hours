@@ -6,6 +6,7 @@
   "preview_urls": false,
   "observability": { "enabled": false },
   "vars": { "OWNER_REPO": "rongsenzhang/common-hours" },
+  // Keep the v1 namespace for older deployments and pending expiry alarms.
   "durable_objects": {
     "bindings": [{ "name": "CHAT_QUOTA", "class_name": "ChatQuota" }],
   },

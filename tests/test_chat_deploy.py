@@ -15,6 +15,24 @@ BASE = "https://example.test"
 
 
 class ChatDeploymentTests(unittest.TestCase):
+    def test_model_preflight_runs_before_any_worker_mutation(self):
+        token = "cfut_" + "u" * 47
+        with patch.dict(deploy.os.environ, {
+                "OPENAI_API_KEY": "test-ai", "CLOUDFLARE_API_TOKEN": token,
+                "WRANGLER_BIN": "/test/wrangler", "GITHUB_REPOSITORY": deploy.REPOSITORY,
+            }), patch.object(deploy, "verified_account", return_value=ACCOUNT), \
+            patch.object(deploy, "check_worker_owner"), patch.object(deploy, "workers_subdomain") as subdomain, \
+            patch.object(deploy, "deploy") as upload, patch.object(deploy.subprocess, "run") as node, \
+            redirect_stdout(StringIO()):
+            node.return_value = subprocess.CompletedProcess([], 1)
+            with self.assertRaisesRegex(deploy.DeploymentError, "preflight"):
+                deploy.main()
+            self.assertEqual(node.call_args.args[0], ["node", "qa/openai-live-smoke.mjs", "--preflight"])
+            self.assertEqual(node.call_args.kwargs["env"]["OPENAI_API_KEY"], "test-ai")
+            self.assertNotIn("CLOUDFLARE_API_TOKEN", node.call_args.kwargs["env"])
+            subdomain.assert_not_called()
+            upload.assert_not_called()
+
     def test_version_probe_runs_without_deployment_logging_filter_or_secrets(self):
         binary = str(Path(__file__).resolve())
         version = subprocess.CompletedProcess([], 0, deploy.WRANGLER_VERSION + "\n")
@@ -119,6 +137,11 @@ class ChatDeploymentTests(unittest.TestCase):
         good = responses(reply)
         self.assertEqual(deploy.verify_worker(BASE, good), BASE + "/api/chat")
         self.assertEqual(good.call_args.kwargs["data"]["message"], "Are you Gemini?")
+        snapshot = {**reply, "model": deploy.MODEL + "-2026-11-17"}
+        self.assertEqual(deploy.verify_worker(BASE, responses(snapshot)), BASE + "/api/chat")
+        for other_model in ("gpt-6.2-sol", deploy.MODEL + "-mini", None):
+            with self.subTest(model=other_model), self.assertRaisesRegex(deploy.DeploymentError, "smoke failed"):
+                deploy.verify_worker(BASE, responses({**reply, "model": other_model}))
         with self.assertRaisesRegex(deploy.DeploymentError, "smoke failed"):
             deploy.verify_worker(BASE, responses({**reply, "provider": "local"}))
         blocked = Mock(side_effect=[(200, cors, status), (204, {**cors, "Access-Control-Allow-Origin": "*"}, {})])

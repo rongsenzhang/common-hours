@@ -6,7 +6,7 @@ import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js"
 import { matchOpportunities } from "../site/engine.js";
 import { answerVolunteerQuestion } from "../site/assistant.js";
 
-export const DEFAULT_MODEL = "gpt-5.4-mini-2026-03-17";
+export const DEFAULT_MODEL = "gpt-6.2-astra";
 const API_URL = "https://api.openai.com/v1/responses";
 const INTENTS = [
   "social",
@@ -231,11 +231,16 @@ function validatePlan(data, known) {
   return data;
 }
 
-function readOutput(body, known, clock, explanation) {
+export function matchesRequestedModel(actual, requested = DEFAULT_MODEL) {
+  return typeof actual === "string" &&
+    (actual === requested || actual.replace(/-\d{4}-\d{2}-\d{2}$/, "") === requested);
+}
+
+function readOutput(body, known, clock, explanation, requestedModel) {
   if (
     body?.status !== "completed" ||
     !Array.isArray(body.output) ||
-    !/^gpt-[a-z0-9.-]{1,100}$/.test(body.model ?? "")
+    !matchesRequestedModel(body.model, requestedModel)
   )
     throw invalidReply();
   const messages = body.output.filter((o) => o?.type === "message");
@@ -625,7 +630,7 @@ export async function answerLive({
   const abort = () => controller.abort();
   if (signal?.aborted) abort();
   else signal?.addEventListener("abort", abort, { once: true });
-  const timeout = setTimeout(abort, 26000);
+  const timeout = setTimeout(abort, 100_000);
   try {
     const response = await fetchImpl(API_URL, {
       method: "POST",
@@ -638,8 +643,6 @@ export async function answerLive({
       body: JSON.stringify({
         model,
         store: false,
-        max_output_tokens: 2200,
-        reasoning: { effort: "low" },
         instructions: clock ? CLOCK_INSTRUCTIONS : explanation ? explanationInstructions : profileTurn ? INSTRUCTIONS + "\nThis message states a volunteer profile. Provide the complete case_profile, interpret skills and preferences from the conversation, and apply the recorded schedule and participation requirements." : INSTRUCTIONS,
         input: JSON.stringify(explanation ? explanation.input : clock ? {latest_message:turn.message, clock, active_profile:latestProfile(turn.history)} : {
           catalogue: inputCatalogue(roles),
@@ -668,7 +671,7 @@ export async function answerLive({
       );
     if (!response.ok) throw unavailable();
     return formatAnswer(
-      readOutput(await response.json(), new Set(roles.map((r) => r.id)), clock, explanation),
+      readOutput(await response.json(), new Set(roles.map((r) => r.id)), clock, explanation, model),
       turn,
       roles,
     );

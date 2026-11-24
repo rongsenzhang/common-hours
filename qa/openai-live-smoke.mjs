@@ -3,7 +3,7 @@
 import { readFile } from "node:fs/promises";
 import { matchCommunityCase } from "../site/community-case.js";
 import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js";
-import { answerLive, DEFAULT_MODEL, LiveError } from "../server/live.mjs";
+import { answerLive, DEFAULT_MODEL, LiveError, matchesRequestedModel } from "../server/live.mjs";
 
 const roles = JSON.parse(
   await readFile(new URL("../site/data/catalog.json", import.meta.url), "utf8"),
@@ -15,15 +15,31 @@ const safeErrorCodes = new Set([
 
 class VerificationFailure extends Error {}
 
+// Include actionable API diagnostics while keeping upstream text and credentials out of CI logs.
+const publicProviderCodes = new Set([
+  "model_not_found", "insufficient_permissions", "invalid_api_key", "insufficient_quota",
+  "rate_limit_exceeded", "unsupported_parameter", "unsupported_value", "invalid_json_schema",
+]);
+
 function requireResult(condition, criterion = "unexpected_outcome") {
   if (!condition) throw new VerificationFailure(criterion);
 }
 
 async function checkTurn(label, message, history, expected) {
   let answer;
+  let upstreamFailure = "";
+  async function observeProvider(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      const error = (await response.clone().json().catch(() => null))?.error;
+      upstreamFailure = `OpenAI HTTP ${response.status}`;
+      if (publicProviderCodes.has(error?.code)) upstreamFailure += " " + error.code;
+    }
+    return response;
+  }
   try {
-    answer = await answerLive({ message, history, roles, apiKey, model: DEFAULT_MODEL });
-    requireResult(answer.provider === "openai" && answer.model === DEFAULT_MODEL);
+    answer = await answerLive({ message, history, roles, apiKey, model: DEFAULT_MODEL, fetchImpl: observeProvider });
+    requireResult(answer.provider === "openai" && matchesRequestedModel(answer.model), "unexpected_model");
     requireResult(typeof answer.text === "string" && answer.text.trim());
     requireResult(Array.isArray(answer.matches) && Array.isArray(answer.toConfirm));
     expected(answer);
@@ -43,11 +59,16 @@ async function checkTurn(label, message, history, expected) {
       evidence: Object.entries(answer.evidence ?? {}).map(([id, item]) =>
         [id, Boolean(item.sourceQuote), Boolean(item.userQuote), Boolean(item.reason)]),
     }) : "";
-    throw new Error(`${label}: ${reason} ${facts}`);
+    throw new Error([label + ":", reason, upstreamFailure, facts].filter(Boolean).join(" "));
   }
 }
 
 const noRoles = (reply) => requireResult(reply.matches.length === 0 && reply.toConfirm.length === 0);
+
+function expectIdentity(reply) {
+  noRoles(reply);
+  requireResult(reply.text.toLowerCase().includes("openai"));
+}
 
 const sameProfile = (first, next) => {
   requireResult(first && next && first.days.length === next.days.length && first.days.every(day => next.days.includes(day)));
@@ -91,10 +112,7 @@ async function checkDogWalkConversation() {
     ({ matches, toConfirm }) => requireResult(
       matches.length === 1 && matches[0] === "shelter-dog-walker" && toConfirm.length === 0));
   await checkTurn("greeting", "How are you?", conversation, noRoles);
-  await checkTurn("assistant identity", "Are you Gemini?", conversation, (reply) => {
-    noRoles(reply);
-    requireResult(reply.text.toLowerCase().includes("openai"));
-  });
+  await checkTurn("assistant identity", "Are you Gemini?", conversation, expectIdentity);
   await checkTurn("weekday refinement after small talk", "What about weekdays instead?", conversation,
     ({ matches, toConfirm }) => requireResult(
       matches.length === 1 && matches[0] === "neighbourhood-dog-walker" && toConfirm.length === 0));
@@ -152,6 +170,10 @@ async function checkChineseCoaching() {
 
 async function checkLiveResponses() {
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY for the live smoke run.");
+  if (process.argv.includes("--preflight")) {
+    await checkTurn("flagship access and structured response", "Are you Gemini?", [], expectIdentity);
+    return;
+  }
   const failures = [];
   for (const scenario of [checkDogWalkConversation, checkGardenAccess, checkSuppliedCases, checkEnglishCoaching, checkChineseCoaching]) {
     try {

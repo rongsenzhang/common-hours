@@ -147,7 +147,8 @@ test("service failure, client cancellation and timeout cannot be mistaken for mo
     }),
     { kind: "busy" },
   );
-  assert.match(liveFailureMessage("busy", "周末遛狗"), /使用上限/);
+  assert.match(liveFailureMessage("busy", "周末遛狗"), /OpenAI 暂时无法处理/);
+  assert.match(liveFailureMessage("busy", "weekend dog walking"), /OpenAI cannot take this request/);
 });
 
 test("the pre-send disclosure matches the selected mode and labels are escaped", () => {

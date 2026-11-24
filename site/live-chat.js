@@ -93,7 +93,7 @@ export async function requestLiveReply({
   roles,
   signal,
   fetchImpl = fetch,
-  timeoutMs = 35000,
+  timeoutMs = 115_000,
 }) {
   const controller = new AbortController();
   const cancel = () => controller.abort();
@@ -145,8 +145,8 @@ export function liveFailureMessage(kind, message = "") {
       : "Cancelled. You can edit your question and send it again.";
   if (kind === "busy")
     return chinese
-      ? "实时 AI 暂时达到使用上限。请稍后重试，或使用本地搜索。"
-      : "Live AI has reached its usage limit. Try again later or use on-device search.";
+      ? "OpenAI 暂时无法处理这次请求。请稍后重试，或使用本地搜索。"
+      : "OpenAI cannot take this request right now. Try again later or use on-device search.";
   if (kind === "timeout")
     return chinese
       ? "实时 AI 响应超时。请重试或使用本地搜索。"

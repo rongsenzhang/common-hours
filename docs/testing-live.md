@@ -21,6 +21,6 @@
 | 5 | I want to help at the community garden at weekends. I need a step-free route to the beds. | 先点 **Start a new chat**。**Community garden buddy** 应归入 **To confirm**，请主办方确认通往种植床的路线。 |
 | 6 | 我第一次去做志愿者，出发前应该向负责人问些什么？ | 新开对话。检查它能否用中文给出针对第一次参加活动的建议。具体措辞每次可能不同。 |
 
-要演示两种模式的区别，可以在 **On-device search** 中试同样的问候，再切回 **Live AI**。两种模式分别保留本标签页内的对话。刷新页面即可重新开始。公开站点达到用量上限时会提示稍后重试，也可立即切到本地查找岗位。
+要演示两种模式的区别，可以在 **On-device search** 中试同样的问候，再切回 **Live AI**。两种模式分别保留本标签页内的对话。刷新页面即可重新开始。所有访客均可不限次发送。遇到 OpenAI 限流时，可以稍后重试，也可以切到本地查找岗位。
 
 在仓库的 [真实模型测试记录](https://github.com/rongsenzhang/common-hours/actions/workflows/live-smoke.yml) 中可以查看真实模型场景的执行结果。浏览器测试使用固定回复，单独检查桌面和手机界面的发送、取消、错误恢复和岗位卡。

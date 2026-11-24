@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import worker, { ChatQuota, networkPrefix } from "../server/worker.mjs";
+import worker, { ChatQuota } from "../server/worker.mjs";
 
 const ORIGIN = "https://rongsenzhang.github.io";
 function bodyRequest(body, extra = {}, method = "POST", url = "/api/chat") {
@@ -13,35 +13,12 @@ function bodyRequest(body, extra = {}, method = "POST", url = "/api/chat") {
   });
 }
 
-function makeEnv(quotaStatus = 204) {
-  const reservations = [];
-  const stub = {
-    async fetch(url, { body }) {
-      reservations.push(body);
-      return new Response(null, {
-        status: quotaStatus,
-        headers: quotaStatus === 429 ? { "Retry-After": "31" } : {},
-      });
-    },
-  };
-  return {
-    reservations,
-    OPENAI_API_KEY: "unit-only",
-    OWNER_REPO: "rongsenzhang/common-hours",
-    CHAT_QUOTA: {
-      idFromName: (n) => {
-        assert.equal(n, "global-v1");
-        return "one";
-      },
-      get: (id) => {
-        assert.equal(id, "one");
-        return stub;
-      },
-    },
-  };
+function makeEnv() {
+  return { OPENAI_API_KEY: "unit-only", OWNER_REPO: "rongsenzhang/common-hours" };
 }
 
-test("health reports public configuration only and restricted browser preflight", async () => {
+test("health reports public configuration only and restricted browser preflight", async (t) => {
+  const provider = t.mock.method(globalThis, "fetch", () => assert.fail("Unexpected provider request"));
   const env = makeEnv();
   const status = await worker.fetch(
     new Request("https://worker.example/api/status"),
@@ -86,10 +63,11 @@ test("health reports public configuration only and restricted browser preflight"
     ).status,
     403,
   );
-  assert.deepEqual(env.reservations, []);
+  assert.equal(provider.mock.callCount(), 0);
 });
 
-test("schema, content type, declared and streamed bytes checked before reserving any provider budget", async () => {
+test("schema, content type, declared and streamed bytes are checked before calling OpenAI", async (t) => {
+  const provider = t.mock.method(globalThis, "fetch", () => assert.fail("Unexpected provider request"));
   const env = makeEnv();
   for (const [body, status] of [
     ["not-json", 400],
@@ -125,37 +103,12 @@ test("schema, content type, declared and streamed bytes checked before reserving
   assert.equal((await worker.fetch(bodyRequest(stream), env)).status, 413);
   const invalidUtf8 = new Uint8Array([123, 34, 255, 34, 125]);
   assert.equal((await worker.fetch(bodyRequest(invalidUtf8), env)).status, 400);
-  assert.deepEqual(env.reservations, []);
+  assert.equal(provider.mock.callCount(), 0);
 });
 
-test("a reservation sees only the normalized edge network and denial makes no OpenAI request", async (t) => {
-  const env = makeEnv(429),
-    spy = t.mock.method(globalThis, "fetch", async () => {
-      throw Error("unexpected collaborator");
-    });
-  const reply = await worker.fetch(
-    bodyRequest('{"message":"How are you?"}', {
-      "CF-Connecting-IP": "192.0.2.200",
-      "X-Forwarded-For": "203.0.113.1",
-    }),
-    env,
-  );
-  assert.equal(reply.status, 429);
-  assert.equal(reply.headers.get("Retry-After"), "31");
-  assert.deepEqual(env.reservations, ["4:192.0.2"]);
-  assert.equal(spy.mock.calls.length, 0);
-  assert.equal(networkPrefix("::ffff:192.0.2.200"), "4:192.0.2");
-  assert.equal(
-    networkPrefix("2001:db8:a:0:1234::1"),
-    networkPrefix("2001:0db8:000a:0000::2"),
-  );
-  assert.equal(networkPrefix(""), "shared");
-  assert.equal(networkPrefix("not a client address"), "shared");
-});
-
-test("accepted requests invoke the configured provider and expose only normalized fields", async (t) => {
+test("accepted requests invoke the configured provider for every turn even beyond the former limits", async (t) => {
   const env = makeEnv();
-  t.mock.method(globalThis, "fetch", async (url, options) => {
+  const provider = t.mock.method(globalThis, "fetch", async (url, options) => {
     assert.equal(url, "https://api.openai.com/v1/responses");
     assert.equal(options.headers.Authorization, "Bearer unit-only");
     const plan = {
@@ -175,7 +128,7 @@ test("accepted requests invoke the configured provider and expose only normalize
     };
     return Response.json({
       status: "completed",
-      model: "gpt-5.4-mini-2026-03-17",
+      model: JSON.parse(options.body).model,
       output: [
         {
           type: "message",
@@ -185,104 +138,58 @@ test("accepted requests invoke the configured provider and expose only normalize
       ],
     });
   });
-  const r = await worker.fetch(
-    bodyRequest('{"message":"Are you Gemini?"}'),
-    env,
-  );
-  assert.equal(r.status, 200);
-  assert.equal(r.headers.get("Access-Control-Allow-Origin"), ORIGIN);
-  const result = await r.json();
+  let reply;
+  for (let i = 0; i < 251; i++) {
+    reply = await worker.fetch(
+      bodyRequest('{"message":"Are you Gemini?"}', { "CF-Connecting-IP": "192.0.2.1" }),
+      env,
+    );
+    assert.equal(reply.status, 200);
+  }
+  assert.equal(provider.mock.callCount(), 251);
+  assert.equal(reply.headers.get("Access-Control-Allow-Origin"), ORIGIN);
+  const result = await reply.json();
   assert.equal(result.provider, "openai");
   assert.match(result.text, /OpenAI/);
   assert.deepEqual(result.matches, []);
   assert(!JSON.stringify(result).includes("unit-only"));
 });
 
-function createObject(t) {
-  const db = new DatabaseSync(":memory:");
-  t.after(() => db.close());
-  let queue = Promise.resolve(),
-    alarm = null;
-  const ctx = {
-    blockConcurrencyWhile(fn) {
-      const next = queue.then(fn);
-      queue = next.catch(() => {});
-      return next;
-    },
-    storage: {
-      sql: {
-        exec(statement, ...bindings) {
-          const stmt = db.prepare(statement);
-          const values = stmt.columns().length
-            ? stmt.all(...bindings)
-            : (stmt.run(...bindings), []);
-          return {
-            toArray: () => values,
-            one: () => {
-              assert.equal(values.length, 1);
-              return values[0];
-            },
-          };
-        },
-      },
-      transactionSync(fn) {
-        db.exec("BEGIN");
-        try {
-          const v = fn();
-          db.exec("COMMIT");
-          return v;
-        } catch (err) {
-          db.exec("ROLLBACK");
-          throw err;
-        }
-      },
-      getAlarm: async () => alarm,
-      setAlarm: async (when) => {
-        alarm = when;
-      },
-    },
-  };
-  return { quota: new ChatQuota(ctx), db, ctx };
-}
-
-test("atomic rolling network limit also holds across UTC midnight, with salts and idle clean-up", async (t) => {
-  let now = Date.UTC(2026, 10, 20, 23, 59, 45);
-  t.mock.method(Date, "now", () => now);
-  const { quota, db, ctx } = createObject(t);
-  const first = await Promise.all(
-    Array.from({ length: 16 }, () => quota.reserve("4:192.0.2")),
-  );
-  assert.equal(first.filter((v) => v === 0).length, 8);
-  assert(first.filter(Boolean).every((wait) => wait === 60));
-  now += 20_000;
-  assert.equal(await quota.reserve("4:192.0.2"), 40);
-  assert.equal(await quota.reserve("4:198.51.100"), 0);
-  now += 41_000;
-  assert.equal(await quota.reserve("4:192.0.2"), 0);
-  assert(
-    db
-      .prepare("SELECT bucket FROM events")
-      .all()
-      .every((r) => /^[0-9a-f]{64}$/.test(r.bucket)),
-  );
-  const before = db.prepare("SELECT COUNT(*) AS n FROM events").get().n;
-  assert.equal(before, 2);
-  assert(await ctx.storage.getAlarm());
-  now += 61_000;
-  await quota.alarm();
-  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM events").get().n, 0);
+test("a provider rate limit remains distinguishable from an application limit", async (t) => {
+  t.mock.method(globalThis, "fetch", () => new Response(null, { status: 429 }));
+  const reply = await worker.fetch(bodyRequest('{"message":"Hello"}'), makeEnv());
+  assert.equal(reply.status, 429);
+  assert.deepEqual(await reply.json(), { error: "provider_busy" });
 });
 
-test("global daily cap is atomic across distinct network groups", async (t) => {
-  let now = Date.UTC(2026, 10, 20, 12);
+test("the retired quota object accepts legacy calls and finishes pending expiry alarms", async (t) => {
+  const db = new DatabaseSync(":memory:");
+  t.after(() => db.close());
+  db.exec("CREATE TABLE events (stamp INTEGER, bucket TEXT); CREATE TABLE days (day INTEGER, used INTEGER, salt BLOB)");
+  const now = Date.UTC(2026, 10, 24, 12);
+  const minute = 60_000;
+  const day = Math.floor(now / 86_400_000);
   t.mock.method(Date, "now", () => now);
-  const { quota, db } = createObject(t);
-  const waits = await Promise.all(
-    Array.from({ length: 260 }, (_, i) => quota.reserve("6:2001:db8:" + i)),
-  );
-  assert.equal(waits.filter((v) => v === 0).length, 250);
-  assert.equal(Math.max(...waits), 12 * 60 * 60);
-  assert.equal(db.prepare("SELECT SUM(used) as n FROM days").get().n, 250);
-  now += 12 * 60 * 60 * 1000;
-  assert.equal(await quota.reserve("6:2001:db8:251"), 0);
+  db.prepare("INSERT INTO events VALUES (?, 'expired'), (?, 'recent')").run(now - minute, now);
+  db.prepare("INSERT INTO days VALUES (?, 250, x'01'), (?, 10, x'02')").run(day - 1, day);
+  let nextAlarm;
+  const quota = new ChatQuota({
+    storage: {
+      sql: {
+        exec(statement, ...args) {
+          const query = db.prepare(statement);
+          if (query.columns().length) return { one: () => query.get(...args) };
+          query.run(...args);
+        },
+      },
+      async setAlarm(when) { nextAlarm = when; },
+    },
+  });
+  const reply = await quota.fetch(new Request("https://internal/reserve", { method: "POST" }));
+  assert.equal(reply.status, 204);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM events").get().n, 2);
+  await quota.alarm();
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM events").get().n, 1);
+  assert.equal(db.prepare("SELECT COUNT(*) AS n FROM days").get().n, 1);
+  assert.equal(nextAlarm, now + minute + 1);
 });
