@@ -139,7 +139,7 @@ class ChatDeploymentTests(unittest.TestCase):
         self.assertEqual(good.call_args.kwargs["data"]["message"], "Are you Gemini?")
         snapshot = {**reply, "model": deploy.MODEL + "-2026-11-17"}
         self.assertEqual(deploy.verify_worker(BASE, responses(snapshot)), BASE + "/api/chat")
-        for other_model in ("gpt-6.2-sol", deploy.MODEL + "-mini", None):
+        for other_model in ("gpt-6.2-astra", deploy.MODEL + "-mini", None):
             with self.subTest(model=other_model), self.assertRaisesRegex(deploy.DeploymentError, "smoke failed"):
                 deploy.verify_worker(BASE, responses({**reply, "model": other_model}))
         with self.assertRaisesRegex(deploy.DeploymentError, "smoke failed"):

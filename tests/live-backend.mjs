@@ -167,7 +167,7 @@ test("accepts a dated snapshot of the requested model and rejects a different mo
   const reply = await identityFrom(actualSnapshot);
   assert.equal(reply.model, actualSnapshot);
   assert.ok(reply.text.includes(actualSnapshot));
-  await assert.rejects(identityFrom("gpt-6.2-sol"), {code: "invalid_reply"});
+  await assert.rejects(identityFrom("gpt-6.2-astra"), {code: "invalid_reply"});
 });
 
 test("a known activity with unconfirmed access stays visible without promising the route", async () => {

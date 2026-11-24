@@ -7,7 +7,7 @@ import { exerciseProfile, EXERCISE_CASE_TEXT } from "../site/exercise-engine.js"
 import { matchOpportunities } from "../site/engine.js";
 import { answerVolunteerQuestion } from "../site/assistant.js";
 
-export const DEFAULT_MODEL = "gpt-6.2-astra";
+export const DEFAULT_MODEL = "gpt-6.2-sol";
 const API_URL = "https://api.openai.com/v1/responses";
 const INTENTS = [
   "social",

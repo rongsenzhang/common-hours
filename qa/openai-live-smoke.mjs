@@ -189,7 +189,7 @@ async function checkChineseCoaching() {
 async function checkLiveResponses() {
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY for the live smoke run.");
   if (process.argv.includes("--preflight")) {
-    await checkTurn("flagship access and structured response", "Are you Gemini?", [], expectIdentity);
+    await checkTurn("configured model access and structured response", "Are you Gemini?", [], expectIdentity);
     return;
   }
   const failures = [];

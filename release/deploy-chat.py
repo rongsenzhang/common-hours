@@ -16,7 +16,7 @@ API = "https://api.cloudflare.com/client/v4"
 REPOSITORY = "rongsenzhang/common-hours"
 ORIGIN = "https://rongsenzhang.github.io"
 WORKER = "common-hours-volunteer-chat"
-MODEL = "gpt-6.2-astra"
+MODEL = "gpt-6.2-sol"
 WRANGLER_VERSION = "4.165.0"
 
 
