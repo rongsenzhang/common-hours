@@ -144,26 +144,32 @@ function odiFields() {
 function layout() {
   return `<div class="ex-page">
     <header class="ex-header"><h1>Matching exercise</h1>
-      <p>Try both volunteer cases against the seven fictional roles supplied in the recruitment task. Change a condition to see which roles the same rules recommend.</p>
+      <p>Compare volunteer conditions with the seven fictional roles supplied in the recruitment task.</p>
     </header>
     <div class="ex-cases" role="group" aria-label="Load a case">
-      <button type="button" data-ex-case="A"><strong>Case A</strong><span>Online or in person</span></button>
-      <button type="button" data-ex-case="B"><strong>Case B</strong><span>In person only</span></button>
+      <button type="button" data-ex-case="A" aria-pressed="false"><strong>Case A</strong><span>Online or in person</span></button>
+      <button type="button" data-ex-case="B" aria-pressed="false"><strong>Case B</strong><span>In person only</span></button>
     </div>
     <p class="ex-case-note">Both cases start with weekday evenings, a three-mile travel limit and unverified clearance. One-to-one work and using digital skills are preferences. <a href="#ask-exercise">Try these cases in the role finder</a>.</p>
     <div class="ex-workspace">
       ${controls()}
-      <section class="ex-results" aria-labelledby="ex-shortlist-title">
+      <section class="ex-results" aria-label="Match results and venue scenario">
+        <div class="ex-empty" id="ex-welcome">
+          <h2>Welcome to the matching exercise</h2>
+          <p>Choose Case A or Case B to see its shortlist. You can also start by changing a volunteer condition or the venue distance. The controls start with the values for Case A.</p>
+        </div>
         ${venueScenario()}
-        <div class="ex-result-head"><h2 id="ex-shortlist-title">Shortlist</h2><span class="ex-current" id="ex-current"></span></div>
-        <div id="ex-recommendations"></div>
-        <div id="ex-breakdown">
-          ${disclosure("pending", "Needs confirmation", true)}
-          ${disclosure("other", "Other feasible roles")}
-          ${disclosure("excluded", "Ruled out")}
-          <details class="ex-disclosure"><summary><span>Compare with a simple filter</span>${icon("down", 17)}</summary>
-            <div class="ex-detail-body"><p>Both methods apply the same requirements. The filter takes the first three feasible records in the supplied order. The shortlist also uses the volunteer’s interests.</p><div id="ex-baseline" class="ex-comparison"></div></div>
-          </details>
+        <div id="ex-output" hidden>
+          <div class="ex-result-head"><h2 id="ex-shortlist-title">Shortlist</h2><span class="ex-current" id="ex-current"></span></div>
+          <div id="ex-recommendations"></div>
+          <div id="ex-breakdown">
+            ${disclosure("pending", "Needs confirmation", true)}
+            ${disclosure("other", "Other feasible roles")}
+            ${disclosure("excluded", "Ruled out")}
+            <details class="ex-disclosure"><summary><span>Compare with a simple filter</span>${icon("down", 17)}</summary>
+              <div class="ex-detail-body"><p>Both methods apply the same requirements. The filter takes the first three feasible records in the supplied order. The shortlist also uses the volunteer’s interests.</p><div id="ex-baseline" class="ex-comparison"></div></div>
+            </details>
+          </div>
         </div>
       </section>
     </div>
@@ -227,6 +233,8 @@ export function mountExercise(main) {
   if (window.matchMedia("(max-width: 740px)").matches) find("controls").open = false;
 
   function update() {
+    find("welcome").hidden = true;
+    find("output").hidden = false;
     const profile = readProfile(form);
     const radius = form.elements.maxMiles;
     radius.disabled = profile.mode === "online";
@@ -285,7 +293,6 @@ export function mountExercise(main) {
   form.addEventListener("input", handleNumber);
   form.addEventListener("submit", preventSubmit);
   putProfile(form, exerciseProfile("A"));
-  update();
   return () => {
     cases.removeEventListener("click", loadCase);
     venue.removeEventListener("change", update);

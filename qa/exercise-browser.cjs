@@ -98,7 +98,17 @@ async function verifyCommunityCases(page) {
   await page.getByRole("heading", {name:"Case A community shortlist"}).waitFor();
   await page.getByRole("link", {name:"Compare the seven interview roles"}).click();
   await page.getByRole("heading", {name:"Matching exercise", exact:true}).waitFor();
+  await verifyWelcome(page);
+  await page.getByRole("button", {name:/Case A/}).click();
   assert.deepEqual(await page.locator("#ex-recommendations h3").allTextContents(), ["Digital access buddy", "Digital skills facilitator"]);
+}
+
+async function verifyWelcome(page) {
+  await page.locator("#ex-welcome").waitFor();
+  assert.equal(await page.locator("#ex-output").isHidden(), true);
+  assert.equal(await page.locator("#ex-recommendations h3").count(), 0);
+  assert.equal(await page.locator("[data-ex-case][aria-pressed=true]").count(), 0);
+  assert.equal(await page.locator("#ex-venue-outcome").textContent(), "");
 }
 
 async function verify(browser, width) {
@@ -112,6 +122,9 @@ async function verify(browser, width) {
     await page.getByRole("heading", { level: 1, name: "Matching exercise" }).waitFor();
     const shortlist = page.locator("#ex-recommendations h3");
     const expectedA = ["Digital access buddy", "Digital skills facilitator"];
+    await verifyWelcome(page);
+    await page.getByRole("button", { name: /Case A/ }).click();
+    assert.equal(await page.locator("#ex-welcome").isHidden(), true);
     assert.deepEqual(await shortlist.allTextContents(), expectedA);
     assert.equal(await page.locator("nav [aria-current=page]").innerText(), "Matching exercise");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
@@ -152,7 +165,17 @@ async function verify(browser, width) {
     await page.getByRole("heading", { name: "Explore opportunities" }).waitFor();
     await page.goBack();
     await page.getByRole("heading", { name: "Matching exercise", exact: true }).waitFor();
-    assert.deepEqual(await shortlist.allTextContents(), expectedA);
+    await verifyWelcome(page);
+    if (!(await radius.isVisible())) await page.locator("#ex-controls summary").click();
+    await radius.fill("");
+    assert.equal(await radius.getAttribute("aria-invalid"), "true");
+    assert.equal(await shortlist.count(), 0);
+    await page.locator("[name=mode]").selectOption("online");
+    assert.deepEqual(await shortlist.allTextContents(), ["Digital access buddy"]);
+    await page.reload();
+    await verifyWelcome(page);
+    await page.locator('#ex-venue-scenario input[value="2"]').check();
+    assert.deepEqual(await shortlist.allTextContents(), [expectedA[0], "Form-filling volunteer", expectedA[1]]);
     await verifyCommunityCases(page);
     assert.deepEqual(errors, []);
     console.log(width + "px passed: original cases, all three venue settings, immutable records, wording checks, ODI mapping, seven-role isolation, full-text Discover cases, profile changes and community role details.");
