@@ -105,6 +105,8 @@ async function verifyCommunityCases(page) {
 
 async function verifyWelcome(page) {
   await page.locator("#ex-welcome").waitFor();
+  for (const id of ["#ex-controls", "#ex-venue-scenario"]) assert.equal(await page.locator(id).isHidden(), true);
+  assert.equal(await page.locator("#exercise-form input:checked").count(), 0);
   assert.equal(await page.locator("#ex-output").isHidden(), true);
   assert.equal(await page.locator("#ex-recommendations h3").count(), 0);
   assert.equal(await page.locator("[data-ex-case][aria-pressed=true]").count(), 0);
@@ -166,6 +168,8 @@ async function verify(browser, width) {
     await page.goBack();
     await page.getByRole("heading", { name: "Matching exercise", exact: true }).waitFor();
     await verifyWelcome(page);
+    await page.getByRole("button", { name: /Case B/ }).click();
+    assert.deepEqual(await shortlist.allTextContents(), ["Digital skills facilitator"]);
     if (!(await radius.isVisible())) await page.locator("#ex-controls summary").click();
     await radius.fill("");
     assert.equal(await radius.getAttribute("aria-invalid"), "true");
@@ -174,6 +178,7 @@ async function verify(browser, width) {
     assert.deepEqual(await shortlist.allTextContents(), ["Digital access buddy"]);
     await page.reload();
     await verifyWelcome(page);
+    await page.getByRole("button", { name: /Case A/ }).click();
     await page.locator('#ex-venue-scenario input[value="2"]').check();
     assert.deepEqual(await shortlist.allTextContents(), [expectedA[0], "Form-filling volunteer", expectedA[1]]);
     await verifyCommunityCases(page);

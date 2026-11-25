@@ -146,20 +146,20 @@ function layout() {
     <header class="ex-header"><h1>Matching exercise</h1>
       <p>Compare volunteer conditions with the seven fictional roles supplied in the recruitment task.</p>
     </header>
+    <div class="ex-empty" id="ex-welcome">
+      <h2>Welcome to the matching exercise</h2>
+      <p>Choose a case to see its shortlist. Then change a condition or try a different venue distance to see how the recommendations respond.</p>
+    </div>
     <div class="ex-cases" role="group" aria-label="Load a case">
       <button type="button" data-ex-case="A" aria-pressed="false"><strong>Case A</strong><span>Online or in person</span></button>
       <button type="button" data-ex-case="B" aria-pressed="false"><strong>Case B</strong><span>In person only</span></button>
     </div>
     <p class="ex-case-note">Both cases start with weekday evenings, a three-mile travel limit and unverified clearance. One-to-one work and using digital skills are preferences. <a href="#ask-exercise">Try these cases in the role finder</a>.</p>
-    <div class="ex-workspace">
+    <div class="ex-workspace" id="ex-workspace" hidden>
       ${controls()}
       <section class="ex-results" aria-label="Match results and venue scenario">
-        <div class="ex-empty" id="ex-welcome">
-          <h2>Welcome to the matching exercise</h2>
-          <p>Choose Case A or Case B to see its shortlist. You can also start by changing a volunteer condition or the venue distance. The controls start with the values for Case A.</p>
-        </div>
         ${venueScenario()}
-        <div id="ex-output" hidden>
+        <div id="ex-output">
           <div class="ex-result-head"><h2 id="ex-shortlist-title">Shortlist</h2><span class="ex-current" id="ex-current"></span></div>
           <div id="ex-recommendations"></div>
           <div id="ex-breakdown">
@@ -233,8 +233,7 @@ export function mountExercise(main) {
   if (window.matchMedia("(max-width: 740px)").matches) find("controls").open = false;
 
   function update() {
-    find("welcome").hidden = true;
-    find("output").hidden = false;
+    if (find("workspace").hidden) return;
     const profile = readProfile(form);
     const radius = form.elements.maxMiles;
     radius.disabled = profile.mode === "online";
@@ -275,6 +274,8 @@ export function mountExercise(main) {
     if (!button) return;
     putProfile(form, exerciseProfile(button.dataset.exCase));
     venue.querySelector('input[value="unknown"]').checked = true;
+    find("welcome").hidden = true;
+    find("workspace").hidden = false;
     update();
   }
 
@@ -292,7 +293,6 @@ export function mountExercise(main) {
   form.addEventListener("change", update);
   form.addEventListener("input", handleNumber);
   form.addEventListener("submit", preventSubmit);
-  putProfile(form, exerciseProfile("A"));
   return () => {
     cases.removeEventListener("click", loadCase);
     venue.removeEventListener("change", update);

@@ -4,7 +4,7 @@
 
 ## Run the two supplied cases
 
-The page opens with a welcome message. The controls show Case A’s starting conditions. Select either case or edit a condition to run the first match.
+The page opens with a welcome message and a choice of two cases. Select a case to load its volunteer conditions and run the first match. You can then edit the conditions or the venue distance to see how the shortlist changes.
 
 1. Select **Case A**. With weekday evenings, online or in-person participation, a three-mile travel limit and unverified clearance, the shortlist is **Digital access buddy**, then **Digital skills facilitator**.
 2. Select **Case B**. The only change is in-person participation. **Digital skills facilitator** is the sole recommendation. In both cases, the form-filling role needs a venue distance and the youth reading role needs a clearance check.
