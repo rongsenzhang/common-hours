@@ -135,7 +135,8 @@ export function renderChat(
   const input = `<textarea id="chat-input" name="message" rows="${interview ? 3 : 1}" maxlength="1200" required placeholder="${placeholder}" autocomplete="off" aria-describedby="chat-disclosure" ${pending ? "disabled" : ""}>${e(draft)}</textarea>`;
   return `<section class="chat-page"><header class="chat-header">
     <div class="chat-mark">${icon("chat", 26)}</div><h1>${interview ? "Seven-role exercise chat" : "Ask the role finder"}</h1>
-    <p>${interview ? 'Try the two cases with the <a href="#exercise-records">seven roles supplied in the recruitment task</a>. You can change one condition in a follow-up.' : `Case A, Case B and your own questions search all ${roles.length} fictional roles, including the <a href="#exercise-records">seven roles supplied in the recruitment task</a>.`}</p></header>
+    <p>${interview ? 'Try the two cases with the <a href="#exercise-records">seven roles supplied in the recruitment task</a>. You can change one condition in a follow-up.' : `Case A, Case B and your own questions search all ${roles.length} fictional roles, including the <a href="#exercise-records">seven roles supplied in the recruitment task</a>.`}</p>
+    <a class="chat-switch" href="${interview ? "#ask" : "#ask-exercise"}">${interview ? "Back to the full catalogue chat" : "Open the seven-role exercise chat"} ${icon("next", 16)}</a></header>
     ${selector}
     <p class="chat-disclosure" id="chat-disclosure">${e(disclosure)}</p>
     ${turns.length || pending ? '<div class="chat-tools"><button class="text-btn" data-restart-chat>Start a new chat</button></div>' : '<div class="chat-starters" aria-label="Example questions">' + prompts + "</div>"}

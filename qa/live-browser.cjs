@@ -160,10 +160,17 @@ async function verifyInterviewChat(page, postBodies, replies) {
             },
           });
         });
-        await page.goto(base.href + "#ask");
+        await page.goto(base.href);
+        await page.getByRole("navigation").getByRole("link", { name: "Ask the role finder" }).click();
+        await page.getByRole("link", { name: "Open the seven-role exercise chat" }).click();
+        await page.getByRole("heading", { name: "Seven-role exercise chat" }).waitFor();
+        await page.getByRole("button", { name: "Run Case A" }).click();
+        await checkCaseAnswer(page, ["Digital access buddy", "Digital skills facilitator"]);
+        await page.getByRole("link", { name: "Back to the full catalogue chat" }).click();
         await page
           .getByRole("heading", { name: "Ask the role finder" })
           .waitFor();
+        assert.equal(await page.locator(".chat-turn").count(), 0);
         assert.equal(messages.length, 0);
         assert.ok(
           await page

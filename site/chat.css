@@ -1,7 +1,8 @@
 .top nav {
   margin-left: auto;
 }
-.hero-assistant {
+.hero-assistant,
+.chat-switch {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
